@@ -7,8 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 class HelloworldwebApplicationTests {
 
 
-	//asdasdsad
-	//testtesttest
 	@Test
 	void contextLoads() {
 	}
