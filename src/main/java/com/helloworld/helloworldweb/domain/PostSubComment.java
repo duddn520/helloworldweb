@@ -1,5 +1,6 @@
 package com.helloworld.helloworldweb.domain;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,5 +21,16 @@ public class PostSubComment {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    private String content;
+
+    @Builder
+    public PostSubComment(Long id, PostComment postComment, User user, String content)
+    {
+        this.id = id;
+        this.postComment = postComment;
+        this.user = user;
+        this.content = content;
+    }
 
 }
