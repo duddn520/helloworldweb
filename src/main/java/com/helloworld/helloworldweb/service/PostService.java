@@ -24,9 +24,9 @@ public class PostService {
 
 
     @Transactional
-    public Post findPost(PostRequestDto requestDto) {
-
-        Post findPost = postRepository.findById(requestDto.getPost_id()).orElseThrow(NoSuchElementException::new);
+    public Post findPost(Long postId) {
+        //일반적으로 요청할수 있도록 requestDto 로 요청하는것이 아닌 postId로 요청할수 있도록 변경.
+        Post findPost = postRepository.findById(postId).orElseThrow(NoSuchElementException::new);
 
         return findPost;
     }
