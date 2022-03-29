@@ -1,13 +1,12 @@
 package com.helloworld.helloworldweb.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
-@NoArgsConstructor
 @Getter
+@NoArgsConstructor
 public class GuestBookComment {
 
     @Id @GeneratedValue
@@ -20,5 +19,21 @@ public class GuestBookComment {
     @ManyToOne
     @JoinColumn(name = "guest_book_id")
     private GuestBook guestBook;
+
+    private String title;
+    private String content;
+
+    @Builder
+    public GuestBookComment(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
+    public GuestBookComment changeGuestBook(GuestBook guestBook){
+        this.guestBook = guestBook;
+        guestBook.getGuestBookComments().add(this);
+        return this;
+    }
+
 
 }
