@@ -7,6 +7,7 @@ import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
 import com.helloworld.helloworldweb.model.HttpStatusCode;
 import com.helloworld.helloworldweb.service.PostService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,50 +18,58 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
+@RequiredArgsConstructor
 public class PostController {
 
     private final PostService postService;
 
-    @Autowired
-    public PostController(PostService postService) {
-        this.postService = postService;
-    }
+    @PostMapping("/api/post")
+    public ResponseEntity<ApiResponse> registerPost(@RequestBody PostRequestDto requestDto) {
 
-    @PostMapping("api/post")
-    @ResponseBody
-    public ResponseEntity<ApiResponse> registerPost(@RequestHeader("user_id") Long user_id, @RequestBody PostRequestDto requestDto) {
-
-        Post post = postService.registerPost(requestDto, user_id);
-        PostResponseDto responseDto = new PostResponseDto(post);
+        Post post = postService.registerPost(requestDto);
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.OK,
                 HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
     }
 
-    @GetMapping("api/post")
-    @ResponseBody
-    public ResponseEntity<ApiResponse> listPost(@RequestHeader("user_id") Long user_id) {
+    @GetMapping("/api/post/blog")
+    public ResponseEntity<ApiResponse<List<PostResponseDto>>> listUserBlog(@RequestBody PostRequestDto requestDto) {
 
-        List<Post> posts = postService.listPost(user_id);
-        List<PostResponseDto> responses = posts.stream()
+        List<Post> blogs = postService.listUserBlog(requestDto);
+        List<PostResponseDto> responses = blogs.stream()
                                             .map(PostResponseDto::new)
                                             .collect(Collectors.toList());
 
-        return new ResponseEntity<>(ApiResponse.response(
+        return new ResponseEntity (ApiResponse.response(
                 HttpStatusCode.OK,
                 HttpResponseMsg.GET_SUCCESS,
                 responses), HttpStatus.OK);
     }
 
-    @DeleteMapping("api/post")
-    @ResponseBody
-    public ResponseEntity<ApiResponse> deletePost(@RequestHeader("user_id") Long user_id, @RequestParam("post_id") Long id) {
+    @GetMapping("/api/post/qna")
+    public ResponseEntity<ApiResponse<List<PostResponseDto>>> listAllQna() {
 
-        postService.deletePost(user_id, id);
+        List<Post> qnas = postService.listAllQna();
+        List<PostResponseDto> responses = qnas.stream()
+                                            .map(PostResponseDto::new)
+                                            .collect(Collectors.toList());
+
+        return new ResponseEntity (ApiResponse.response(
+                HttpStatusCode.OK,
+                HttpResponseMsg.GET_SUCCESS,
+                responses), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/api/post")
+    public ResponseEntity<ApiResponse> deletePost(@RequestBody PostRequestDto requestDto) {
+
+        Post findPost = postService.findPost(requestDto);
+        postService.deletePost(findPost);
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.OK,
                 HttpResponseMsg.DELETE_SUCCESS), HttpStatus.OK);
     }
+
 }
