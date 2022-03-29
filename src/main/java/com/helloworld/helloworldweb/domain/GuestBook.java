@@ -1,15 +1,15 @@
 package com.helloworld.helloworldweb.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@NoArgsConstructor
 @Getter
+@NoArgsConstructor
 public class GuestBook {
 
     @Id @GeneratedValue
@@ -19,7 +19,17 @@ public class GuestBook {
     @JoinColumn(name = "user_id")
     private User user;
 
+
     @OneToMany(mappedBy = "guestBook")
-    private List<GuestBookComment> guestBookComments = new ArrayList<>();
+    private List<GuestBookComment> guestBookComments = new ArrayList<GuestBookComment>();
+
+    @Builder
+    public GuestBook(User user) {
+        this.user = user;
+    }
+
+    public void changeUser(User user){
+        this.user = user;
+    }
 
 }
