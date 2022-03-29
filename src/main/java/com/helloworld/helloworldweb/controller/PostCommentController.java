@@ -1,16 +1,20 @@
 package com.helloworld.helloworldweb.controller;
 
+import com.helloworld.helloworldweb.domain.Post;
 import com.helloworld.helloworldweb.domain.PostComment;
+import com.helloworld.helloworldweb.domain.PostSubComment;
 import com.helloworld.helloworldweb.dto.PostComment.PostCommentRequestDto;
 import com.helloworld.helloworldweb.dto.PostComment.PostCommentResponseDto;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
 import com.helloworld.helloworldweb.model.HttpStatusCode;
 import com.helloworld.helloworldweb.service.PostCommentService;
+import com.helloworld.helloworldweb.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -18,19 +22,28 @@ import org.springframework.web.bind.annotation.*;
 public class PostCommentController {
 
     private final PostCommentService postCommentService;
+    private final PostService postService;
 
     //PostComment CRUD
 
-//    @PostMapping("/api/postcomment")
-//    public ResponseEntity<ApiResponse<PostCommentResponseDto>> registerPostComment(@RequestBody PostCommentRequestDto postCommentRequestDto)
-//    {
-//        //TODO 지훈이 POST부분 완성 후 포스트 아이디 받고 포스트 찾아서 포스트코멘트 객체 주입, 서브코멘트도 생성해서 서브코멘트 1 에 박기.
-//
-//        return new ResponseEntity<>(ApiResponse.response(
-//                HttpStatusCode.OK,
-//                HttpResponseMsg.GET_SUCCESS,
-//                responseDto), HttpStatus.OK);
-//    }
+    @Transactional
+    @PostMapping("/api/postcomment")
+    public ResponseEntity<ApiResponse<PostCommentResponseDto>> registerPostComment(@RequestBody PostCommentRequestDto postCommentRequestDto)
+    {
+        Post post = postService.findPost(postCommentRequestDto.getPostId());
+        PostComment postComment = PostComment.builder()
+                .build();
+        PostSubComment postSubComment = PostSubComment.builder()
+                .content(postCommentRequestDto.getContent())
+                .build();
+
+        PostCommentResponseDto responseDto = new PostCommentResponseDto(postCommentService.registerPostComment(postComment,post,postSubComment));
+
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.OK,
+                HttpResponseMsg.GET_SUCCESS,
+                responseDto), HttpStatus.OK);
+    }
 
     @GetMapping("/api/postcomment")
     public ResponseEntity<ApiResponse<PostCommentResponseDto>> getPostComment(@RequestParam(name = "id")Long id)
