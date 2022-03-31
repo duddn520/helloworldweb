@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -25,5 +26,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Transactional
+    public User findUserById(Long userId) {
+
+        User findUser = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("로그인상태가 아닙니다."));
+
+        return findUser;
+    }
 
 }

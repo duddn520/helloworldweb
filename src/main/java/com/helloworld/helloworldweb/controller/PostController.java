@@ -1,12 +1,14 @@
 package com.helloworld.helloworldweb.controller;
 
 import com.helloworld.helloworldweb.domain.Post;
+import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.dto.Post.PostRequestDto;
 import com.helloworld.helloworldweb.dto.Post.PostResponseDto;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
 import com.helloworld.helloworldweb.model.HttpStatusCode;
 import com.helloworld.helloworldweb.service.PostService;
+import com.helloworld.helloworldweb.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,11 +24,13 @@ import java.util.stream.Collectors;
 public class PostController {
 
     private final PostService postService;
+    private final UserService userService;
 
     @PostMapping("/api/post")
     public ResponseEntity<ApiResponse> registerPost(@RequestBody PostRequestDto requestDto) {
 
-        Post post = postService.registerPost(requestDto);
+        User findUser = userService.findUserById(requestDto.getUser_id());
+        Post post = postService.registerPost(requestDto, findUser);
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.OK,
@@ -36,7 +40,7 @@ public class PostController {
     @GetMapping("/api/post/blog")
     public ResponseEntity<ApiResponse<List<PostResponseDto>>> listUserBlog(@RequestBody PostRequestDto requestDto) {
 
-        List<Post> blogs = postService.listUserBlog(requestDto);
+        List<Post> blogs = postService.listUserBlog(requestDto.getUser_id());
         List<PostResponseDto> responses = blogs.stream()
                                             .map(PostResponseDto::new)
                                             .collect(Collectors.toList());
@@ -64,7 +68,7 @@ public class PostController {
     @DeleteMapping("/api/post")
     public ResponseEntity<ApiResponse> deletePost(@RequestBody PostRequestDto requestDto) {
 
-        Post findPost = postService.findPost(requestDto);
+        Post findPost = postService.findPost(requestDto.getPost_id());
         postService.deletePost(findPost);
 
         return new ResponseEntity<>(ApiResponse.response(
