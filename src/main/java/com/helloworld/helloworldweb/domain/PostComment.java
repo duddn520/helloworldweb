@@ -25,10 +25,16 @@ public class PostComment {
     private List<PostSubComment> postSubComments = new ArrayList<>();
 
     @Builder
-    public PostComment(Long id, Post post, List<PostSubComment> postSubComments )
+    public PostComment(Long id, Post post )
     {
         this.id = id;
         this.post = post;
-        this.postSubComments = postSubComments;
+        this.postSubComments = new ArrayList<>();
+    }
+
+    public void updatePost(Post post)
+    {
+        post.getPostComments().add(this);
+        this.post = post;
     }
 }

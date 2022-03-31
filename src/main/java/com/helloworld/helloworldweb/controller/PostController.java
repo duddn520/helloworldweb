@@ -63,8 +63,8 @@ public class PostController {
 
     @DeleteMapping("/api/post")
     public ResponseEntity<ApiResponse> deletePost(@RequestBody PostRequestDto requestDto) {
-
-        Post findPost = postService.findPost(requestDto);
+        Long postid = requestDto.getPost_id();
+        Post findPost = postService.findPost(postid);
         postService.deletePost(findPost);
 
         return new ResponseEntity<>(ApiResponse.response(
