@@ -69,6 +69,7 @@ public class PostController {
     public ResponseEntity<ApiResponse> deletePost(@RequestBody PostRequestDto requestDto) {
 
         Post findPost = postService.findPost(requestDto.getPost_id());
+
         postService.deletePost(findPost);
 
         return new ResponseEntity<>(ApiResponse.response(
