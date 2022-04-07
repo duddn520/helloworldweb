@@ -39,4 +39,11 @@ public class PostSubComment {
         postComment.getPostSubComments().add(this);
     }
 
+    public PostSubComment updatePostSubComment(PostSubComment postSubComment)
+    {
+        this.content = postSubComment.getContent();
+
+        return this;
+    }
+
 }

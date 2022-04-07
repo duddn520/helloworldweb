@@ -41,7 +41,7 @@ public class PostCommentController {
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.OK,
-                HttpResponseMsg.GET_SUCCESS,
+                HttpResponseMsg.POST_SUCCESS,
                 responseDto), HttpStatus.OK);
     }
 

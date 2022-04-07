@@ -3,6 +3,7 @@ package com.helloworld.helloworldweb.model;
 public class HttpResponseMsg {
     public static final String GET_SUCCESS = "조회성공";
     public static final String POST_SUCCESS = "리소스 저장 성공";
+    public static final String PUT_SUCCESS = "리소스 수정 성공";
 
     public static final String NO_CONTENT = "데이터가 존재하지 않습니다.";
     public static final String LOGIN_SUCCESS = "로그인 성공";
