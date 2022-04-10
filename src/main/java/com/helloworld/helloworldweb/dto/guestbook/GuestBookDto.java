@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class GuestBookDto {
+    private Long id;
     private String title;
     private String content;
 
@@ -19,6 +20,7 @@ public class GuestBookDto {
     }
 
     public GuestBookDto(GuestBookComment guestBookComment) {
+        this.id = guestBookComment.getId();
         this.title = guestBookComment.getTitle();
         this.content = guestBookComment.getContent();
     }
