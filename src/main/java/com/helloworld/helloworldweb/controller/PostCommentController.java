@@ -3,6 +3,7 @@ package com.helloworld.helloworldweb.controller;
 import com.helloworld.helloworldweb.domain.Post;
 import com.helloworld.helloworldweb.domain.PostComment;
 import com.helloworld.helloworldweb.domain.PostSubComment;
+import com.helloworld.helloworldweb.domain.Role;
 import com.helloworld.helloworldweb.dto.PostComment.PostCommentRequestDto;
 import com.helloworld.helloworldweb.dto.PostComment.PostCommentResponseDto;
 import com.helloworld.helloworldweb.model.ApiResponse;
@@ -13,9 +14,12 @@ import com.helloworld.helloworldweb.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.Authenticator;
 
 @Controller
 @RequiredArgsConstructor
