@@ -34,7 +34,7 @@ public class PostCommentController {
     @PostMapping("/api/postcomment")
     public ResponseEntity<ApiResponse<PostCommentResponseDto>> registerPostComment(@RequestBody PostCommentRequestDto postCommentRequestDto)
     {
-        Post post = postService.findPost(postCommentRequestDto.getPostId());
+        Post post = postService.getPost(postCommentRequestDto.getPostId());
         PostComment postComment = PostComment.builder()
                 .build();
         PostSubComment postSubComment = PostSubComment.builder()
