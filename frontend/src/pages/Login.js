@@ -1,4 +1,9 @@
 import React from "react";
+import {Box} from "@mui/material";
+import {Typography} from "@mui/material";
+import {Stack} from "@mui/material";
+import LoginButton from "../component/login/LoginButton";
+import axios from "axios";
 import api from "../api/api";
 import { Button } from "@mui/material";
 
@@ -12,12 +17,31 @@ function kakao_getCode(){
     window.location.replace(kakao_url);
 }
 
+
 export default function (){
 
     return(
-        <div>
-            <h1>Login Page</h1>
-            <Button onClick={kakao_getCode}>Kakao Login</Button>
-        </div>
-    )   ;
+        <Box className="App">
+            <Box sx={{
+                alignItems:'center',
+                marginTop:20
+            }}>
+                <Typography variant='h3' sx={{
+                    color:'gray'
+                }}>로그인</Typography>
+            </Box>
+            <Box sx={{
+                alignItems:'center',
+                marginTop:10
+            }}>
+                <Stack sx={{ alignItems: 'center'}}>
+                    <LoginButton imagelocation={'KakaoLogin'} />
+                    <LoginButton imagelocation={'NaverLogin'} />
+                    <LoginButton  imagelocation={'NaverLogin'} />
+                </Stack>
+            </Box>
+        </Box>
+
+        );
+
 }
