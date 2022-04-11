@@ -50,26 +50,24 @@ public class UserService {
     }
 
     @Transactional
+    public String addKakaoUser(String accessToken) throws ParseException {
+
+        String userInfoFromKakao = getUserInfoFromKakao(accessToken);
+
+        //받은 String정보를 JSON 객체화
+        JSONObject userInfo = stringToJson(userInfoFromKakao, "kakao_account");
+
+        return addUser(userInfo);
+
+    }
+
+    @Transactional
     public String addNaverUser(String userInfoRespnoseFromNaver) throws ParseException {
 
         //받은 String정보를 JSON 객체화
-        JSONParser jsonParser = new JSONParser();
-        Object obj = jsonParser.parse(userInfoRespnoseFromNaver);
-        JSONObject userInfoFromNaver = (JSONObject) obj;
+        JSONObject userInfo = stringToJson(userInfoRespnoseFromNaver, "response");
 
-        Object obj2 = jsonParser.parse(userInfoFromNaver.getAsString("response"));
-        JSONObject userInfo = (JSONObject) obj2;
-
-        User newUser = User.builder()
-                .email(userInfo.getAsString("email"))
-                .role(Role.USER)
-                .build();
-
-        User savedUser = userRepository.save(newUser);
-
-        String token = jwtTokenProvider.createToken(savedUser.getEmail(), Role.USER);
-
-        return token;
+        return addUser(userInfo);
     }
 
     //네이버로 부터 사용자 정보 불러오는 부분
@@ -80,6 +78,25 @@ public class UserService {
 
 
         String apiURL = "https://openapi.naver.com/v1/nid/me";
+
+
+        Map<String, String> requestHeaders = new HashMap<>();
+        requestHeaders.put("Authorization", header);
+        String responseBody = get(apiURL,requestHeaders);
+
+        System.out.println("responseBody = " + responseBody);
+        return responseBody;
+
+    }
+
+    //네이버로 부터 사용자 정보 불러오는 부분
+    private String getUserInfoFromKakao(String accessToken) {
+
+        String token = accessToken; // 네이버 로그인 접근 토큰;
+        String header = "Bearer " + token; // Bearer 다음에 공백 추가
+
+
+        String apiURL = "https://kapi.kakao.com/v2/user/me";
 
 
         Map<String, String> requestHeaders = new HashMap<>();
@@ -145,6 +162,28 @@ public class UserService {
         } finally {
             con.disconnect();
         }
+    }
+
+    private String addUser(JSONObject userInfo){
+        User newUser = User.builder()
+                .email(userInfo.getAsString("email"))
+                .role(Role.USER)
+                .build();
+
+        User savedUser = userRepository.save(newUser);
+
+        String token = jwtTokenProvider.createToken(savedUser.getEmail(), Role.USER);
+
+        return token;
+    }
+
+    private JSONObject stringToJson(String str,String key) throws ParseException {
+        JSONParser jsonParser = new JSONParser();
+        Object obj = jsonParser.parse(str);
+        JSONObject userInfoFromKakaoJson = (JSONObject) obj;
+
+        Object obj2 = jsonParser.parse(userInfoFromKakaoJson.getAsString(key));
+        return (JSONObject) obj2;
     }
 
 }
