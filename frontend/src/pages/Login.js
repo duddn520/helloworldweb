@@ -1,27 +1,35 @@
 import React from "react";
-import api from "../api/api";
+import {Box} from "@mui/material";
+import {Typography} from "@mui/material";
+import {Stack} from "@mui/material";
+import LoginButton from "../component/login/LoginButton";
+import axios from "axios";
+
 
 export default function (){
 
-    const [data,setData] = React.useState([]);
-
-    React.useEffect(() => {
-        setData( api.getGuestBooks() ) ;
-    },[]);
-
-
     return(
-        <div>
-            <h1>Login</h1>
-            {
-                data.map( item => {
-                    return(
-                      <Card>
+        <Box className="App">
+            <Box sx={{
+                alignItems:'center',
+                marginTop:20
+            }}>
+                <Typography variant='h3' sx={{
+                    color:'gray'
+                }}>로그인</Typography>
+            </Box>
+            <Box sx={{
+                alignItems:'center',
+                marginTop:10
+            }}>
+                <Stack sx={{ alignItems: 'center'}}>
+                    <LoginButton imagelocation={'KakaoLogin'} />
+                    <LoginButton imagelocation={'NaverLogin'} />
+                    <LoginButton  imagelocation={'NaverLogin'} />
+                </Stack>
+            </Box>
+        </Box>
 
-                      </Card>
-                    );
-                })
-            }
-        </div>
-    )   ;
+        );
+
 }
