@@ -13,6 +13,8 @@ function getGuestBooks(){
         })
 
 }
+
+// 
 function kakaoLogin(token){
     console.log(token);
     axios({
@@ -21,7 +23,7 @@ function kakaoLogin(token){
         url: '/login/kakao',
         headers: { 
             "token" : token ,
-            // "Access-Control-Allow-Origin" : true
+            "Access-Control-Allow-Origin" : true
         },
     })
     .then( res => {
