@@ -2,6 +2,7 @@ package com.helloworld.helloworldweb.controller;
 
 import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.dto.Post.PostRequestDto;
+import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
 import com.helloworld.helloworldweb.model.HttpStatusCode;
@@ -22,11 +23,28 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @Controller
 @RequiredArgsConstructor
 public class UserController extends HttpServlet {
 
     private final UserService userService;
+
+    // 카카오 로그인 및 회원가입 요청
+    @PostMapping("/login/kakao")
+    public ResponseEntity<ApiResponse> kakaoLogin(HttpServletRequest request,HttpServletResponse response){
+
+        response.addHeader("Access-Control-Allow-Origin","*");
+
+        System.out.println("request.getHeader(\"token\") = " + request.getHeader("token"));
+
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.OK,
+                HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
+    }
+
 
     @GetMapping("/user/register")
     public ResponseEntity<ApiResponse> registerUser()

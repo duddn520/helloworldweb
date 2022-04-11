@@ -23,7 +23,7 @@ public class GuestBookService {
     private final GuestBookRepository guestBookRepository;
     private final GuestBookCommentRepository guestBookCommentRepository;
 
-//    @Transactional
+    // 방명록 조회
     public List<GuestBookComment> getGuestBookComments(User user){
 
         // GuestBook - List<GuestBookComment> 리턴
@@ -34,8 +34,9 @@ public class GuestBookService {
 
     }
 
+    // 방명록 추가
     @Transactional
-    public GuestBookComment postGuestBookComment(User user,GuestBookComment guestBookComment){
+    public GuestBookComment addGuestBookComment(User user,GuestBookComment guestBookComment){
 
             // GuestBook 찾기
             Optional<GuestBook> optionalGuestBook = guestBookRepository.findByUser(user) ;
@@ -49,6 +50,23 @@ public class GuestBookService {
 
             return addGuestBookComment;
     }
+
+    // 방명록 수정
+//    public GuestBookComment updateGuestBookComment() {
+//
+//    }
+
+    // 방명록 삭제
+    @Transactional
+    public boolean deleteGuestBookComment(Long id){
+        try {
+            guestBookCommentRepository.deleteById(id);
+            return true;
+        } catch( Exception e ) {
+            return false;
+        }
+    }
+
 
     private GuestBook getNewGuestBook(User user){
         GuestBook newGuestBook = GuestBook.builder()

@@ -13,11 +13,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,9 +41,9 @@ public class GuestBookController {
 
     @GetMapping("/api/guestbook")
     @Transactional
-    public ResponseEntity<ApiResponse<List<GuestBookDto>>> getGuestBooks(HttpServletRequest request){
+    public ResponseEntity<ApiResponse<List<GuestBookDto>>> getGuestBooks(@RequestParam(name="id") Long id){
             // 임시: 유저 ID로 유저를 찾음.
-            User findUser = userService.searchUserById(Long.parseLong(request.getParameter("id")))
+            User findUser = userService.searchUserById(id)
                     .orElseThrow(() -> new IllegalStateException("GuestBook - GET - 회원조회 실패"));
             //
 
@@ -71,7 +71,7 @@ public class GuestBookController {
             //
 
             // 방명록 저장
-            GuestBookComment saveGuestBookComment = guestBookService.postGuestBookComment(findUser, guestBookComment);
+            GuestBookComment saveGuestBookComment = guestBookService.addGuestBookComment(findUser, guestBookComment);
             GuestBookDto responseDto = new GuestBookDto(saveGuestBookComment);
 
             return new ResponseEntity<>(ApiResponse.response(
@@ -84,6 +84,24 @@ public class GuestBookController {
                     HttpStatusCode.INTERNAL_SERVER_ERROR,
                     HttpResponseMsg.INTERNAL_SERVER_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @DeleteMapping("/api/guestbook")
+    public ResponseEntity<ApiResponse> deleteGuestBook(HttpServletRequest request){
+        String requestId = request.getParameter("id");
+        boolean result = guestBookService.deleteGuestBookComment(Long.parseLong(requestId));
+        if( result ) {
+            return new ResponseEntity<>(ApiResponse.response(
+                    HttpStatusCode.OK,
+                    HttpResponseMsg.DELETE_SUCCESS),HttpStatus.OK
+            );
+        } else {
+            return new ResponseEntity<>(ApiResponse.response(
+                    HttpStatusCode.INTERNAL_SERVER_ERROR,
+                    HttpResponseMsg.INTERNAL_SERVER_ERROR),HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+
     }
 
 }
