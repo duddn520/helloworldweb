@@ -13,9 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -43,9 +41,9 @@ public class GuestBookController {
 
     @GetMapping("/api/guestbook")
     @Transactional
-    public ResponseEntity<ApiResponse<List<GuestBookDto>>> getGuestBooks(HttpServletRequest request){
+    public ResponseEntity<ApiResponse<List<GuestBookDto>>> getGuestBooks(@RequestParam(name="id") Long id){
             // 임시: 유저 ID로 유저를 찾음.
-            User findUser = userService.searchUserById(Long.parseLong(request.getParameter("id")))
+            User findUser = userService.searchUserById(id)
                     .orElseThrow(() -> new IllegalStateException("GuestBook - GET - 회원조회 실패"));
             //
 
