@@ -10,9 +10,11 @@ import { Button } from "@mui/material";
 const rest_api_key = "0961546bc0d26c67ab09717f36939b7c";
 const redirect_url = "http://localhost:3000/login/redirect";
 
+const kakao_url = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${rest_api_key}&redirect_uri=${redirect_url}`;
+const url = "https://github.com/login/oauth/authorize?client_id=105e0b50eefc27b4dc81&redirect_uri=http://localhost:3000/login/red";
+
 // 카카오 인가코드를 받아옴 ( REST_API_KEY , REDIRECT_URL 필요 )
 function kakao_getCode(){
-    const kakao_url = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${rest_api_key}&redirect_uri=${redirect_url}`;
     // 현재 페이지를 대체
     window.location.replace(kakao_url);
 }
@@ -35,7 +37,7 @@ export default function (){
                 marginTop:10
             }}>
                 <Stack sx={{ alignItems: 'center'}}>
-                    <LoginButton imagelocation={'KakaoLogin'} />
+                    <LoginButton imagelocation={'KakaoLogin'} login={kakao_getCode}/>
                     <LoginButton imagelocation={'NaverLogin'} />
                     <LoginButton  imagelocation={'NaverLogin'} />
                 </Stack>
