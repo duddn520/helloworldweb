@@ -21,7 +21,7 @@ public class PostService {
     private final PostRepository postRepository;
 
     @Transactional
-    public Post findPost(Long postId) {
+    public Post getPost(Long postId) {
 
         Post findPost = postRepository.findById(postId).orElseThrow(NoSuchElementException::new);
 
@@ -29,7 +29,7 @@ public class PostService {
     }
 
     @Transactional
-    public Post registerPost(PostRequestDto requestDto, User user) {
+    public Post addPost(PostRequestDto requestDto, User user) {
 
         Post post = requestDto.toEntity();
         post.updateUser(user);
@@ -39,7 +39,7 @@ public class PostService {
 
     @Transactional
     //사용자 본인의 블로그 게시물 전체조회
-    public List<Post> listUserBlog(Long userId) {
+    public List<Post> getAllUserBlog(Long userId) {
 
         List<Post> blogs = postRepository.findByUserIdAndCategory(userId, Category.BLOG).orElseGet(() -> new ArrayList<>());
 
@@ -48,7 +48,7 @@ public class PostService {
 
     @Transactional
     //모든 QNA 게시물
-    public List<Post> listAllQna() {
+    public List<Post> getAllQna() {
 
         List<Post> qnas = postRepository.findByCategory(Category.QNA).orElseGet(() -> new ArrayList<>());
 

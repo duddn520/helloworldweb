@@ -1,5 +1,6 @@
 package com.helloworld.helloworldweb.domain;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -72,5 +73,17 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return false;
+    }
+
+    @Builder
+    public User(Long id, List<Post> posts, List<PostSubComment> subComments, UserHome userHome, GuestBook guestBook, List<GuestBookComment> guestBookComments, Role role, String email) {
+        this.id = id;
+        this.posts = posts;
+        this.subComments = subComments;
+        this.userHome = userHome;
+        this.guestBook = guestBook;
+        this.guestBookComments = guestBookComments;
+        this.role = role;
+        this.email = email;
     }
 }
