@@ -32,8 +32,8 @@ public class GuestBookController {
     // 임시
     @GetMapping("/api/guestbook/test")
     public void test(){
-        userService.registerUser(new User());
-        userService.registerUser(new User());
+        userService.addUser(new User());
+        userService.addUser(new User());
     }
     //
 

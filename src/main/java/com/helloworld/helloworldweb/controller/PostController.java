@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,10 +28,11 @@ public class PostController {
     private final UserService userService;
 
     @PostMapping("/api/post")
+    @Transactional
     public ResponseEntity<ApiResponse> registerPost(@RequestBody PostRequestDto requestDto) {
 
-        User findUser = userService.findUserById(requestDto.getUser_id());
-        Post post = postService.registerPost(requestDto, findUser);
+        User findUser = userService.getUserById(requestDto.getUser_id());
+        Post post = postService.addPost(requestDto, findUser);
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.OK,
@@ -38,9 +40,9 @@ public class PostController {
     }
 
     @GetMapping("/api/post/blog")
-    public ResponseEntity<ApiResponse<List<PostResponseDto>>> listUserBlog(@RequestBody PostRequestDto requestDto) {
+    public ResponseEntity<ApiResponse<List<PostResponseDto>>> getUserBlog(@RequestBody PostRequestDto requestDto) {
 
-        List<Post> blogs = postService.listUserBlog(requestDto.getUser_id());
+        List<Post> blogs = postService.getAllUserBlog(requestDto.getUser_id());
         List<PostResponseDto> responses = blogs.stream()
                                             .map(PostResponseDto::new)
                                             .collect(Collectors.toList());
@@ -52,9 +54,9 @@ public class PostController {
     }
 
     @GetMapping("/api/post/qna")
-    public ResponseEntity<ApiResponse<List<PostResponseDto>>> listAllQna() {
+    public ResponseEntity<ApiResponse<List<PostResponseDto>>> getAllQna() {
 
-        List<Post> qnas = postService.listAllQna();
+        List<Post> qnas = postService.getAllQna();
         List<PostResponseDto> responses = qnas.stream()
                                             .map(PostResponseDto::new)
                                             .collect(Collectors.toList());
@@ -68,7 +70,7 @@ public class PostController {
     @DeleteMapping("/api/post")
     public ResponseEntity<ApiResponse> deletePost(@RequestBody PostRequestDto requestDto) {
 
-        Post findPost = postService.findPost(requestDto.getPost_id());
+        Post findPost = postService.getPost(requestDto.getPost_id());
 
         postService.deletePost(findPost);
 

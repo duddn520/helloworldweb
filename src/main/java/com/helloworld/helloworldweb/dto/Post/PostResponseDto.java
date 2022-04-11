@@ -19,10 +19,4 @@ public class PostResponseDto { // post결과로 전달할 데이터
         this.category = post.getCategory();
         this.content = post.getContent();
     }
-
-    public PostResponseDto(Long user_id, Category category, String content) {
-        this.user_id = user_id;
-        this.category = category;
-        this.content = content;
-    }
 }

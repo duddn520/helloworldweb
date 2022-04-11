@@ -3,6 +3,7 @@ package com.helloworld.helloworldweb.dto.Post;
 import com.helloworld.helloworldweb.domain.Category;
 import com.helloworld.helloworldweb.domain.Post;
 import com.helloworld.helloworldweb.domain.User;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,7 +24,9 @@ public class PostRequestDto { //post요청과 함께 받을 데이터
                 .build();
     }
 
-    public PostRequestDto(Long user_id, Category category, String content) {
+    @Builder
+    public PostRequestDto(Long post_id, Long user_id, Category category, String content) {
+        this.post_id = post_id;
         this.user_id = user_id;
         this.category = category;
         this.content = content;

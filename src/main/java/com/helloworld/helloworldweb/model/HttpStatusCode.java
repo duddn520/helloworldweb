@@ -12,4 +12,12 @@ public class HttpStatusCode {
     public static final int INTERNAL_SERVER_ERROR = 500;
     public static final int SERVICE_UNAVAILABLE = 503;
     public static final int DB_ERROR = 600;
+
+
+    public static final int POST_SUCCESS = 210;
+    public static final int GET_SUCCESS = 211;
+    public static final int PUT_SUCCESS = 212;
+    public static final int DELETE_SUCCESS = 213;
+
+
 }
