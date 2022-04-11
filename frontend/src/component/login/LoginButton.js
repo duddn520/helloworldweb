@@ -12,14 +12,6 @@ export default function LoginButton(props){
 
     function LoginMethod(){
         window.location.replace(url);
-
-
-        let accToken = window.location.search.split("code=")[1];
-
-        console.log(accToken);
-
-
-
     }
 
     return(
