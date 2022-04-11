@@ -20,14 +20,15 @@ function kakaoLogin(token){
     axios({
         method: 'POST' ,
         // baseURL: baseUrl ,
-        url: '/login/kakao',
+        url: '/user/register/kakao',
         headers: { 
             "token" : token ,
             "Access-Control-Allow-Origin" : true
         },
     })
     .then( res => {
-        console.log(res.data)
+        // Jwt 반환
+        console.log(res.headers.auth);
     })
     .catch( e => {
 

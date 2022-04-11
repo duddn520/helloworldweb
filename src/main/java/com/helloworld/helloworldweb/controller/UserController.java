@@ -33,29 +33,22 @@ public class UserController extends HttpServlet {
     private final UserService userService;
 
     // 카카오 로그인 및 회원가입 요청
-    @PostMapping("/login/kakao")
-    public ResponseEntity<ApiResponse> kakaoLogin(HttpServletRequest request,HttpServletResponse response){
+    @PostMapping("/user/register/kakao")
+    public ResponseEntity<ApiResponse> registerUserWithKakao(HttpServletRequest request,HttpServletResponse response) throws ParseException {
 
         response.addHeader("Access-Control-Allow-Origin","*");
 
-        System.out.println("request.getHeader(\"token\") = " + request.getHeader("token"));
+        // 카카오로 부터 받아온 정보로 유저로 등록
+        String jwt = userService.addKakaoUser(request.getHeader("token"));
+
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Auth", jwt);
+        headers.add("Access-Control-Allow-Origin", "*");
 
         return new ResponseEntity<>(ApiResponse.response(
-                HttpStatusCode.OK,
-                HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
-    }
-
-
-    @GetMapping("/user/register")
-    public ResponseEntity<ApiResponse> registerUser()
-    {
-        User user = new User();
-        userService.addUser(user);
-
-        return new ResponseEntity<>(ApiResponse.response(
-                HttpStatusCode.OK,
-                HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
-
+                HttpStatusCode.POST_SUCCESS,
+                HttpResponseMsg.POST_SUCCESS), headers, HttpStatus.OK);
     }
 
     @PostMapping("/user/register/naver")
@@ -76,4 +69,5 @@ public class UserController extends HttpServlet {
                 HttpResponseMsg.POST_SUCCESS,
                 userInfoRespnoseFromNaver), headers, HttpStatus.OK);
     }
+
 }
