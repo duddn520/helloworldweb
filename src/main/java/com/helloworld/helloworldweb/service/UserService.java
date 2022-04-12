@@ -70,6 +70,21 @@ public class UserService {
         return addUser(userInfo);
     }
 
+    @Transactional
+    public String addGithubUser(JSONObject userInfoJsonObject)
+    {
+        String repo_url = (String) userInfoJsonObject.get("repos_url");
+        String email = (userInfoJsonObject.get("login") + "@github.com");
+        User user = User.builder()
+                .email(email)
+                .repo_url(repo_url)
+                .role(Role.USER)
+                .build();
+
+        addUser(user);
+        return jwtTokenProvider.createToken(email,Role.USER);
+    }
+
     //네이버로 부터 사용자 정보 불러오는 부분
     public String getUserInfoFromNaver(String accessToken) {
 
