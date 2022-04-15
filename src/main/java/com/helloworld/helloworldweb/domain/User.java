@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
@@ -39,10 +40,13 @@ public class User implements UserDetails {
 
     private String email;
 
+    @Transient
+    private Collection<SimpleGrantedAuthority> authorities;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.getAuthorities();
+        return this.authorities;
     }
 
     @Override

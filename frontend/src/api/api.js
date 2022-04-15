@@ -1,38 +1,63 @@
 import axios from 'axios';
+import request from './request';
 
-const baseUrl = "http://localhost:8080"
+// Http Response statusCode 정리
+const status = {
+    POST_SUCCESS : 210 ,
+    GET_SUCCESS : 211 ,
+    PUT_SUCCESS : 212 ,
+    DELETE_SUCCESS : 213
+}
 
-//   GET - /api/guestbook
-function getGuestBooks(){
-    axios.get(baseUrl+'/api/guestbook')
+
+// POST - 카카오 유저 로그인/회원가입
+function registerUserWithKakao(token){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'POST' ,
+            url: '/user/register/kakao',
+            headers: { 
+                token: token
+                // "Access-Control-Allow-Origin" : true
+            },
+        })
         .then( res => {
-            return res.data.data;
+            // Jwt 반환
+            if ( res.data.statusCode == status.POST_SUCCESS ){
+                resolve (res.headers.auth);
+            }
         })
         .catch( e => {
             console.log(e);
+            reject();
         })
-
+    });
 }
 
-// 
-function kakaoLogin(token){
-    console.log(token);
-    axios({
-        method: 'POST' ,
-        // baseURL: baseUrl ,
-        url: '/user/register/kakao',
-        headers: { 
-            "token" : token ,
-            "Access-Control-Allow-Origin" : true
-        },
-    })
-    .then( res => {
-        // Jwt 반환
-        console.log(res.headers.auth);
-    })
-    .catch( e => {
+// GET - 나의 방명록 조회
+function getGuestBooks(){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'GET' ,
+            url: '/api/guestbook',
+            params: { 
+                id: 1
+            },
+        })
+        .then( res => {
+            // Jwt 반환
+            if ( res.data.statusCode == status.GET_SUCCESS ){
 
-    })
+                console.log(res.data.data);
+                resolve (res.data.data);
+            }
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
 }
 
-export default { getGuestBooks , kakaoLogin } ;
+
+export default { registerUserWithKakao,getGuestBooks } ;
