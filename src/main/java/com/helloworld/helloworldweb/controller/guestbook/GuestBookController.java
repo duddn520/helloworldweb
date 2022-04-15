@@ -4,6 +4,7 @@ import com.helloworld.helloworldweb.domain.GuestBook;
 import com.helloworld.helloworldweb.domain.GuestBookComment;
 import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.dto.guestbook.GuestBookDto;
+import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
 import com.helloworld.helloworldweb.model.HttpStatusCode;
@@ -27,49 +28,39 @@ public class GuestBookController {
 
     private final GuestBookService guestBookService;
     private final UserService userService;
-
-
-    // 임시
-    @GetMapping("/api/guestbook/test")
-    public void test(){
-        userService.addUser(new User());
-        userService.addUser(new User());
-    }
-    //
-
-
+    private final JwtTokenProvider jwtTokenProvider;
 
     @GetMapping("/api/guestbook")
     @Transactional
-    public ResponseEntity<ApiResponse<List<GuestBookDto>>> getGuestBooks(@RequestParam(name="id") Long id){
-            // 임시: 유저 ID로 유저를 찾음.
-            User findUser = userService.searchUserById(id)
-                    .orElseThrow(() -> new IllegalStateException("GuestBook - GET - 회원조회 실패"));
-            //
+    public ResponseEntity<ApiResponse<List<GuestBookDto>>> getGuestBooks(@RequestParam(name="id") Long id,HttpServletRequest request){
 
-            // 유저를 통해 방명록들 불러옴.
-            List<GuestBookComment> findGuestBookComments = guestBookService.getGuestBookComments(findUser);
+        // 유저 찾기
+        String findEmail = jwtTokenProvider.getUserEmail(jwtTokenProvider.getTokenByHeader(request));
+        User findUser = userService.getUserByEmail(findEmail);
 
-            List<GuestBookDto> responseDtos = new ArrayList<GuestBookDto>();
+        // 유저를 통해 방명록들 불러옴.
+        List<GuestBookComment> findGuestBookComments = guestBookService.getGuestBookComments(findUser);
 
-            for ( GuestBookComment comment : findGuestBookComments ) {
-                responseDtos.add(new GuestBookDto(comment));
-            }
+        List<GuestBookDto> responseDtos = new ArrayList<GuestBookDto>();
 
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.OK,
-                    HttpResponseMsg.GET_SUCCESS,responseDtos), HttpStatus.OK);
+        for ( GuestBookComment comment : findGuestBookComments ) {
+            responseDtos.add(new GuestBookDto(comment));
+        }
+
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.GET_SUCCESS,
+                HttpResponseMsg.GET_SUCCESS,responseDtos), HttpStatus.OK);
     }
 
     @PostMapping("/api/guestbook")
-    public ResponseEntity<ApiResponse> postGuestBook(GuestBookDto guestBookDto){
+    public ResponseEntity<ApiResponse> registerGuestBook(GuestBookDto guestBookDto,HttpServletRequest request){
         try {
-            GuestBookComment guestBookComment = guestBookDto.toEntity();
-            // 임시: 유저 ID로 유저를 찾음.
-            User findUser = userService.searchUserById(1L)
-                    .orElseThrow(() -> new IllegalStateException("GuestBook - GET - 회원조회 실패"));
-            //
+            // 유저 찾기
+            String findEmail = jwtTokenProvider.getUserEmail(jwtTokenProvider.getTokenByHeader(request));
+            User findUser = userService.getUserByEmail(findEmail);
 
+            // Dto -> Entity
+            GuestBookComment guestBookComment = guestBookDto.toEntity();
             // 방명록 저장
             GuestBookComment saveGuestBookComment = guestBookService.addGuestBookComment(findUser, guestBookComment);
             GuestBookDto responseDto = new GuestBookDto(saveGuestBookComment);
@@ -92,7 +83,7 @@ public class GuestBookController {
         boolean result = guestBookService.deleteGuestBookComment(Long.parseLong(requestId));
         if( result ) {
             return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.OK,
+                    HttpStatusCode.DELETE_SUCCESS,
                     HttpResponseMsg.DELETE_SUCCESS),HttpStatus.OK
             );
         } else {

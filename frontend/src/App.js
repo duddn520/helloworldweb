@@ -3,7 +3,7 @@ import './App.css';
 import {BrowserRouter, Router , Route , Routes }  from "react-router-dom";
 import Login from "./pages/Login";
 import Main from "./pages/Main";
-import Redirect from './pages/redirect/Redirect';
+import KakaoRedirect from './pages/redirect/KakaoRedirect';
 
 function App() {
   return (
@@ -11,7 +11,7 @@ function App() {
       <Routes>
         <Route exact path="/" element={<Main />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/login/redirect" element={<Redirect />} />
+        <Route path="/login/redirect/kakao" element={<KakaoRedirect />} />
       </Routes>
     </BrowserRouter>
   );

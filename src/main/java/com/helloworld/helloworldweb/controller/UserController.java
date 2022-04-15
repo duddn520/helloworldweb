@@ -44,7 +44,6 @@ public class UserController extends HttpServlet {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Auth", jwt);
-        headers.add("Access-Control-Allow-Origin", "*");
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.POST_SUCCESS,
