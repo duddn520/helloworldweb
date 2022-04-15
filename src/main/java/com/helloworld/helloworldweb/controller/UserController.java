@@ -39,10 +39,10 @@ public class UserController extends HttpServlet {
     public ResponseEntity<ApiResponse> registerUserWithKakao(HttpServletRequest request,HttpServletResponse response) throws ParseException {
 
         response.addHeader("Access-Control-Allow-Origin","*");
+        response.addHeader("Access-Control-Expose-Headers", "Auth");
 
         // 카카오로 부터 받아온 정보로 유저로 등록
         String jwt = userService.addKakaoUser(request.getHeader("token"));
-
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Auth", jwt);
@@ -53,22 +53,18 @@ public class UserController extends HttpServlet {
     }
 
     @PostMapping("/user/register/naver")
-    public ResponseEntity<ApiResponse<String>> registerUserWithNaver(@RequestParam(name = "accessToken") String accessToken) throws ParseException {
-
-        //accessToken으로 네이버로 부터 정보를 받아옴 String 형식
-        String userInfoRespnoseFromNaver = userService.getUserInfoFromNaver(accessToken);
+    public ResponseEntity<ApiResponse> registerUserWithNaver(@RequestParam(name = "accessToken") String accessToken, HttpServletResponse response) throws ParseException {
 
         //네이버로 부터 받아온 정보로 유저로 등록
-        String jwt = userService.addNaverUser(userInfoRespnoseFromNaver);
+        String jwt = userService.addNaverUser(accessToken);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Auth", jwt);
-        headers.add("Access-Control-Allow-Origin", "*");
+        response.addHeader("Auth", jwt);
+        response.addHeader("Access-Control-Allow-Origin","*");
+        response.addHeader("Access-Control-Expose-Headers", "Auth");
 
         return new ResponseEntity<>(ApiResponse.response(
-                HttpStatusCode.OK,
-                HttpResponseMsg.POST_SUCCESS,
-                userInfoRespnoseFromNaver), headers, HttpStatus.OK);
+                HttpStatusCode.POST_SUCCESS,
+                HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
     }
 
     @PostMapping("/user/register/github")

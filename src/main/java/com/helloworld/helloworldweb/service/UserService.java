@@ -63,7 +63,9 @@ public class UserService {
     }
 
     @Transactional
-    public String addNaverUser(String userInfoRespnoseFromNaver) throws ParseException {
+    public String addNaverUser(String accessToken) throws ParseException {
+
+        String userInfoRespnoseFromNaver = getUserInfoFromNaver(accessToken);
 
         //받은 String정보를 JSON 객체화
         JSONObject userInfo = stringToJson(userInfoRespnoseFromNaver, "response");
@@ -72,7 +74,7 @@ public class UserService {
     }
 
     //네이버로 부터 사용자 정보 불러오는 부분
-    public String getUserInfoFromNaver(String accessToken) {
+    private String getUserInfoFromNaver(String accessToken) {
 
         String token = accessToken; // 네이버 로그인 접근 토큰;
         String header = "Bearer " + token; // Bearer 다음에 공백 추가
@@ -165,6 +167,8 @@ public class UserService {
         }
     }
 
+    //각 소셜 로그인으로부터 받은 정보로 회원가입 시키는 함수
+    //JWT를 반환
     private String addUser(JSONObject userInfo){
 
         // 유저가 이미 DB에 존재하는지 확인
