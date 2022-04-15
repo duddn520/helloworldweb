@@ -31,11 +31,6 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public Optional<User> searchUserById(Long Id){
-        return userRepository.findById(Id);
-    }
-
-    @Transactional
     public User addUser(User user)
     {
         return userRepository.save(user);
@@ -47,6 +42,12 @@ public class UserService {
         User findUser = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("로그인상태가 아닙니다."));
 
         return findUser;
+    }
+
+    // Jwt 안의 이메일 정보를 통해 유저를 찾기 위한 함수
+    @Transactional
+    public User getUserByEmail(String email){
+        return userRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
     }
 
     @Transactional
@@ -169,16 +170,22 @@ public class UserService {
     //각 소셜 로그인으로부터 받은 정보로 회원가입 시키는 함수
     //JWT를 반환
     private String addUser(JSONObject userInfo){
-        User newUser = User.builder()
-                .email(userInfo.getAsString("email"))
-                .role(Role.USER)
-                .build();
 
-        User savedUser = userRepository.save(newUser);
+        // 유저가 이미 DB에 존재하는지 확인
+        Optional<User> findUser = userRepository.findByEmail(userInfo.getAsString(("email")));
 
-        String token = jwtTokenProvider.createToken(savedUser.getEmail(), Role.USER);
+        // 존재 유무 isPresent()로 확인
+        if( findUser.isPresent() ){
+            return jwtTokenProvider.createToken(findUser.get().getEmail(),findUser.get().getRole());
+        } else{
+            User newUser = User.builder()
+                    .email(userInfo.getAsString("email"))
+                    .role(Role.USER)
+                    .build();
+            User savedUser = userRepository.save(newUser);
+            return jwtTokenProvider.createToken(savedUser.getEmail(), Role.USER);
+        }
 
-        return token;
     }
 
     private JSONObject stringToJson(String str,String key) throws ParseException {
