@@ -3,7 +3,7 @@ import {BrowserRouter, Router , Route , Routes }  from "react-router-dom";
 import Login from "./pages/Login";
 import Main from "./pages/Main";
 import KakaoRedirect from './pages/redirect/KakaoRedirect';
-import Red from "./pages/Red";
+import GithubRedirect from "./pages/redirect/GithubRedirect";
 
 function App() {
   return (
@@ -12,7 +12,7 @@ function App() {
         <Route exact path="/" element={<Main />} />
         <Route path="/login" element={<Login />} />
         <Route path="/login/redirect/kakao" element={<KakaoRedirect />} />
-        <Route path="/login/red" element={<Red />} />
+        <Route path="/login/redirect/github" element={<GithubRedirect />} />
       </Routes>
     </BrowserRouter>
   );

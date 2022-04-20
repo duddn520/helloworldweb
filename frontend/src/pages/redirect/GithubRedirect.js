@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 import axios from "axios";
 
-export default function Red(){
+export default function GithubRedirect(){
     const cid = "105e0b50eefc27b4dc81";
     const cpwd = "ce4d0a93a257529e78a8804f322ca629b1d7cba6"
 
