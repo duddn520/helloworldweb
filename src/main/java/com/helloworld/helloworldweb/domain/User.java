@@ -39,6 +39,7 @@ public class User implements UserDetails {
     private Role role;
 
     private String email;
+    private String repo_url;
 
     @Transient
     private Collection<SimpleGrantedAuthority> authorities;
@@ -80,7 +81,8 @@ public class User implements UserDetails {
     }
 
     @Builder
-    public User(Long id, List<Post> posts, List<PostSubComment> subComments, UserHome userHome, GuestBook guestBook, List<GuestBookComment> guestBookComments, Role role, String email) {
+    public User(Long id, List<Post> posts, List<PostSubComment> subComments, UserHome userHome, GuestBook guestBook, List<GuestBookComment> guestBookComments, Role role, String email
+    ,String repo_url) {
         this.id = id;
         this.posts = posts;
         this.subComments = subComments;
@@ -89,5 +91,6 @@ public class User implements UserDetails {
         this.guestBookComments = guestBookComments;
         this.role = role;
         this.email = email;
+        this.repo_url = repo_url;
     }
 }

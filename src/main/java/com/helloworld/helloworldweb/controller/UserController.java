@@ -105,20 +105,16 @@ public class UserController extends HttpServlet {
                 newEntity,
                 JSONObject.class
         );
-        //TODO User엔티티에 repos_url 애트리뷰트 만들고 저장, LoginMethod e
-        userInfoResponse.getBody().get("repos_url");
-        String email = (String) (userInfoResponse.getBody().get("login") + "@github.com");
+        //TODO User엔티티에 repos_url 애트리뷰트 만들고 저장, LoginMethod 추가.
 
-        User user = User.builder()
-                .email(email)
-                .role(Role.USER)
-                        .build();
-        userService.addUser(user);
+        String jwt = userService.addGithubUser(userInfoResponse.getBody());
+
+        servletresponse.addHeader("Auth",jwt);
 
         System.out.println("userInfoResponse = " + userInfoResponse);
 
         return new ResponseEntity<>(ApiResponse.response(
-                HttpStatusCode.OK,
+                HttpStatusCode.POST_SUCCESS,
                 HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
     }
 }
