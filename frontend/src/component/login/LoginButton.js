@@ -1,20 +1,23 @@
 import React from "react";
 import { Box } from '@mui/system';
+import {Button} from "@mui/material";
+import {Avatar} from "@mui/material";
 import axios from "axios";
 
 
-export default function LoginButton({ imagelocation , login }){
-    const url = "https://github.com/login/oauth/authorize?client_id=105e0b50eefc27b4dc81&redirect_uri=http://localhost:3000/login/red";
-    const cid = "105e0b50eefc27b4dc81";
-    const cpwd = "ce4d0a93a257529e78a8804f322ca629b1d7cba6"
-
-    function LoginMethod(){
-        window.location.replace(url);
-    }
+export default function LoginButton({ imagelocation , login ,login_method }){
 
     return(
-        <Box sx={{marginTop:0.4}}>
-            <img onClick={login} src={require(`../../images/${imagelocation}.png`)} alt='LoginButtonImage' width='300' height='45'></img>
+        <Box sx={{marginTop:0.8}}>
+            <Button
+                startIcon={<Avatar sx={{position : "absolute", left:5, alignSelf:"center", bottom:4.2}} onClick={login} src={require(`../../images/${imagelocation}.png`)} alt='LoginButtonImage' width='50' height='50' />}
+                sx={{ color: 'gray', width : 300, height: 50, fontSize:14 ,backgroundColor : "white" ,boxShadow:0 , borderColor:"gray", borderWidth:0.9 ,":hover":{ boxShadow:0, backgroundColor:"whitesmoke", borderColor:"gray"}}}
+                variant={"outlined"}
+                onClick={login}
+
+            >
+                {`${login_method}로 로그인`}
+            </Button>
         </Box>
 
     );
