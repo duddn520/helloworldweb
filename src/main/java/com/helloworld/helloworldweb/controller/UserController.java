@@ -27,12 +27,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
 public class UserController extends HttpServlet {
 
     private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     // 카카오 로그인 및 회원가입 요청
     @PostMapping("/user/register/kakao")
@@ -120,5 +122,32 @@ public class UserController extends HttpServlet {
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.POST_SUCCESS,
                 HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
+    }
+
+    //유저 db에 저장된 repo_url 통해 깃허브 레포지토리 조회, 레포지토리 json 리스트 반환.
+    @GetMapping("/user/repos_url")
+    public ResponseEntity<ApiResponse> getGithubRepositories(HttpServletRequest request, HttpServletResponse response)
+    {
+         String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.getTokenByHeader(request));
+         User user = userService.getUserByEmail(email);
+
+        response.addHeader("Access-Control-Allow-Origin","*");
+        response.addHeader("Access-Control-Expose-Headers", "Auth");
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity entity = new HttpEntity(params,headers);
+        RestTemplate rt = new RestTemplate();
+        ResponseEntity<JSONObject> res = rt.exchange(
+                user.getRepo_url(),
+                HttpMethod.GET,
+                entity,
+                JSONObject.class);
+        System.out.println("res.getBody() = " + res.getBody());
+
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.GET_SUCCESS,
+                HttpResponseMsg.GET_SUCCESS,
+                res.getBody()), HttpStatus.OK);
     }
 }
