@@ -52,10 +52,14 @@ public class UserController extends HttpServlet {
                 HttpResponseMsg.POST_SUCCESS), headers, HttpStatus.OK);
     }
 
+    //네이버로그인 및 회원가입 요청
     @PostMapping("/user/register/naver")
-    public ResponseEntity<ApiResponse> registerUserWithNaver(@RequestParam(name = "accessToken") String accessToken, HttpServletResponse response) throws ParseException {
+    public ResponseEntity<ApiResponse> registerUserWithNaver(@RequestParam(name = "code") String code, @RequestParam("state") String state, HttpServletResponse response) throws ParseException {
 
-        //네이버로 부터 받아온 정보로 유저로 등록
+        //네이버로 부터 엑세스 토큰을 받아옴.
+        String accessToken = userService.getAccessTokenFromNaver(state, code);
+
+        //받아온 엑세스 토큰을 사용하여 네이버에서 유저 정보를 받아온 후 유저로 등록
         String jwt = userService.addNaverUser(accessToken);
 
         response.addHeader("Auth", jwt);

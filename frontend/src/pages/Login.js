@@ -11,7 +11,7 @@ const rest_api_key = "0961546bc0d26c67ab09717f36939b7c";
 const redirect_url = "http://localhost:3000/login/redirect/kakao";
 
 const kakao_url = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${rest_api_key}&redirect_uri=${redirect_url}`;
-const github_url = "https://github.com/login/oauth/authorize?client_id=105e0b50eefc27b4dc81&redirect_uri=http://localhost:3000/login/rediect/github";
+const github_url = "https://github.com/login/oauth/authorize?client_id=105e0b50eefc27b4dc81&redirect_uri=http://localhost:3000/login/red";
 
 // 카카오 인가코드를 받아옴 ( REST_API_KEY , REDIRECT_URL 필요 )
 function kakao_getCode(){
