@@ -1,24 +1,21 @@
 package com.helloworld.helloworldweb.controller;
 
-import com.helloworld.helloworldweb.domain.Role;
 import com.helloworld.helloworldweb.domain.User;
-import com.helloworld.helloworldweb.dto.Post.PostRequestDto;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
 import com.helloworld.helloworldweb.model.HttpStatusCode;
 import com.helloworld.helloworldweb.service.UserService;
 import com.nimbusds.jose.shaded.json.JSONObject;
-import com.nimbusds.jose.shaded.json.parser.JSONParser;
 import com.nimbusds.jose.shaded.json.parser.ParseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,7 +23,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @Controller
@@ -116,6 +112,7 @@ public class UserController extends HttpServlet {
         String jwt = userService.addGithubUser(userInfoResponse.getBody());
 
         servletresponse.addHeader("Auth",jwt);
+        System.out.println("jwt = " + jwt);
 
         System.out.println("userInfoResponse = " + userInfoResponse);
 
@@ -134,20 +131,14 @@ public class UserController extends HttpServlet {
         response.addHeader("Access-Control-Allow-Origin","*");
         response.addHeader("Access-Control-Expose-Headers", "Auth");
 
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity entity = new HttpEntity(params,headers);
         RestTemplate rt = new RestTemplate();
-        ResponseEntity<JSONObject> res = rt.exchange(
-                user.getRepo_url(),
-                HttpMethod.GET,
-                entity,
-                JSONObject.class);
-        System.out.println("res.getBody() = " + res.getBody());
+        ResponseEntity<Object[]> res = rt.getForEntity(user.getRepo_url(),Object[].class);
+        Object[] objects = res.getBody();
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.GET_SUCCESS,
                 HttpResponseMsg.GET_SUCCESS,
-                res.getBody()), HttpStatus.OK);
+                objects), HttpStatus.OK);
     }
+
 }
