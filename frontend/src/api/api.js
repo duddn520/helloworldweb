@@ -59,5 +59,28 @@ function getGuestBooks(){
     });
 }
 
+function registerUserWithNaver(code, state){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'POST',
+            url : `/user/register/naver`,
+            params: {
+                state : state,
+                code: code,
+            },
+        })
+        .then( res => {
+            // Jwt 반환
+            if ( res.data.statusCode == status.POST_SUCCESS ){
+                resolve (res.headers.auth);
+            }
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
 
-export default { registerUserWithKakao,getGuestBooks } ;
+
+export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver } ;
