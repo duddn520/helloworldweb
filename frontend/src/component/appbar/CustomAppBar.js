@@ -1,24 +1,35 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography ,TextField ,IconButton ,Avatar ,
     MenuList , MenuItem , ListItemText ,Divider , ListItemButton , Paper ,
-    Button
+    Button ,Popover ,Drawer ,Box ,List ,ListItem ,ListItemIcon 
 } from '@mui/material';
-import { Menu as MenuIcon ,Search as SearchIcon } from '@mui/icons-material';
+import { Menu as MenuIcon ,Search as SearchIcon,Home as HomeIcon } from '@mui/icons-material';
 import { styled } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 
 
-// 로그아웃 함수
-function logout(){
-    window.sessionStorage.removeItem("Auth");
-}
+
 
 export default function(){
+    const navigate = useNavigate();
     // 로그인 상태
     const [loginState,setLoginState] = React.useState(false);
     // 로그인 시 아바타 클릭 시 메뉴 활성화 
     const [loginMenuVisible,setLoginMenuVisible] = React.useState(false);
-    const navigate = useNavigate();
+    // 햄버거 메뉴 활성화
+    const [state,setState] = React.useState([{ right: false }]);
+    const toggleDrawer = (anchor, open) => (event) => {
+        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+          return;
+        }    
+        setState({ ...state, [anchor]: open });
+    };        
+
+    // 로그아웃 함수
+    function logout(){
+        window.sessionStorage.removeItem("Auth");
+        setLoginState(false);
+    }
 
     // 화면 로딩 시 호출
     React.useEffect(()=>{
@@ -29,17 +40,19 @@ export default function(){
     },[]);
 
     return(
-        <AppBar position='static' sx={{ backgroundColor: 'white' ,boxShadow: 0}}>
+        <AppBar position='static' sx={{ backgroundColor: 'white' ,boxShadow: 0 }} >
                 <Toolbar>
-                    <Typography 
-                        variant='h6' 
-                        sx={{ color: 'black' , textAlign: 'center' , p: 1 , mr: 1 }}
-                    >
-                        {"<Hello World"}
-                        <Typography display='inline' variant="h5" sx={{ color: 'red' }}>
-                            {"/>"}
+                    <IconButton disableRipple onClick={() => navigate('/')}>
+                        <Typography 
+                            variant='h6' 
+                            sx={{ color: 'black' , textAlign: 'center' , p: 1 , mr: 1 }}
+                        >
+                            {"<Hello World"}
+                            <Typography display='inline' variant="h5" sx={{ color: 'red' }}>
+                                {"/>"}
+                            </Typography>
                         </Typography>
-                    </Typography>
+                    </IconButton>
                     
                     <StyledForm>
                         <TextField
@@ -49,10 +62,9 @@ export default function(){
                             InputProps={{ startAdornment: <SearchIcon/> }}
                         />
                     </StyledForm>
-
                     {
                         loginState ? 
-                        <Paper sx={{ alignItems: 'center', boxShadow: 0 }}>
+                        <Paper sx={{ alignItems: 'center', boxShadow: 0 , display: 'flex' ,flexDirection: 'row' }}>
                             <ListItemButton 
                                 sx={{ alignItems: 'center' }}
                                 onClick={() => { setLoginMenuVisible(!loginMenuVisible) }}
@@ -61,27 +73,57 @@ export default function(){
                                     유저
                                 </Avatar>
                             </ListItemButton>
-                            {
-                                loginMenuVisible &&
-                                <MenuList sx={{ borderWidth: 1 , boxShadow: 2 , position: 'absolute' }}>
-                                    <MenuItem>
-                                        <ListItemText>Cut</ListItemText>
-                                    </MenuItem>
-
-                                    <MenuItem>
-                                        <ListItemText>Copy</ListItemText>
-                                    </MenuItem>
-
-                                    <MenuItem>
-                                        <ListItemText>Paste</ListItemText>
+                            
+                            <Popover
+                                open={loginMenuVisible}
+                                onClose={() => setLoginMenuVisible(false)}
+                                sx={{ borderWidth: 1 , top: 50 }}
+                                anchorOrigin={{
+                                    horizontal: 'right',
+                                }}
+                            >
+                                <MenuList>
+                                    <MenuItem onClick={() => navigate('/qna/register')}>
+                                        <ListItemText>질문 작성하기</ListItemText>
                                     </MenuItem>
 
                                     <Divider />
                                     <MenuItem onClick={logout}>
-                                        <ListItemText>로그아웃</ListItemText>
+                                        <ListItemText sx={{ color: 'red' }}>로그아웃</ListItemText>
                                     </MenuItem>
                                 </MenuList>
-                            }
+                            </Popover>
+
+                            <IconButton onClick={toggleDrawer('right',true)}>
+                                <MenuIcon color='black' />
+                            </IconButton>
+
+                            {/* 햄버거 메뉴 */}
+                            <Drawer
+                                anchor={'right'}
+                                open={state['right']}
+                                onClose={toggleDrawer('right', false)}
+                                >
+                                <Box
+                                    sx={{ width: 250 }}
+                                    role="presentation"
+                                    onClick={toggleDrawer('right', false)}
+                                    onKeyDown={toggleDrawer('right', false)}
+                                >
+                                    <List>
+                                        <Button sx={{ width: '100%' ,color: 'black' }}>
+                                        <ListItem>
+                                            <ListItemIcon>
+                                                <HomeIcon />
+                                            </ListItemIcon>
+                                            <ListItemText primary={'내 블로그'} />
+                                        </ListItem>
+                                        </Button>
+                                    </List>
+                                </Box>
+                            </Drawer>
+                            
+
                         </Paper>
                         :
                         <Button 
@@ -92,9 +134,6 @@ export default function(){
                                 로그인
                         </Button>
                     }
-                    <IconButton>
-                        <MenuIcon color='black' />
-                    </IconButton>
                 </Toolbar>
             </AppBar>
     );

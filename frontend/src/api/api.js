@@ -45,7 +45,6 @@ function getGuestBooks(){
             },
         })
         .then( res => {
-            // Jwt 반환
             if ( res.data.statusCode == status.GET_SUCCESS ){
 
                 console.log(res.data.data);
@@ -59,5 +58,48 @@ function getGuestBooks(){
     });
 }
 
+// POST - 게시글/QnA 작성
+function registerPost( {content,type}){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'POST' ,
+            url: '/api/post',
+            data: {
+                content: content ,
+                category: type ,
+                user_id: 1
+            }
+        })
+        .then( res => {
+            if ( res.data.statusCode == status.POST_SUCCESS ){
+                resolve(true);
+            }
+        })
+        .catch( e => {
+            console.log(e);
+            reject(false);
+        })
+    });
+}
+// GET - 모든 QnA 조회
+function getAllQna(){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'GET' ,
+            url: '/api/post/qnas',
+        })
+        .then( res => {
+            if ( res.data.statusCode == status.GET_SUCCESS ){
+                resolve(res.data.data);
+            }
+        })
+        .catch( e => {
+            console.log(e);
+            // 실패 시 빈 리스트 리턴
+            reject([]);
+        })
+    });
+}
 
-export default { registerUserWithKakao,getGuestBooks } ;
+
+export default { registerUserWithKakao,getGuestBooks,registerPost,getAllQna } ;
