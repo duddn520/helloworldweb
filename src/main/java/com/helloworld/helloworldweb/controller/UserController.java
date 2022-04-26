@@ -3,6 +3,8 @@ package com.helloworld.helloworldweb.controller;
 import com.helloworld.helloworldweb.domain.Role;
 import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.dto.Post.PostRequestDto;
+import com.helloworld.helloworldweb.dto.Post.PostResponseDto;
+import com.helloworld.helloworldweb.dto.User.UserResponseDto;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
@@ -16,10 +18,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServlet;
@@ -33,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 public class UserController extends HttpServlet {
 
     private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     // 카카오 로그인 및 회원가입 요청
     @PostMapping("/user/register/kakao")
@@ -120,5 +120,18 @@ public class UserController extends HttpServlet {
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.POST_SUCCESS,
                 HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
+    }
+
+    @GetMapping("/api/user")
+    public ResponseEntity<ApiResponse<UserResponseDto>> getUser(@RequestHeader(value = "Auth") String jwtToken) {
+
+        String userEmail = jwtTokenProvider.getUserEmail(jwtToken);
+        User findUser = userService.getUserByEmail(userEmail);
+        UserResponseDto responseDto = new UserResponseDto(findUser);
+
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.GET_SUCCESS,
+                HttpResponseMsg.GET_SUCCESS,
+                responseDto), HttpStatus.OK);
     }
 }
