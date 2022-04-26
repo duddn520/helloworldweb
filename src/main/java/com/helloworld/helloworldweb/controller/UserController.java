@@ -3,6 +3,8 @@ package com.helloworld.helloworldweb.controller;
 import com.helloworld.helloworldweb.domain.Role;
 import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.dto.Post.PostRequestDto;
+import com.helloworld.helloworldweb.dto.Post.PostResponseDto;
+import com.helloworld.helloworldweb.dto.User.UserResponseDto;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
@@ -16,10 +18,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServlet;
@@ -33,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 public class UserController extends HttpServlet {
 
     private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     // 카카오 로그인 및 회원가입 요청
     @PostMapping("/user/register/kakao")
@@ -52,10 +52,14 @@ public class UserController extends HttpServlet {
                 HttpResponseMsg.POST_SUCCESS), headers, HttpStatus.OK);
     }
 
+    //네이버로그인 및 회원가입 요청
     @PostMapping("/user/register/naver")
-    public ResponseEntity<ApiResponse> registerUserWithNaver(@RequestParam(name = "accessToken") String accessToken, HttpServletResponse response) throws ParseException {
+    public ResponseEntity<ApiResponse> registerUserWithNaver(@RequestParam(name = "code") String code, @RequestParam("state") String state, HttpServletResponse response) throws ParseException {
 
-        //네이버로 부터 받아온 정보로 유저로 등록
+        //네이버로 부터 엑세스 토큰을 받아옴.
+        String accessToken = userService.getAccessTokenFromNaver(state, code);
+
+        //받아온 엑세스 토큰을 사용하여 네이버에서 유저 정보를 받아온 후 유저로 등록
         String jwt = userService.addNaverUser(accessToken);
 
         response.addHeader("Auth", jwt);
@@ -105,20 +109,29 @@ public class UserController extends HttpServlet {
                 newEntity,
                 JSONObject.class
         );
-        //TODO User엔티티에 repos_url 애트리뷰트 만들고 저장, LoginMethod e
-        userInfoResponse.getBody().get("repos_url");
-        String email = (String) (userInfoResponse.getBody().get("login") + "@github.com");
+        //TODO User엔티티에 repos_url 애트리뷰트 만들고 저장, LoginMethod 추가.
 
-        User user = User.builder()
-                .email(email)
-                .role(Role.USER)
-                        .build();
-        userService.addUser(user);
+        String jwt = userService.addGithubUser(userInfoResponse.getBody());
+
+        servletresponse.addHeader("Auth",jwt);
 
         System.out.println("userInfoResponse = " + userInfoResponse);
 
         return new ResponseEntity<>(ApiResponse.response(
-                HttpStatusCode.OK,
+                HttpStatusCode.POST_SUCCESS,
                 HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
+    }
+
+    @GetMapping("/api/user")
+    public ResponseEntity<ApiResponse<UserResponseDto>> getUser(@RequestHeader(value = "Auth") String jwtToken) {
+
+        String userEmail = jwtTokenProvider.getUserEmail(jwtToken);
+        User findUser = userService.getUserByEmail(userEmail);
+        UserResponseDto responseDto = new UserResponseDto(findUser);
+
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.GET_SUCCESS,
+                HttpResponseMsg.GET_SUCCESS,
+                responseDto), HttpStatus.OK);
     }
 }

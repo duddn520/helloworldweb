@@ -11,10 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -71,6 +68,21 @@ public class UserService {
         JSONObject userInfo = stringToJson(userInfoRespnoseFromNaver, "response");
 
         return addUser(userInfo);
+    }
+
+    @Transactional
+    public String addGithubUser(JSONObject userInfoJsonObject)
+    {
+        String repo_url = (String) userInfoJsonObject.get("repos_url");
+        String email = (userInfoJsonObject.get("login") + "@github.com");
+        User user = User.builder()
+                .email(email)
+                .repo_url(repo_url)
+                .role(Role.USER)
+                .build();
+
+        addUser(user);
+        return jwtTokenProvider.createToken(email,Role.USER);
     }
 
     //네이버로 부터 사용자 정보 불러오는 부분
@@ -188,13 +200,41 @@ public class UserService {
 
     }
 
-    private JSONObject stringToJson(String str,String key) throws ParseException {
+    private JSONObject stringToJson(String str, String key) throws ParseException {
         JSONParser jsonParser = new JSONParser();
         Object obj = jsonParser.parse(str);
-        JSONObject userInfoFromKakaoJson = (JSONObject) obj;
+        JSONObject newJson = (JSONObject) obj;
 
-        Object obj2 = jsonParser.parse(userInfoFromKakaoJson.getAsString(key));
+        Object obj2 = jsonParser.parse(newJson.getAsString(key));
         return (JSONObject) obj2;
+    }
+
+    public String getAccessTokenFromNaver(String state, String code) {
+
+        HttpURLConnection con = connect(" https://nid.naver.com/oauth2.0/token?client_id=3RFZ_7joHf_HlJXavuMB&client_secret=luFryHID4J&grant_type=authorization_code&state="+state+"&code="+code);
+        try {
+            con.setRequestMethod("GET");
+            int responseCode = con.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
+                String response = readBody(con.getInputStream());
+
+                JSONParser parser = new JSONParser();
+                Object obj = parser.parse(response);
+                JSONObject responseJSON = (JSONObject) obj;
+
+                String access_token = responseJSON.getAsString("access_token");
+
+                return access_token;
+
+            } else { // 에러 발생
+                throw new RuntimeException("API 엑세스 토큰 요청 실패");
+            }
+        } catch (IOException | ParseException e) {
+            throw new RuntimeException("API 요청과 응답 실패", e);
+        } finally {
+            con.disconnect();
+        }
     }
 
 }

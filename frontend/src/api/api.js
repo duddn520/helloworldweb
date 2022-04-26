@@ -1,4 +1,3 @@
-import axios from 'axios';
 import request from './request';
 
 // Http Response statusCode 정리
@@ -23,7 +22,7 @@ function registerUserWithKakao(token){
         })
         .then( res => {
             // Jwt 반환
-            if ( res.data.statusCode == status.POST_SUCCESS ){
+            if ( res.data.statusCode === status.POST_SUCCESS ){
                 resolve (res.headers.auth);
             }
         })
@@ -45,7 +44,8 @@ function getGuestBooks(){
             },
         })
         .then( res => {
-            if ( res.data.statusCode == status.GET_SUCCESS ){
+            // Jwt 반환
+            if ( res.data.statusCode === status.GET_SUCCESS ){
 
                 console.log(res.data.data);
                 resolve (res.data.data);
@@ -58,48 +58,44 @@ function getGuestBooks(){
     });
 }
 
-// POST - 게시글/QnA 작성
-function registerPost( {content,type}){
+function registerUserWithNaver(code, state){
     return new Promise((resolve,reject) => {
         request({
-            method: 'POST' ,
-            url: '/api/post',
-            data: {
-                content: content ,
-                category: type ,
-                user_id: 1
-            }
+            method: 'POST',
+            url : `/user/register/naver`,
+            params: {
+                state : state,
+                code: code,
+            },
         })
         .then( res => {
-            if ( res.data.statusCode == status.POST_SUCCESS ){
-                resolve(true);
+            // Jwt 반환
+            if ( res.data.statusCode === status.POST_SUCCESS ){
+                resolve (res.headers.auth);
             }
         })
         .catch( e => {
             console.log(e);
-            reject(false);
+            reject();
         })
     });
 }
-// GET - 모든 QnA 조회
-function getAllQna(){
+
+function getUser(){
     return new Promise((resolve,reject) => {
         request({
-            method: 'GET' ,
-            url: '/api/post/qnas',
+            method: 'GET',
+            url : '/api/user',
         })
         .then( res => {
-            if ( res.data.statusCode == status.GET_SUCCESS ){
-                resolve(res.data.data);
-            }
+            resolve(res.data.data);
         })
         .catch( e => {
             console.log(e);
-            // 실패 시 빈 리스트 리턴
-            reject([]);
+            reject();
         })
     });
 }
 
 
-export default { registerUserWithKakao,getGuestBooks,registerPost,getAllQna } ;
+export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, getUser } ;
