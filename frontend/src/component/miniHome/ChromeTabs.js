@@ -1,120 +1,107 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import Color from 'color';
-import { styled } from '@mui/material';
+import * as React from 'react';
+import { styled } from '@mui/material/styles';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
+import Box from '@mui/material/Box';
+import Color from 'color';
+import PropTypes from 'prop-types';
 
-const useTabsStyles = styled(() => ({
-    indicator: {
-        display: 'none',
+const TabHeight = 40;
+const TabWidth = 70;
+
+const TotalTabs = styled(Tabs)({
+  borderBottom: '1px solid #e8e8e8',
+  '& .MuiTabs-indicator': {
+    backgroundColor: '#272C34',
+    display: 'none'
+  },
+  minHeight: TabHeight,
+});
+
+const ChromeTab = styled((props) => <Tab disableRipple {...props} />)(({ theme }) => ({
+    backgroundColor: theme.palette.grey[300],
+    opacity: 1,
+    overflow: 'initial',
+    paddingLeft: theme.spacing(2),
+    paddingRight: theme.spacing(2),
+    borderTopLeftRadius: theme.spacing(1),
+    borderTopRightRadius: theme.spacing(1),
+    color: Color(theme.palette.grey[300]).isLight() ? theme.palette.text.primary : theme.palette.common.white,
+    transition: '0.2s',
+    textTransform: 'none',
+    minWidth: 0,
+    [theme.breakpoints.up('md')]: {
+        minWidth: TabWidth,
+    },
+    minHeight: TabHeight,
+    fontWeight: theme.typography.fontWeightRegular,
+    fontFamily: [
+        '-apple-system',
+        'BlinkMacSystemFont',
+        '"Segoe UI"',
+        'Roboto',
+        '"Helvetica Neue"',
+        'Arial',
+        'sans-serif',
+        '"Apple Color Emoji"',
+        '"Segoe UI Emoji"',
+        '"Segoe UI Symbol"',
+    ].join(','),
+    '&:hover': {
+        opacity: 1,
+        backgroundColor: Color(theme.palette.grey[300])
+        .whiten(0.6)
+        .hex(),
+    },
+    '&.Mui-selected': {
+        backgroundColor: '#272C34',
+        color: Color('#272C34').isLight() ? theme.palette.text.primary : theme.palette.common.white,
+        '& + $root': {
+          zIndex: 1,
+        },
+        '& + $root:before': {
+          opacity: 0,
+        },
+        fontWeight: theme.typography.fontWeightMedium,
+    },
+    '&.Mui-focusVisible': {
+        backgroundColor: '#d1eaff',
+    },
+    '&:before': {
+        transition: '0.2s',
     },
 }));
 
-const useTabStyles = styled(({ palette, spacing, breakpoints }) => {
-    const defaultBgColor = palette.grey[300];
-    const defaultSelectedBgColor = '#272C34';
-    const defaultMinWidth = {
-        md: 120,
-    };
-    const getTextColor = color => {
-        if (Color(color).isLight()) return palette.text.primary;
-        return palette.common.white;
-    };
-    return {
-        root: ({ bgColor = defaultBgColor, minWidth = defaultMinWidth }) => ({
-            opacity: 1,
-            overflow: 'initial',
-            paddingLeft: spacing(2),
-            paddingRight: spacing(2),
-            borderTopLeftRadius: spacing(1),
-            borderTopRightRadius: spacing(1),
-            color: getTextColor(bgColor),
-            backgroundColor: bgColor,
-            transition: '0.2s',
-            [breakpoints.up('md')]: {
-                minWidth: minWidth.md,
-            },
-            '&:before': {
-                transition: '0.2s',
-            },
-            '&:not(:first-of-type)': {
-                '&:before': {
-                content: '" "',
-                position: 'absolute',
-                left: 0,
-                display: 'block',
-                height: 20,
-                width: 1,
-                zIndex: 1,
-                marginTop: spacing(0.5),
-                backgroundColor: palette.grey[500],
-                },
-            },
-            '& + $selected:before': {
-                opacity: 0,
-            },
-            '&:hover': {
-                '&:not($selected)': {
-                backgroundColor: Color(bgColor)
-                    .whiten(0.6)
-                    .hex(),
-                },
-                '&::before': {
-                opacity: 0,
-                },
-                '& + $root:before': {
-                opacity: 0,
-                },
-            },
-        }),
-        selected: ({ selectedBgColor = defaultSelectedBgColor }) => ({
-            backgroundColor: selectedBgColor,
-            color: getTextColor(selectedBgColor),
-            '& + $root': {
-                zIndex: 1,
-            },
-            '& + $root:before': {
-                opacity: 0,
-            },
-            }),
-            wrapper: {
-            zIndex: 2,
-            marginTop: spacing(0.5),
-            textTransform: 'initial',
-        },
-    };
-});
+function ChromeTabs({ tabs, tabStyle, tabProps, ...props }) {
 
-const ChromeTabs = ({ tabs, tabStyle, tabProps, ...props }) => {
-    const tabsClasses = useTabsStyles(props);
-    const tabClasses = useTabStyles({ ...tabProps, ...tabStyle });
-
-    return (
-        <Tabs {...props} classes={tabsClasses}>
-        {tabs.map(tab => (
-            <Tab key={tab.label} {...tabProps} {...tab} classes={tabClasses} />
-        ))}
-        </Tabs>
-    );
-};
+  return (
+    <Box sx={{ width: '100%' }}>
+        <TotalTabs {...props} >
+            {tabs.map(tab => (
+              <ChromeTab key={tab.label} {...tabProps} {...tab}/>
+            ))}
+        </TotalTabs>
+    </Box>
+  );
+}
 
 ChromeTabs.propTypes = {
     tabs: PropTypes.arrayOf(
-        PropTypes.shape({
+      PropTypes.shape({
         label: PropTypes.node.isRequired,
-        }),
+      }),
     ),
     tabStyle: PropTypes.shape({
-        bgColor: PropTypes.string,
-        minWidth: PropTypes.shape({}),
+      bgColor: PropTypes.string,
+      minWidth: PropTypes.shape({}),
     }),
     tabProps: PropTypes.shape({}),
-    };
-    ChromeTabs.defaultProps = {
+  };
+  ChromeTabs.defaultProps = {
     tabs: [],
     tabStyle: {},
     tabProps: {},
-};
+  };
 
 export default ChromeTabs;
+

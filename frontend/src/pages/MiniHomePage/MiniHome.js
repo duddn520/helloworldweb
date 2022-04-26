@@ -5,26 +5,47 @@ import Profile from './Profile';
 import MyInfo from './MyInfo';
 import Posts from './Posts';
 import GuestBooks from './GuestBooks';
+import TotalBar from './TotalBar';
+import { useNavigate } from 'react-router';
+import api from '../../api/api';
+
+const BlankUser = {
+  id: -1,
+  email: '',
+  userName: '',
+}
 
 function Main() {
+  const navigate = useNavigate();
   const [index, setIndex] = React.useState(0);
+  const [userInfo, setUserInfo]= React.useState(BlankUser);
+
+  function LogOut(){
+    window.sessionStorage.removeItem("Auth");
+    navigate("/", {replace: true});
+  }
+
+  React.useEffect(()=>{
+    api.getUser()
+    .then(res => {
+      setUserInfo(res);
+    })
+    .catch((e) => {
+      alert('회원정보를 불러오는데 실패했습니다.')
+    })
+  }, [])
   
   return (
-    <Box sx={{display: 'flex'}}>
-        <Box sx={{flex: 1, textAlign: 'center', pt: 10}}>
-            <Profile/>
-        </Box>
-        <Box sx={{flex: 3, backgroundColor: 'white', paddingRight: 15, paddingLeft: 5, borderLeft: 1, borderColor: 'lightgray', minHeight: '100vmin', width: '100vmin'}}>
+     <TotalBar drawer={<Profile userInfo={userInfo}/>} title={userInfo.userName+'의 미니홈피'} logOut={LogOut}>
+         <Box>
             <div>
                 <ChromeTabBar index={index} setIndex={setIndex} tabNames={['내 정보', '게시물', '방명록']}/>
-                <Box sx={{ border: 1, borderColor: '#E6E8EB', paddingLeft: 5, paddingRight: 5, wordBreak: 'normal', wordWrap: 'break-word'}}>
-                    {index === 0 && <MyInfo/>}
-                    {index === 1 && <Posts/>}
-                    {index === 2 && <GuestBooks/>}
-                </Box>
+                {index === 0 && <MyInfo/>}
+                {index === 1 && <Posts/>}
+                {index === 2 && <GuestBooks/>}
             </div> 
         </Box>
-    </Box>
+     </TotalBar>
   );
 }
 

@@ -19,9 +19,9 @@ function ChromeTabBar(props){
         <AppBar
             position={'static'}
             elevation={0}
-            style={{ backgroundColor: 'white', marginTop: 20 }}
+            sx={{ backgroundColor: 'white' }}
           >
-            <Toolbar style={{ padding: 0}}>
+            <Toolbar style={{ padding: 0 }}>
               <ChromeTabs
                 style={{ alignSelf: 'flex-end' }}
                 tabs={changeTabName(props.tabNames)}
