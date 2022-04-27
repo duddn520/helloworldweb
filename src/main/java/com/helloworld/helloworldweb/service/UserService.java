@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -75,14 +76,23 @@ public class UserService {
     {
         String repo_url = (String) userInfoJsonObject.get("repos_url");
         String email = (userInfoJsonObject.get("login") + "@github.com");
-        User user = User.builder()
-                .email(email)
-                .repo_url(repo_url)
-                .role(Role.USER)
-                .build();
 
-        addUser(user);
-        return jwtTokenProvider.createToken(email,Role.USER);
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if(userOptional.isPresent())
+        {
+            return jwtTokenProvider.createToken(email,Role.USER);
+        }else
+        {
+            User user = User.builder()
+                    .email(email)
+                    .repo_url(repo_url)
+                    .role(Role.USER)
+                    .build();
+
+            addUser(user);
+
+            return jwtTokenProvider.createToken(email,Role.USER);
+        }
     }
 
     //네이버로 부터 사용자 정보 불러오는 부분
