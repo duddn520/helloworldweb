@@ -80,6 +80,7 @@ public class UserController extends HttpServlet {
         HttpHeaders headers = new HttpHeaders();
 
         servletresponse.addHeader("Access-Control-Allow-Origin","*");
+        servletresponse.addHeader("Access-Control-Expose-Headers", "Auth");
 
         HttpEntity<MultiValueMap<String,String>> entity = new HttpEntity<>(params, headers);
 
@@ -111,14 +112,14 @@ public class UserController extends HttpServlet {
 
         String jwt = userService.addGithubUser(userInfoResponse.getBody());
 
-        servletresponse.addHeader("Auth",jwt);
+        headers.add("Auth",jwt);
         System.out.println("jwt = " + jwt);
 
         System.out.println("userInfoResponse = " + userInfoResponse);
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.POST_SUCCESS,
-                HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
+                HttpResponseMsg.POST_SUCCESS),headers, HttpStatus.OK);
     }
 
     //유저 db에 저장된 repo_url 통해 깃허브 레포지토리 조회, 레포지토리 json 리스트 반환.
@@ -128,17 +129,32 @@ public class UserController extends HttpServlet {
          String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.getTokenByHeader(request));
          User user = userService.getUserByEmail(email);
 
-        response.addHeader("Access-Control-Allow-Origin","*");
+        response.addHeader("Access-Control-Allow-Origin", "*");
         response.addHeader("Access-Control-Expose-Headers", "Auth");
 
-        RestTemplate rt = new RestTemplate();
-        ResponseEntity<Object[]> res = rt.getForEntity(user.getRepo_url(),Object[].class);
-        Object[] objects = res.getBody();
+         if(user.getRepo_url().equals(null))
+         {
+             return new ResponseEntity<>(ApiResponse.response(
+                     HttpStatusCode.NO_CONTENT,
+                     HttpResponseMsg.NO_CONTENT), HttpStatus.NO_CONTENT);
+         }
+         else {
 
-        return new ResponseEntity<>(ApiResponse.response(
-                HttpStatusCode.GET_SUCCESS,
-                HttpResponseMsg.GET_SUCCESS,
-                objects), HttpStatus.OK);
+             RestTemplate rt = new RestTemplate();
+             HttpHeaders headers = new HttpHeaders();
+             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+
+             headers.add("Authorization","token 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");
+             HttpEntity<MultiValueMap<String,String>> entity = new HttpEntity<>(params, headers);
+
+             ResponseEntity<Object[]> res = rt.exchange(user.getRepo_url(),HttpMethod.GET,entity,Object[].class);
+             Object[] objects = res.getBody();
+
+             return new ResponseEntity<>(ApiResponse.response(
+                     HttpStatusCode.GET_SUCCESS,
+                     HttpResponseMsg.GET_SUCCESS,
+                     objects), HttpStatus.OK);
+         }
     }
 
 }
