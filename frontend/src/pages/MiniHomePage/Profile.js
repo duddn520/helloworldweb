@@ -1,21 +1,24 @@
 import React from "react";
-import { useNavigate } from 'react-router';
+import { Box } from '@mui/material';
 
-function Profile(){
-    const navigate = useNavigate();
-
-    function LogOut(){
-        window.sessionStorage.removeItem("Auth");
-        navigate("/");
-      }
+function Profile({ userInfo }){
 
     return(
-        <div>
-            <img src={'https://play-lh.googleusercontent.com/8_0SDfkFXAFm12A7XEqkyChCdGC055J6fC8JR7qynNuO3qNOczIoNHo4U4lad8xYMJOL'} width={200} height={200}></img>
-            <h3>허지훈</h3>
+        <Box sx={{flex: 1, marginTop: 5, textAlign: 'center'}}>
+            <Box 
+                display="flex" 
+                width={300}
+                alignItems="center"
+                justifyContent="center"
+                flex={1}
+            >
+                <Box sx={{width: 200, height: 200, borderRadius: 100, overflow: 'hidden'}}>
+                    <img src={'https://d2u3dcdbebyaiu.cloudfront.net/uploads/atch_img/309/59932b0eb046f9fa3e063b8875032edd_crop.jpeg'} width={200} height={200} alt={'프로필 사진'}></img>
+                </Box>
+            </Box>
+            <h3>{userInfo.userName}</h3>
             <h5>난...ㄱㅏ끔...눈물을...흘린ㄷr...</h5>
-            <img src={require('../../images/btnG_LogOut.png')} width={200} height={50} onClick={()=>LogOut()}></img>
-        </div>
+        </Box>
        
     )
 }

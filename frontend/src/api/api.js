@@ -1,4 +1,3 @@
-import axios from 'axios';
 import request from './request';
 
 // Http Response statusCode 정리
@@ -23,7 +22,7 @@ function registerUserWithKakao(token){
         })
         .then( res => {
             // Jwt 반환
-            if ( res.data.statusCode == status.POST_SUCCESS ){
+            if ( res.data.statusCode === status.POST_SUCCESS ){
                 resolve (res.headers.auth);
             }
         })
@@ -46,7 +45,7 @@ function getGuestBooks(){
         })
         .then( res => {
             // Jwt 반환
-            if ( res.data.statusCode == status.GET_SUCCESS ){
+            if ( res.data.statusCode === status.GET_SUCCESS ){
 
                 console.log(res.data.data);
                 resolve (res.data.data);
@@ -71,7 +70,7 @@ function registerUserWithNaver(code, state){
         })
         .then( res => {
             // Jwt 반환
-            if ( res.data.statusCode == status.POST_SUCCESS ){
+            if ( res.data.statusCode === status.POST_SUCCESS ){
                 resolve (res.headers.auth);
             }
         })
@@ -82,5 +81,21 @@ function registerUserWithNaver(code, state){
     });
 }
 
+function getUser(){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'GET',
+            url : '/api/user',
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
 
-export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver } ;
+
+export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, getUser } ;

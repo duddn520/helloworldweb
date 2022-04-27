@@ -1,6 +1,9 @@
 package com.helloworld.helloworldweb.controller;
 
 import com.helloworld.helloworldweb.domain.User;
+import com.helloworld.helloworldweb.dto.Post.PostRequestDto;
+import com.helloworld.helloworldweb.dto.Post.PostResponseDto;
+import com.helloworld.helloworldweb.dto.User.UserResponseDto;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
@@ -17,6 +20,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServlet;
@@ -157,4 +161,16 @@ public class UserController extends HttpServlet {
          }
     }
 
+    @GetMapping("/api/user")
+    public ResponseEntity<ApiResponse<UserResponseDto>> getUser(@RequestHeader(value = "Auth") String jwtToken) {
+
+        String userEmail = jwtTokenProvider.getUserEmail(jwtToken);
+        User findUser = userService.getUserByEmail(userEmail);
+        UserResponseDto responseDto = new UserResponseDto(findUser);
+
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.GET_SUCCESS,
+                HttpResponseMsg.GET_SUCCESS,
+                responseDto), HttpStatus.OK);
+    }
 }

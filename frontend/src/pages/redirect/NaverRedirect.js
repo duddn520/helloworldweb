@@ -8,10 +8,10 @@ function NaverRedirect(){
     const navigate = useNavigate();
 
     //redirect Url에 포함된 인증code로 회원가입.
-    function registerUserWithNaver(){
+    function registerUser(){
         if (!location.search){
             alert('로그인 실패');
-            navigate("/");
+            navigate("/", {replace: true});
         }
         else{
             const code = location.search.split('&')[0].split('=')[1];
@@ -22,20 +22,20 @@ function NaverRedirect(){
                 // SessionStorage에 jwt 저장
                 window.sessionStorage.setItem("Auth", res);
 
-                // 메인화면으로 이동
-                navigate("/minihome");
+                // 미니홈피페이지로 이동
+                navigate("/minihome", {replace: true});
             })
             .catch(e => {
                 console.log(e);
                 alert('회원가입 실패');
-                navigate("/");
+                navigate("/", {replace: true});
             })
         }
         
     } 
 
     React.useEffect(() => {
-        registerUserWithNaver();
+        registerUser();
     }, []);
     
 
