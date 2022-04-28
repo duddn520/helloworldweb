@@ -39,6 +39,7 @@ export default function Redirect(){
             })
             .catch( e => {  
                 // 로그인 또는 회원가입 실패 
+                navigate("/login");
             });
 
         }
