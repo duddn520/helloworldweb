@@ -4,8 +4,6 @@ import {useNavigate} from "react-router";
 
 export default function GithubRedirect(){
     const navigate = useNavigate()
-    const cid = "105e0b50eefc27b4dc81";
-    const cpwd = "ce4d0a93a257529e78a8804f322ca629b1d7cba6"
 
     useEffect(()=>
     {

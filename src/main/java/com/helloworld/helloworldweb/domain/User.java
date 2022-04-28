@@ -95,4 +95,9 @@ public class User implements UserDetails {
         this.profileUrl = profileUrl;
         this.repo_url = repo_url;
     }
+
+    public void updateRepoUrl(String repo_url)
+    {
+        this.repo_url = repo_url;
+    }
 }

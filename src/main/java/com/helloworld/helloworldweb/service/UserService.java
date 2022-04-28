@@ -8,8 +8,15 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jose.shaded.json.parser.JSONParser;
 import com.nimbusds.jose.shaded.json.parser.ParseException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import javax.swing.text.html.Option;
 import java.io.*;
@@ -255,5 +262,58 @@ public class UserService {
             con.disconnect();
         }
     }
+
+    public String getGithubAccessTokenByCode(String code)
+    {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("client_id","105e0b50eefc27b4dc81");
+        params.add("client_secret","ce4d0a93a257529e78a8804f322ca629b1d7cba6");
+        params.add("code",code);
+
+        HttpHeaders headers = new HttpHeaders();
+
+        HttpEntity<MultiValueMap<String,String>> entity = new HttpEntity<>(params, headers);
+
+        RestTemplate rt = new RestTemplate();
+
+        ResponseEntity<JSONObject> accessTokenResponse = rt.exchange(
+                "https://github.com/login/oauth/access_token",
+                HttpMethod.POST,
+                entity,
+                JSONObject.class
+        );
+
+        JSONObject obj = accessTokenResponse.getBody();
+        return obj.getAsString("access_token");
+
+    }
+
+    public JSONObject getGithubUserInfoByAccessToken(String token)
+    {
+        System.out.println("token = " + token);
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization","Token "+ token);
+
+        HttpEntity<MultiValueMap<String,String>> entity = new HttpEntity<>(params, headers);
+        RestTemplate rt = new RestTemplate();
+
+        ResponseEntity<JSONObject> userInfoResponse = rt.exchange(
+                "https://api.github.com/user",
+                HttpMethod.GET,
+                entity,
+                JSONObject.class
+        );
+
+        return userInfoResponse.getBody();
+
+    }
+
+    public void updateUserRepoUrl(User user, String repo_url)
+    {
+        user.updateRepoUrl(repo_url);
+        userRepository.save(user);
+    }
+
 
 }

@@ -1,5 +1,6 @@
 package com.helloworld.helloworldweb.controller;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.dto.Post.PostRequestDto;
 import com.helloworld.helloworldweb.dto.Post.PostResponseDto;
@@ -28,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -76,54 +78,20 @@ public class UserController extends HttpServlet {
     @PostMapping("/user/register/github")
     public ResponseEntity<ApiResponse> registerUserWithGithub(@RequestParam(name = "code") String code,HttpServletResponse servletresponse) throws ParseException {
 
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("client_id","105e0b50eefc27b4dc81");
-        params.add("client_secret","ce4d0a93a257529e78a8804f322ca629b1d7cba6");
-        params.add("code",code);
-
-        HttpHeaders headers = new HttpHeaders();
-
         servletresponse.addHeader("Access-Control-Allow-Origin","*");
         servletresponse.addHeader("Access-Control-Expose-Headers", "Auth");
 
-        HttpEntity<MultiValueMap<String,String>> entity = new HttpEntity<>(params, headers);
+        String token = userService.getGithubAccessTokenByCode(code);
 
-        RestTemplate rt = new RestTemplate();
+        JSONObject userInfo = userService.getGithubUserInfoByAccessToken(token);
 
-        ResponseEntity<JSONObject> accessTokenResponse = rt.exchange(
-                "https://github.com/login/oauth/access_token",
-                HttpMethod.POST,
-                entity,
-                JSONObject.class
-        );
+        String jwt = userService.addGithubUser(userInfo);
 
-        MultiValueMap<String, String> newParams = new LinkedMultiValueMap<>();
-        JSONObject obj = accessTokenResponse.getBody();
-        String accessToken = obj.getAsString("access_token");
-        RestTemplate newRt = new RestTemplate();
-
-        headers.add("Authorization","token " + accessToken);
-
-        HttpEntity<MultiValueMap<String,String>> newEntity = new HttpEntity<>(newParams, headers);
-
-        ResponseEntity<JSONObject> userInfoResponse = newRt.exchange(
-                "https://api.github.com/user",
-                HttpMethod.GET,
-                newEntity,
-                JSONObject.class
-        );
-        //TODO User엔티티에 repos_url 애트리뷰트 만들고 저장, LoginMethod 추가.
-
-        String jwt = userService.addGithubUser(userInfoResponse.getBody());
-
-        headers.add("Auth",jwt);
-        System.out.println("jwt = " + jwt);
-
-        System.out.println("userInfoResponse = " + userInfoResponse);
+        servletresponse.addHeader("Auth",jwt);
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.POST_SUCCESS,
-                HttpResponseMsg.POST_SUCCESS),headers, HttpStatus.OK);
+                HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
     }
 
     //유저 db에 저장된 repo_url 통해 깃허브 레포지토리 조회, 레포지토리 json 리스트 반환.
@@ -136,7 +104,8 @@ public class UserController extends HttpServlet {
         response.addHeader("Access-Control-Allow-Origin", "*");
         response.addHeader("Access-Control-Expose-Headers", "Auth");
 
-         if(user.getRepo_url().equals(null))
+
+         if(user.getRepo_url().equals(" "))
          {
              return new ResponseEntity<>(ApiResponse.response(
                      HttpStatusCode.NO_CONTENT,
@@ -172,5 +141,30 @@ public class UserController extends HttpServlet {
                 HttpStatusCode.GET_SUCCESS,
                 HttpResponseMsg.GET_SUCCESS,
                 responseDto), HttpStatus.OK);
+    }
+
+    //프론트에서 생성할 연동하기 버튼에서, 인가코드를 받아온 후 이 컨트롤러 메서드 실행.
+    @PostMapping("/user/githubconnect")
+    public ResponseEntity<ApiResponse> connectUserToGithub(@RequestParam(name = "code") String code, HttpServletRequest request, HttpServletResponse response)
+    {
+        System.out.println("method init");
+        System.out.println("code = " + code);
+        String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.getTokenByHeader(request));
+        User user = userService.getUserByEmail(email);
+
+        response.addHeader("Access-Control-Allow-Origin", "*");
+        response.addHeader("Access-Control-Expose-Headers", "Auth");
+
+        String token = userService.getGithubAccessTokenByCode(code);
+        JSONObject userInfoRes = userService.getGithubUserInfoByAccessToken(token);
+
+        String repo_api_url = (String) userInfoRes.get("repos_url");
+
+        userService.updateUserRepoUrl(user,repo_api_url);
+
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.PUT_SUCCESS,
+                HttpResponseMsg.PUT_SUCCESS), HttpStatus.OK);
+
     }
 }
