@@ -140,7 +140,7 @@ export default function(){
                             buttonTags.map( tag => {
                                 tmp += tag + ','
                             },[]);
-                            if( api.registerPost({ title: title ,content: content , type: "QNA" ,tags:  tmp }) )
+                            if( api.registerQnA({ title: title ,content: content , type: "QNA" ,tags:  tmp }) )
                                 navigate('/');
                         }}
                     >

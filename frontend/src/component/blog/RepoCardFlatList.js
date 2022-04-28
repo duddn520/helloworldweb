@@ -19,7 +19,7 @@ export default function RepoCardFlatList()
     useEffect(()=>{
         request({
             method:"GET",
-            url:"http://localhost:8080/user/repos_url",
+            url:"/user/repos_url",
         })
             .then( res =>{
                 console.log(res)

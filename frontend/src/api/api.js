@@ -104,7 +104,7 @@ function registerGuestBook({ targetUserEmail ,content }){
 }
 
 // POST - 게시글/QnA 작성
-function registerPost( {content,type,title,tags}){
+function registerQnA( {content,type,title,tags}){
     return new Promise((resolve,reject) => {
         request({
             method: 'POST' ,
@@ -228,4 +228,4 @@ function getMyBlogPosts(){
 
 
 
-export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , getMyBlogPosts} ;
+export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, getUser ,registerQnA ,registerPost,getAllQna,registerGuestBook,updateGuestBook , getMyBlogPosts} ;
