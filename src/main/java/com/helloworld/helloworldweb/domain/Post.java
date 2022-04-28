@@ -27,18 +27,22 @@ public class Post {
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    private String content;
+    // 제목
     private String title;
-
+    // 내용
+    private String content;
+    // 태그
+    private String tags;
 
     @Builder
-    public Post(Long id, User user, List<PostComment> postComments, Category category, String content, String title) {
+    public Post(Long id, User user, List<PostComment> postComments, Category category, String content, String title ,String tags) {
         this.id = id;
         this.user = user;
         this.postComments = postComments;
         this.category = category;
         this.content = content;
         this.title = title;
+        this.tags = tags;
     }
 
     public void updateUser(User user) {

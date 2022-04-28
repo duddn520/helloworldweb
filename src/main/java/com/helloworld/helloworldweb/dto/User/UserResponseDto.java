@@ -12,10 +12,12 @@ public class UserResponseDto {
     private Long id;
     private String email;
     private String userName;
+    private String profileUrl;
 
     public UserResponseDto(User user) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.userName = user.getUsername();
+        this.profileUrl = user.getProfileUrl();
     }
 }

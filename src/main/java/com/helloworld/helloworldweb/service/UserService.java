@@ -8,9 +8,17 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jose.shaded.json.parser.JSONParser;
 import com.nimbusds.jose.shaded.json.parser.ParseException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
+import javax.swing.text.html.Option;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -64,7 +72,12 @@ public class UserService {
         //받은 String정보를 JSON 객체화
         JSONObject userInfo = stringToJson(userInfoFromKakao, "kakao_account");
 
-        return addUser(userInfo);
+        // 필요한 정보들
+        String email = userInfo.getAsString("email");
+        String profileUrl = ( (JSONObject)userInfo.get("profile") ).getAsString("profile_image_url");
+
+
+        return addUser(email,profileUrl);
 
     }
 
@@ -76,7 +89,10 @@ public class UserService {
         //받은 String정보를 JSON 객체화
         JSONObject userInfo = stringToJson(userInfoRespnoseFromNaver, "response");
 
-        return addUser(userInfo);
+        // 필요한 정보들
+        String email = userInfo.getAsString("email");
+        String profileUrl = "";
+        return addUser(email,profileUrl);
     }
 
     @Transactional
@@ -84,14 +100,23 @@ public class UserService {
     {
         String repo_url = (String) userInfoJsonObject.get("repos_url");
         String email = (userInfoJsonObject.get("login") + "@github.com");
-        User user = User.builder()
-                .email(email)
-                .repo_url(repo_url)
-                .role(Role.USER)
-                .build();
 
-        addUser(user);
-        return jwtTokenProvider.createToken(email,Role.USER);
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if(userOptional.isPresent())
+        {
+            return jwtTokenProvider.createToken(email,Role.USER);
+        }else
+        {
+            User user = User.builder()
+                    .email(email)
+                    .repo_url(repo_url)
+                    .role(Role.USER)
+                    .build();
+
+            addUser(user);
+
+            return jwtTokenProvider.createToken(email,Role.USER);
+        }
     }
 
     //네이버로 부터 사용자 정보 불러오는 부분
@@ -190,17 +215,18 @@ public class UserService {
 
     //각 소셜 로그인으로부터 받은 정보로 회원가입 시키는 함수
     //JWT를 반환
-    private String addUser(JSONObject userInfo){
+    private String addUser(String email,String profileUrl){
 
         // 유저가 이미 DB에 존재하는지 확인
-        Optional<User> findUser = userRepository.findByEmail(userInfo.getAsString(("email")));
+        Optional<User> findUser = userRepository.findByEmail(email);
 
         // 존재 유무 isPresent()로 확인
         if( findUser.isPresent() ){
             return jwtTokenProvider.createToken(findUser.get().getEmail(),findUser.get().getRole());
         } else{
             User newUser = User.builder()
-                    .email(userInfo.getAsString("email"))
+                    .email(email)
+                    .profileUrl(profileUrl)
                     .role(Role.USER)
                     .build();
             User savedUser = userRepository.save(newUser);
@@ -245,5 +271,58 @@ public class UserService {
             con.disconnect();
         }
     }
+
+    public String getGithubAccessTokenByCode(String code)
+    {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("client_id","105e0b50eefc27b4dc81");
+        params.add("client_secret","ce4d0a93a257529e78a8804f322ca629b1d7cba6");
+        params.add("code",code);
+
+        HttpHeaders headers = new HttpHeaders();
+
+        HttpEntity<MultiValueMap<String,String>> entity = new HttpEntity<>(params, headers);
+
+        RestTemplate rt = new RestTemplate();
+
+        ResponseEntity<JSONObject> accessTokenResponse = rt.exchange(
+                "https://github.com/login/oauth/access_token",
+                HttpMethod.POST,
+                entity,
+                JSONObject.class
+        );
+
+        JSONObject obj = accessTokenResponse.getBody();
+        return obj.getAsString("access_token");
+
+    }
+
+    public JSONObject getGithubUserInfoByAccessToken(String token)
+    {
+        System.out.println("token = " + token);
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization","Token "+ token);
+
+        HttpEntity<MultiValueMap<String,String>> entity = new HttpEntity<>(params, headers);
+        RestTemplate rt = new RestTemplate();
+
+        ResponseEntity<JSONObject> userInfoResponse = rt.exchange(
+                "https://api.github.com/user",
+                HttpMethod.GET,
+                entity,
+                JSONObject.class
+        );
+
+        return userInfoResponse.getBody();
+
+    }
+
+    public void updateUserRepoUrl(User user, String repo_url)
+    {
+        user.updateRepoUrl(repo_url);
+        userRepository.save(user);
+    }
+
 
 }

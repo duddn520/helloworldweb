@@ -15,13 +15,15 @@ public class PostRequestDto { //post요청과 함께 받을 데이터
     private Category category;
     private String content;
     private String title;
+    private String tags;
 
     public Post toEntity() {
         return Post.builder()
                 .id(post_id)
                 .category(category)
-                .content(content)
                 .title(title)
+                .content(content)
+                .tags(tags)
                 .build();
     }
 
