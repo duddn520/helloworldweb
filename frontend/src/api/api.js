@@ -228,4 +228,5 @@ function getMyBlogPosts(){
 
 
 
-export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, getUser ,registerQnA ,registerPost,getAllQna,registerGuestBook,updateGuestBook , getMyBlogPosts} ;
+
+export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , getMyBlogPosts, registerQnA} ;
