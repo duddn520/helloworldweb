@@ -6,6 +6,7 @@ import KakaoRedirect from './pages/redirect/KakaoRedirect';
 import GithubRedirect from "./pages/redirect/GithubRedirect";
 import NaverRedirect from './pages/redirect/NaverRedirect';
 import MiniHome from "./pages/MiniHomePage/MiniHome";
+import GithubConnectRedirect from "./pages/redirect/GithubConnectRedirect";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/login/redirect/kakao" element={<KakaoRedirect />} />
         <Route path="/login/redirect/github" element={<GithubRedirect />} />
         <Route path="/login/redirect/naver" element={<NaverRedirect />} />
+        <Route path="/login/redirect/github/connect" element={<GithubConnectRedirect />} />
         <Route path="/minihome" element={<MiniHome />} />
       </Routes>
     </BrowserRouter>

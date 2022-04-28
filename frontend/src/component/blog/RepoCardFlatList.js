@@ -2,7 +2,7 @@ import React, {useEffect} from "react";
 import FlatList from 'flatlist-react';
 import RepoCard from "./RepoCard";
 import request from "../../api/request";
-import {Typography} from "@mui/material";
+import {Avatar, Box, Button, Typography} from "@mui/material";
 //useEffect사용하여 getPosts 로 postList 받고, 렌더링.
 
 export default function RepoCardFlatList()
@@ -10,21 +10,29 @@ export default function RepoCardFlatList()
     const [jsonList,setJsonList] = React.useState([])
     const [flag,setFlag] = React.useState([])
 
-    useEffect(()=>{
+    const github_url = "https://github.com/login/oauth/authorize?client_id=105e0b50eefc27b4dc81&redirect_uri=http://localhost:3000/login/redirect/github/connect";
 
+    function getGitCode(){
+        window.location.replace(github_url)
+
+    }
+    useEffect(()=>{
         request({
             method:"GET",
             url:"http://localhost:8080/user/repos_url",
         })
             .then( res =>{
-                if(res.data.statusCode===211)
+                console.log(res)
+
+                if(res.status===200)   //github 연동 되어있는 경우
                 {
                     setJsonList(res.data.data)
                     setFlag([true])
                 }
-                else if(res.data.statusCode===204)
+                else if(res.status===204) //github 연동 안되어있는 경우
                 {
                     setFlag([false])
+                    console.log(res)
                 }
             })
             .catch( e=>{
@@ -61,7 +69,31 @@ export default function RepoCardFlatList()
     {
         return(
             <div>
-                <Typography variant="h5">Github 연동이 필요합니다.</Typography>
+                <Box sx={{
+                    display:"flex",
+                    alignItems:"center",
+                    justifyContent:"center",
+                    m:2
+                }}>
+                    <Typography variant="h5"
+                            sx={{alignItems:"center"}}>
+                        Github 연동이 필요합니다.
+                    </Typography>
+                </Box>
+                <Box sx={{
+                    display:"flex",
+                    alignItems:"center",
+                    justifyContent:"center",
+                    m:3
+                }}>
+                    <Button
+                        startIcon={<Avatar sx={{position : "absolute", left:5, alignSelf:"center", bottom:4.2}} onClick={getGitCode} src={require(`../../images/github_icon.png`)} alt='LoginButtonImage' width='50' height='50' />}
+                        sx={{ color: 'gray', width : 300, height: 50, fontSize:14 ,backgroundColor : "white" ,boxShadow:0 , borderColor:"gray", borderWidth:0.9 ,":hover":{ boxShadow:0, backgroundColor:"whitesmoke", borderColor:"gray"}}}
+                        variant={"outlined"}
+                    >
+                        Github 연동하기
+                    </Button>
+                </Box>
             </div>
         )
     }
