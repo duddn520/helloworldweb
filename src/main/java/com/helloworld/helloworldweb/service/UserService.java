@@ -63,7 +63,12 @@ public class UserService {
         //받은 String정보를 JSON 객체화
         JSONObject userInfo = stringToJson(userInfoFromKakao, "kakao_account");
 
-        return addUser(userInfo);
+        // 필요한 정보들
+        String email = userInfo.getAsString("email");
+        String profileUrl = ( (JSONObject)userInfo.get("profile") ).getAsString("profile_image_url");
+
+
+        return addUser(email,profileUrl);
 
     }
 
@@ -75,7 +80,10 @@ public class UserService {
         //받은 String정보를 JSON 객체화
         JSONObject userInfo = stringToJson(userInfoRespnoseFromNaver, "response");
 
-        return addUser(userInfo);
+        // 필요한 정보들
+        String email = userInfo.getAsString("email");
+        String profileUrl = "";
+        return addUser(email,profileUrl);
     }
 
     @Transactional
@@ -198,18 +206,18 @@ public class UserService {
 
     //각 소셜 로그인으로부터 받은 정보로 회원가입 시키는 함수
     //JWT를 반환
-    private String addUser(JSONObject userInfo){
+    private String addUser(String email,String profileUrl){
 
         // 유저가 이미 DB에 존재하는지 확인
-        Optional<User> findUser = userRepository.findByEmail(userInfo.getAsString(("email")));
+        Optional<User> findUser = userRepository.findByEmail(email);
 
         // 존재 유무 isPresent()로 확인
         if( findUser.isPresent() ){
             return jwtTokenProvider.createToken(findUser.get().getEmail(),findUser.get().getRole());
         } else{
             User newUser = User.builder()
-                    .email(userInfo.getAsString("email"))
-                    .repo_url(" ")
+                    .email(email)
+                    .profileUrl(profileUrl)
                     .role(Role.USER)
                     .build();
             User savedUser = userRepository.save(newUser);

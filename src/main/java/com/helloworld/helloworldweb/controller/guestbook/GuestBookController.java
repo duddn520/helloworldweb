@@ -1,9 +1,9 @@
 package com.helloworld.helloworldweb.controller.guestbook;
 
-import com.helloworld.helloworldweb.domain.GuestBook;
 import com.helloworld.helloworldweb.domain.GuestBookComment;
 import com.helloworld.helloworldweb.domain.User;
-import com.helloworld.helloworldweb.dto.guestbook.GuestBookDto;
+import com.helloworld.helloworldweb.dto.guestbook.GuestBookRequestDto;
+import com.helloworld.helloworldweb.dto.guestbook.GuestBookResponseDto;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
-import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class GuestBookController {
 
     @GetMapping("/api/guestbook")
     @Transactional
-    public ResponseEntity<ApiResponse<List<GuestBookDto>>> getGuestBooks(@RequestParam(name="id") Long id,HttpServletRequest request){
+    public ResponseEntity<ApiResponse<List<GuestBookRequestDto>>> getGuestBooks(@RequestParam(name="id") Long id, HttpServletRequest request){
 
         // 유저 찾기
         String findEmail = jwtTokenProvider.getUserEmail(jwtTokenProvider.getTokenByHeader(request));
@@ -41,40 +40,63 @@ public class GuestBookController {
         // 유저를 통해 방명록들 불러옴.
         List<GuestBookComment> findGuestBookComments = guestBookService.getGuestBookComments(findUser);
 
-        List<GuestBookDto> responseDtos = new ArrayList<GuestBookDto>();
+        List<GuestBookResponseDto> responseDtos = new ArrayList<GuestBookResponseDto>();
 
         for ( GuestBookComment comment : findGuestBookComments ) {
-            responseDtos.add(new GuestBookDto(comment));
+            responseDtos.add(new GuestBookResponseDto(comment));
         }
 
-        return new ResponseEntity<>(ApiResponse.response(
+        return new ResponseEntity(ApiResponse.response(
                 HttpStatusCode.GET_SUCCESS,
                 HttpResponseMsg.GET_SUCCESS,responseDtos), HttpStatus.OK);
     }
 
     @PostMapping("/api/guestbook")
-    public ResponseEntity<ApiResponse> registerGuestBook(GuestBookDto guestBookDto,HttpServletRequest request){
+    public ResponseEntity<ApiResponse> registerGuestBook(@RequestBody GuestBookRequestDto guestBookRequestDto, HttpServletRequest request){
         try {
             // 유저 찾기
             String findEmail = jwtTokenProvider.getUserEmail(jwtTokenProvider.getTokenByHeader(request));
-            User findUser = userService.getUserByEmail(findEmail);
+            User findCreatedUser = userService.getUserByEmail(findEmail);
 
             // Dto -> Entity
-            GuestBookComment guestBookComment = guestBookDto.toEntity();
+            GuestBookComment guestBookComment = guestBookRequestDto.toEntity(findCreatedUser);
+
             // 방명록 저장
-            GuestBookComment saveGuestBookComment = guestBookService.addGuestBookComment(findUser, guestBookComment);
-            GuestBookDto responseDto = new GuestBookDto(saveGuestBookComment);
+            // 타겟유저 찾기
+            User findTargetUser = userService.getUserByEmail(guestBookRequestDto.getTargetUserEmail());
+
+            GuestBookComment saveGuestBookComment = guestBookService.addGuestBookComment(findTargetUser,guestBookComment);
+            GuestBookResponseDto responseDto = new GuestBookResponseDto(saveGuestBookComment);
 
             return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.OK,
+                    HttpStatusCode.POST_SUCCESS,
                     HttpResponseMsg.POST_SUCCESS,responseDto), HttpStatus.OK);
 
         } catch( Exception e ){
-
+            System.out.println("e.getMessage() = " + e.getMessage());
             return new ResponseEntity<>(ApiResponse.response(
                     HttpStatusCode.INTERNAL_SERVER_ERROR,
                     HttpResponseMsg.INTERNAL_SERVER_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    // 방명록에 답글 달기
+    @PutMapping("/api/guestbook")
+    public ResponseEntity<ApiResponse<GuestBookResponseDto>> updateGuestBook(@RequestBody GuestBookRequestDto guestBookRequestDto){
+
+        // Dto -> Entity
+        Long id = guestBookRequestDto.getId();
+        GuestBookComment guestBookComment = guestBookRequestDto.toEntity();
+
+        GuestBookComment updateGuestBookComment = guestBookService.updateGuestBookComment(id, guestBookComment);
+
+        GuestBookResponseDto responseDto = new GuestBookResponseDto(updateGuestBookComment);
+
+        return new ResponseEntity(ApiResponse.response(
+                HttpStatusCode.PUT_SUCCESS,
+                HttpResponseMsg.PUT_SUCCESS,responseDto),HttpStatus.OK
+        );
+
     }
 
     @DeleteMapping("/api/guestbook")

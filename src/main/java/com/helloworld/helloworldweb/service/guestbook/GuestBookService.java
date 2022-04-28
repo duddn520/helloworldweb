@@ -36,13 +36,13 @@ public class GuestBookService {
 
     // 방명록 추가
     @Transactional
-    public GuestBookComment addGuestBookComment(User user,GuestBookComment guestBookComment){
+    public GuestBookComment addGuestBookComment(User targetUser,GuestBookComment guestBookComment){
 
             // GuestBook 찾기
-            Optional<GuestBook> optionalGuestBook = guestBookRepository.findByUser(user) ;
+            Optional<GuestBook> optionalGuestBook = guestBookRepository.findByUser(targetUser) ;
             GuestBook findGuestBook;
             if( optionalGuestBook.isPresent() ) findGuestBook = optionalGuestBook.get();
-            else findGuestBook = getNewGuestBook(user);
+            else findGuestBook = getNewGuestBook(targetUser);
 
             // GuestBookComment -> FindGuestBook 연결
             GuestBookComment addGuestBookComment = guestBookComment.changeGuestBook(findGuestBook);
@@ -52,9 +52,11 @@ public class GuestBookService {
     }
 
     // 방명록 수정
-//    public GuestBookComment updateGuestBookComment() {
-//
-//    }
+    @Transactional
+    public GuestBookComment updateGuestBookComment(Long id,GuestBookComment newGuestBookComment) {
+        GuestBookComment findGuestBookComment = guestBookCommentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(""));
+        return guestBookCommentRepository.save(findGuestBookComment.updateGuestBookComment(newGuestBookComment));
+    }
 
     // 방명록 삭제
     @Transactional
