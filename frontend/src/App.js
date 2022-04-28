@@ -9,6 +9,7 @@ import Red from "./pages/Red";
 import QnARegister from './pages/questions/QnARegister';
 import QnA from './pages/questions/QnA';
 import MiniHome from "./pages/MiniHomePage/MiniHome";
+import WriteBlog from './pages/MiniHomePage/WriteBlog';
 import GithubConnectRedirect from "./pages/redirect/GithubConnectRedirect";
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <Route exact path="/qna/register" element={<QnARegister />} />
         
         <Route path="/minihome" element={<MiniHome />} />
+        <Route path="/minihome/write" element={<WriteBlog />} />
       </Routes>
     </BrowserRouter>
   );

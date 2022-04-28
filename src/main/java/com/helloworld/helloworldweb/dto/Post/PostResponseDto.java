@@ -5,6 +5,7 @@ import com.helloworld.helloworldweb.domain.Post;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+
 @Getter
 @NoArgsConstructor
 public class PostResponseDto { // post결과로 전달할 데이터

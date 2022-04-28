@@ -55,6 +55,15 @@ public class UserService {
         return userRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
     }
 
+    // JWT를 사용하여 User를 찾아주는 함수
+    @Transactional
+    public User getUserByJwt(String jwtToken) {
+        String userEmail = jwtTokenProvider.getUserEmail(jwtToken);
+        User findUser = getUserByEmail(userEmail);
+
+        return findUser;
+    }
+
     @Transactional
     public String addKakaoUser(String accessToken) throws ParseException {
 

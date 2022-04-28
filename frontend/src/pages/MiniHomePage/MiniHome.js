@@ -6,7 +6,7 @@ import MyInfo from './MyInfo';
 import Posts from './Posts';
 import GuestBooks from './GuestBooks';
 import TotalBar from './TotalBar';
-import { useNavigate } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 import api from '../../api/api';
 
 const BlankUser = {
@@ -15,9 +15,10 @@ const BlankUser = {
   userName: '',
 }
 
-function Main() {
+function MiniHome() {
   const navigate = useNavigate();
-  const [index, setIndex] = React.useState(0);
+  const { state } = useLocation();
+  const [index, setIndex] = React.useState((state === null) ? 0 : state.tabIndex);
   const [userInfo, setUserInfo]= React.useState(BlankUser);
 
   function LogOut(){
@@ -49,4 +50,4 @@ function Main() {
   );
 }
 
-export default Main;
+export default MiniHome;

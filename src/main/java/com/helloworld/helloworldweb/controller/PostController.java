@@ -5,6 +5,7 @@ import com.helloworld.helloworldweb.domain.Post;
 import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.dto.Post.PostRequestDto;
 import com.helloworld.helloworldweb.dto.Post.PostResponseDto;
+import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
 import com.helloworld.helloworldweb.model.HttpStatusCode;
@@ -27,12 +28,13 @@ public class PostController {
 
     private final PostService postService;
     private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/api/post")
     @Transactional
-    public ResponseEntity<ApiResponse> registerPost(@RequestBody PostRequestDto requestDto) {
+    public ResponseEntity<ApiResponse> registerPost(@RequestBody PostRequestDto requestDto, @RequestHeader(value = "Auth") String jwtToken) {
 
-        User findUser = userService.getUserById(requestDto.getUser_id());
+        User findUser = userService.getUserByJwt(jwtToken);
 
         Post post = requestDto.toEntity();
         postService.addPost(post, findUser);
@@ -43,9 +45,10 @@ public class PostController {
     }
 
     @GetMapping("/api/post/myblogs")
-    public ResponseEntity<ApiResponse<List<PostResponseDto>>> getUserBlog(@RequestBody PostRequestDto requestDto) {
+    public ResponseEntity<ApiResponse<List<PostResponseDto>>> getUserBlog(@RequestHeader(value = "Auth") String jwtToken) {
 
-        List<Post> myBlogs = postService.getAllUserPosts(requestDto.getUser_id(), Category.BLOG);
+        User findUser = userService.getUserByJwt(jwtToken);
+        List<Post> myBlogs = postService.getAllUserPosts(findUser.getId(), Category.BLOG);
 
         List<PostResponseDto> responseDtos = myBlogs.stream()
                                             .map(PostResponseDto::new)
