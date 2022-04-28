@@ -93,4 +93,9 @@ public class User implements UserDetails {
         this.email = email;
         this.repo_url = repo_url;
     }
+
+    public void updateRepoUrl(String repo_url)
+    {
+        this.repo_url = repo_url;
+    }
 }
