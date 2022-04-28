@@ -20,7 +20,7 @@ export default function RepoCard({title,content,fullName,createdAt,htmlUrl}) {
         }
         setCreatedDate(createdAt.substr(0,10))
 
-    })
+    },[]);
     return(
     <Card
         sx={{ m : 1

@@ -24,7 +24,7 @@ export default function GithubRedirect(){
              }).catch(e=>{
             console.log(e);
         })
-    })
+    },[]);
 
     return(
         <div>

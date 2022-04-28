@@ -22,7 +22,7 @@ export default function GithubConnectRedirect(){
         }).catch(e=>{
             console.log(e);
         })
-    })
+    },[]);
 
     return(
         <div>
