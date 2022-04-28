@@ -97,5 +97,43 @@ function getUser(){
     });
 }
 
+function registerPost(formdata, title, totalContent){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'POST',
+            url : '/api/post',
+            data: {
+                formdata: formdata,
+                content: totalContent,
+                category: "BLOG",
+                title: title,
+            }
+        })
+        .then( res => {
+            resolve(res.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
 
-export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, getUser } ;
+function getMyBlogPosts(){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'GET',
+            url : "/api/post/myblogs",
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
+
+
+export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, getUser, registerPost, getMyBlogPosts } ;

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,14 +28,17 @@ public class Post {
     private Category category;
 
     private String content;
+    private String title;
+
 
     @Builder
-    public Post(Long id, User user, List<PostComment> postComments, Category category, String content) {
+    public Post(Long id, User user, List<PostComment> postComments, Category category, String content, String title) {
         this.id = id;
         this.user = user;
         this.postComments = postComments;
         this.category = category;
         this.content = content;
+        this.title = title;
     }
 
     public void updateUser(User user) {
