@@ -5,7 +5,6 @@ import Main from "./pages/Main";
 import KakaoRedirect from './pages/redirect/KakaoRedirect';
 import GithubRedirect from "./pages/redirect/GithubRedirect";
 import NaverRedirect from './pages/redirect/NaverRedirect';
-import Red from "./pages/Red";
 import QnARegister from './pages/questions/QnARegister';
 import QnA from './pages/questions/QnA';
 import MiniHome from "./pages/MiniHomePage/MiniHome";
