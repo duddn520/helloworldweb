@@ -5,6 +5,8 @@ import Main from "./pages/Main";
 import KakaoRedirect from './pages/redirect/KakaoRedirect';
 import NaverRedirect from './pages/redirect/NaverRedirect';
 import Red from "./pages/Red";
+import QnARegister from './pages/questions/QnARegister';
+import QnA from './pages/questions/QnA';
 import MiniHome from "./pages/MiniHomePage/MiniHome";
 
 function App() {
@@ -16,6 +18,10 @@ function App() {
         <Route path="/login/redirect/kakao" element={<KakaoRedirect />} />
         <Route path="/login/red" element={<Red />} />
         <Route path="/login/redirect/naver" element={<NaverRedirect />} />
+        {/* QnA */}
+        <Route exact path="/qna" element={<QnA />} />
+        <Route exact path="/qna/register" element={<QnARegister />} />
+        
         <Route path="/minihome" element={<MiniHome />} />
       </Routes>
     </BrowserRouter>

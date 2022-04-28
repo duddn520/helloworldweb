@@ -14,13 +14,17 @@ public class PostRequestDto { //post요청과 함께 받을 데이터
     private Long post_id;
     private Long user_id;
     private Category category;
+    private String title;
     private String content;
+    private String tags;
 
     public Post toEntity() {
         return Post.builder()
                 .id(post_id)
                 .category(category)
+                .title(title)
                 .content(content)
+                .tags(tags)
                 .build();
     }
 

@@ -46,7 +46,52 @@ function getGuestBooks(){
         .then( res => {
             // Jwt 반환
             if ( res.data.statusCode === status.GET_SUCCESS ){
+                resolve (res.data.data);
+            }
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
+// PUT - 방명록 수정 및 답글 달기
+function updateGuestBook({ id, reply }){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'PUT' ,
+            url: '/api/guestbook',
+            data: {
+                id: id ,
+                reply: reply
+            }
+        })
+        .then( res => {
+            console.log(res);
 
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
+
+//Post - 방명록 작성
+function registerGuestBook({ targetUserEmail ,content }){
+
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'POST' ,
+            url: '/api/guestbook' ,
+            data: {
+                "targetUserEmail": targetUserEmail ,
+                "content": content
+            }
+        })
+        .then( res => {
+            // Jwt 반환
+            if ( res.data.statusCode === status.POST_SUCCESS ){
                 console.log(res.data.data);
                 resolve (res.data.data);
             }
@@ -54,6 +99,51 @@ function getGuestBooks(){
         .catch( e => {
             console.log(e);
             reject();
+        })
+    });
+}
+
+// POST - 게시글/QnA 작성
+function registerPost( {content,type,title,tags}){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'POST' ,
+            url: '/api/post',
+            data: {
+                title: title ,
+                tags: tags ,
+                content: content ,
+                category: type ,
+                user_id: 1
+            }
+        })
+        .then( res => {
+            if ( res.data.statusCode == status.POST_SUCCESS ){
+                resolve(true);
+            }
+        })
+        .catch( e => {
+            console.log(e);
+            reject(false);
+        })
+    });
+}
+// GET - 모든 QnA 조회
+function getAllQna(){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'GET' ,
+            url: '/api/post/qnas',
+        })
+        .then( res => {
+            if ( res.data.statusCode == status.GET_SUCCESS ){
+                resolve(res.data.data);
+            }
+        })
+        .catch( e => {
+            console.log(e);
+            // 실패 시 빈 리스트 리턴
+            reject([]);
         })
     });
 }
@@ -98,4 +188,4 @@ function getUser(){
 }
 
 
-export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, getUser } ;
+export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook} ;

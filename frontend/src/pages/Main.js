@@ -1,7 +1,7 @@
 import React from "react";
 import { Button , AppBar , Toolbar , Typography , Box , 
         TextField , Avatar, InputBase , IconButton , Container ,
-        List ,ListItem ,ListItemIcon ,Badge ,Tabs ,Tab 
+        List ,ListItem ,ListItemIcon ,Badge ,Tabs ,Tab, Link 
 } 
 from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,8 @@ import { Search as SearchIcon } from "@mui/icons-material";
 import { styled } from "@mui/material";
 import CustomAppBar from "../component/appbar/CustomAppBar";
 import api from "../api/api";
+import DragDrop from "../component/DragDrop";
+import { Routes ,Route ,BrowserRouter ,Outlet} from "react-router-dom";
 
 const data = [
     {
@@ -87,6 +89,7 @@ function TabPanel(props) {
         )
     );
 }
+  
 
 export default function ( props ){
     const navigate = useNavigate();
@@ -98,7 +101,7 @@ export default function ( props ){
 
     const handleChange = (event, newValue) => {
 
-        if( newValue == 1 ){
+        if( newValue === 1 ){
             api.getAllQna()
             .then( res => { setAllQna(res) })
             .catch( e => { });
@@ -127,83 +130,20 @@ export default function ( props ){
                     sx={{ borderRight: 1, borderColor: 'lightgray' ,width: 200 }}
                 >
                     <Tab label="홈" sx={{ display: 'flex' ,flexDirection: 'row'}} />
-                    <Tab label="QnA" icon={<SearchIcon sx={{ m: 1 ,width: 20 ,height: 20}}/>} sx={{ display: 'flex' ,flexDirection: 'row' ,textAlign: 'center'}}  />
+                    <Tab label="Questions" icon={<SearchIcon sx={{ m: 1 ,width: 20 ,height: 20}}/>} sx={{ display: 'flex' ,flexDirection: 'row' ,textAlign: 'center' ,textTransform: 'none' }}  />
                 </Tabs>
 
                 {/* 탭 : 홈 */}
                 <TabPanel value={value} index={0}>
-                    <Box sx={{ display: 'flex' ,flexDirection: 'row' }}>
-                        <Typography sx={{ fontSize: 24 ,flex: 1 }}>Top Questions</Typography>
-                        <Button 
-                            onClick={() => navigate('/qna/register')}
-                            variant='contained' 
-                            size='small' 
-                            sx={{ mb: 1 ,p: 1}}
-                        >
-                            질문 작성하기
-                        </Button>
-                    </Box>
-                    <List>
-                    {
-                        data.map( item => {
-                            return(
-                                <Box border={1} borderColor='rgb(240,240,240)' sx={{ display: 'flex' ,flexDirection: 'row' ,alignItems: 'center' }}>
-                                    <Box sx={{ flex: 1 }}>
-                                        <Typography sx={{ fontSize: 13 ,ml: 2 ,mb: 1 }}>{item.views} 조회수</Typography>
-                                        <Typography sx={{ fontSize: 13 ,ml: 2 ,mb: 1 }}>{item.answers} 답변</Typography>
-                                    </Box>
-                                    <Box sx={{ flex: 10 }}>
-                                        <Button sx={{ textAlignLast: 'start' ,m: 2 ,mb: 1 ,textAlign: 'start' }}>{item.title}</Button>
-                                        <ListItem sx={{ display: 'flex' ,flexDirection: 'row'}}>
-                                            {
-                                                item.tags.map( tag => {return <Badge sx={{ backgroundColor: 'rgb(240,240,240)' ,p: 0.5 ,mr: 0.2 ,fontSize: 13}}>{tag}</Badge>})
-                                            }
-                                        </ListItem>
-                                    </Box>
-                                </Box>
-                            );
-                        })
-                    }
-                    </List>
+                    <Home />
                 </TabPanel>
 
                 <TabPanel value={value} index={1}>
-                    <Box sx={{ display: 'flex' ,flexDirection: 'row' }}>
-                        <Typography sx={{ fontSize: 24 ,flex: 1 }}>All Questions</Typography>
-                        <Button 
-                            onClick={() => navigate('/qna/register')}
-                            variant='contained' 
-                            size='small' 
-                            sx={{ mb: 1 ,p: 1}}
-                        >
-                            질문 작성하기
-                        </Button>
-                    </Box>
-                    <List>
-                    {
-                        allQna.map( item => {
-                            return(
-                                <Box border={1} borderColor='rgb(240,240,240)' sx={{ display: 'flex' ,flexDirection: 'row' ,alignItems: 'center' }}>
-                                    <Box sx={{ flex: 1 }}>
-                                        <Typography sx={{ fontSize: 13 ,ml: 2 ,mb: 1 }}>100 조회수</Typography>
-                                        <Typography sx={{ fontSize: 13 ,ml: 2 ,mb: 1 }}>2 답변</Typography>
-                                    </Box>
-                                    <Box sx={{ flex: 10 }}>
-                                        <Button sx={{ textAlignLast: 'start' ,m: 2 ,mb: 1 ,textAlign: 'start' }}>제목없음</Button>
-                                        <Typography sx={{ ml: 3 }}>{item.content.substr(0,100)}</Typography>
-                                        {/* <ListItem sx={{ display: 'flex' ,flexDirection: 'row'}}>
-                                            {
-                                                item.tags.map( tag => {return <Badge sx={{ backgroundColor: 'rgb(240,240,240)' ,p: 0.5 ,mr: 0.2 ,fontSize: 13}}>{tag}</Badge>})
-                                            }
-                                        </ListItem> */}
-                                    </Box>
-                                </Box>
-                            );
-                        })
-                    }
-                    </List>
-                </TabPanel>
+                    <Questions />
+                </TabPanel> 
+
             </Box>
+
 
             {/* <Box sx={{ margin: 10 , textAlign: 'center'}}>
 
@@ -238,7 +178,94 @@ export default function ( props ){
 
             
     </Box>
-    )   ;
+    );
+
+function Home(){
+
+    return(
+        <div>
+                    <Box sx={{ display: 'flex' ,flexDirection: 'row' }}>
+                        <Typography sx={{ fontSize: 24 ,flex: 1 }}>Top Questions</Typography>
+                        <Button 
+                            onClick={() => navigate('/qna/register')}
+                            variant='contained' 
+                            size='small' 
+                            sx={{ mb: 1 ,p: 1}}
+                        >
+                            질문 작성하기
+                        </Button>
+                    </Box>
+                    <List>
+                    {
+                        data.map( item => {
+                            return(
+                                <Box border={1} borderColor='rgb(240,240,240)' sx={{ display: 'flex' ,flexDirection: 'row' ,alignItems: 'center' }}>
+                                    <Box sx={{ flex: 1 }}>
+                                        <Typography sx={{ fontSize: 13 ,ml: 2 ,mb: 1 }}>{item.views} 조회수</Typography>
+                                        <Typography sx={{ fontSize: 13 ,ml: 2 ,mb: 1 }}>{item.answers} 답변</Typography>
+                                    </Box>
+                                    <Box sx={{ flex: 10 }}>
+                                        <Button sx={{ textAlignLast: 'start' ,m: 2 ,mb: 1 ,textAlign: 'start' ,textTransform: 'none' }}>{item.title}</Button>
+                                        <ListItem sx={{ display: 'flex' ,flexDirection: 'row'}}>
+                                            {
+                                                item.tags.map( tag => {return <Badge sx={{ backgroundColor: 'rgb(240,240,240)' ,p: 0.5 ,mr: 0.2 ,ml: 0.5,fontSize: 13}}>{tag}</Badge>})
+                                            }
+                                        </ListItem>
+                                    </Box>
+                                </Box>
+                            );
+                        })
+                    }
+                    </List>
+        </div>
+    );
+}
+function Questions(){
+    return(
+        <div>
+                    <Box sx={{ display: 'flex' ,flexDirection: 'row' }}>
+                        <Typography sx={{ fontSize: 24 ,flex: 1 }}>All Questions</Typography>
+                        <Button 
+                            onClick={() => navigate('/qna/register')}
+                            variant='contained' 
+                            size='small' 
+                            sx={{ mb: 1 ,p: 1}}
+                        >
+                            질문 작성하기
+                        </Button>
+                    </Box>
+                    <List>
+                    {
+                        allQna.map( item => {
+                            return(
+                                <Box border={1} borderColor='rgb(240,240,240)' sx={{ display: 'flex' ,flexDirection: 'row' ,alignItems: 'center' }}>
+                                    <Box sx={{ flex: 1 }}>
+                                        <Typography sx={{ fontSize: 13 ,ml: 2 ,mb: 1  ,mt: 1}}>100 조회수</Typography>
+                                        <Typography sx={{ fontSize: 13 ,ml: 2 ,mb: 1  }}>2 답변</Typography>
+                                    </Box>
+                                    <Box sx={{ flex: 10 }}>
+                                        <Button 
+                                            sx={{ textAlignLast: 'start' ,ml: 2 ,mb: 1,textAlign: 'start' ,textTransform: 'none'}}
+                                            onClick={() => { navigate('/qna',{ state : item}) }}
+                                        >
+                                            {item.title}
+                                        </Button>
+                                        <Typography sx={{ ml: 3.5 ,fontSize: 13 }}>{item.content.substr(0,100)}</Typography>
+                                        {/* <ListItem sx={{ display: 'flex' ,flexDirection: 'row'}}>
+                                            {
+                                                item.tags.map( tag => {return <Badge sx={{ backgroundColor: 'rgb(240,240,240)' ,p: 0.5 ,mr: 0.2 ,fontSize: 13}}>{tag}</Badge>})
+                                            }
+                                        </ListItem> */}
+                                    </Box>
+                                </Box>
+                            );
+                        })
+                    }
+                    </List>
+        </div>
+    );
+}
+
 }
 
 // TextField의 부모 Compnent로 감싸줘야 onSumbit() 작동
