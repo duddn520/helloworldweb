@@ -33,6 +33,10 @@ public class Post {
     private String content;
     // 태그
     private String tags;
+    // 검색횟수
+    private Long searchCount = 0L;
+    // 조회수
+    private Long views = 0L;
 
     @Builder
     public Post(Long id, User user, List<PostComment> postComments, Category category, String content, String title ,String tags) {
@@ -49,5 +53,10 @@ public class Post {
         this.user = user;
         user.getPosts().add(this);
     }
-
+    public void updateSearchCount(){
+        this.searchCount += 1;
+    }
+    public void updateViews(){
+        this.views += 1;
+    }
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import { Tabs ,Box ,Tab ,Typography ,Divider ,Container ,styled ,Button ,Badge} from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { useLocation } from 'react-router';
+import api from '../../api/api';
 import CustomAppBar from '../../component/appbar/CustomAppBar';
 
 export default function( props ){
@@ -25,7 +26,7 @@ export default function( props ){
                     // 본문
                     if( index % 2 == 0){
                         return(
-                            <Typography sx={{ m: 1 }}>
+                            <Typography sx={{ m: 2 }}>
                                 <pre key={index} style={{ fontFamily: 'inherit' }}>{text}</pre>
                             </Typography>
                         );
@@ -46,6 +47,9 @@ export default function( props ){
     
     React.useEffect(() => {
        setQna(state);
+
+        // 조회수+1
+        api.updatePost(state.id)
 
        if( state.tags != null ){
           setTags( state.tags.split(',') );
@@ -72,29 +76,39 @@ export default function( props ){
                 </Tabs>
 
                 <Container>
-                    <Typography sx={{ m : 2 ,ml: 4 ,fontSize: 25 ,fontWeight: '600'}}>{'제목1'}</Typography>
+                    <Box sx={{ justifyContent: 'start' }}>
+                        <Typography sx={{ m : 1 ,ml: 2 ,fontSize: 25 ,fontWeight: '600'}}>{qna.title}</Typography>
+                        <Box sx={{ display: 'flex' ,flexDirection: 'row' ,mb: 2 }}>
+                            <Typography sx={{ ml: 2 ,fontSize: 13}}>조회수 {qna.views}</Typography>
+                            <Typography sx={{ ml: 2 ,fontSize: 13}}>작성일 2022.04.28</Typography>
+                        </Box>
+                    </Box>
                     <Divider variant="fullWidth" sx={{ flexGrow: 1 }}/>
-                    <Container>
+                    <Box>
                         {renderContent()}
-                    </Container>
+                    </Box>
                     {
-                        tags.map( tag => { if( tag.length ) return <Badge sx={{ backgroundColor: 'rgb(240,240,240)' ,ml: 4 ,p: 0.5,mt: 10,fontSize: 13}}>{tag}</Badge>})
+                        tags.map( tag => { if( tag.length ) return <Badge sx={{ backgroundColor: 'rgb(240,240,240)' ,ml: 2 ,p: 1,mt: 10,fontSize: 13}}>{tag}</Badge>})
                     }
-
-                    <Typography sx={{ m : 3 ,fontSize: 25 ,mt: 10 ,fontWeight: '600' }}>{'당신의 답변'}</Typography>
-                    <TextArea
-                        sx={{ width: '90%' ,m: 2 ,height: 300 , p : 2 ,borderColor: 'lightgray' }}
-                        value={reply}
-                        onChange={value => setReply(value.target.value)}
-                        size='small'
-                        placeholder='e.g. 리액트 질문'
-                    />
-                    <Button 
-                        variant='contained' 
-                        sx={{ m: 2 ,mb: 10 }}
-                    >
-                        작성하기
-                    </Button>
+                    <Divider variant="fullWidth" sx={{ flexGrow: 1 ,mt: 10}}/>
+                    <Typography sx={{ m : 2 ,fontSize: 25 ,fontWeight: '600' }}>{'당신의 답변'}</Typography>
+                    <Box>
+                        <TextArea
+                            sx={{ width: '60%' ,m: 2 ,height: 300 , p : 2 ,borderColor: 'lightgray' ,borderRadius: 2 }}
+                            value={reply}
+                            onChange={value => setReply(value.target.value)}
+                            size='small'
+                            placeholder='e.g. 리액트 질문'
+                        />
+                    </Box>
+                    <Box>
+                        <Button 
+                            variant='contained' 
+                            sx={{ m: 2 ,mb: 10 }}
+                        >
+                            작성하기
+                        </Button>
+                    </Box>
                 </Container>
 
             </Box>

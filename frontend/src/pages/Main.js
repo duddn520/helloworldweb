@@ -1,17 +1,17 @@
 import React from "react";
-import { Button , AppBar , Toolbar , Typography , Box , 
-        TextField , Avatar, InputBase , IconButton , Container ,
-        List ,ListItem ,ListItemIcon ,Badge ,Tabs ,Tab, Link 
+import { Button ,Typography ,Box , 
+         List ,Tabs ,Tab
 } 
 from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Search as SearchIcon } from "@mui/icons-material";
 import { styled } from "@mui/material";
 import CustomAppBar from "../component/appbar/CustomAppBar";
+import QnAItem from "../component/questions/QnAItem";
 import api from "../api/api";
-import DragDrop from "../component/DragDrop";
-import { Routes ,Route ,BrowserRouter ,Outlet} from "react-router-dom";
 
+
+// 임시데이터
 const data = [
     {
         title: 'why could not found the symbol even define the fields name',
@@ -93,8 +93,6 @@ function TabPanel(props) {
 
 export default function ( props ){
     const navigate = useNavigate();
-    // 검색창
-    const [text,setText] = React.useState("");
     // 탭(Tab)
     const [value, setValue] = React.useState(0);
     const [allQna,setAllQna] = React.useState([]);
@@ -110,14 +108,8 @@ export default function ( props ){
         setValue(newValue);
     };
 
-    // 검색창 입력완료 후 자동호출
-    function handleSubmit(){
-        alert(text);
-    }
-
     return(
-        <Box sx={{ flexGrow: 1 }}>
-            
+        <Box sx={{ flexGrow: 1 }}> 
             <CustomAppBar />
             <Box
                 sx={{ flexGrow: 1, bgcolor: 'background.paper', display: 'flex'}}
@@ -142,46 +134,11 @@ export default function ( props ){
                     <Questions />
                 </TabPanel> 
 
-            </Box>
-
-
-            {/* <Box sx={{ margin: 10 , textAlign: 'center'}}>
-
-                <Typography 
-                    variant='h2' 
-                    sx={{ color: 'black' , textAlign: 'center' , p: 5 }}
-                >
-                    {"<Hello World"}
-                    <Typography display='inline' variant="h2" sx={{ color: 'red' }}>
-                        {"/>"}
-                    </Typography>
-                </Typography>
-
-                <Container sx={{ width: '50%'}}>
-                <StyledForm 
-                    onSubmit={handleSubmit}
-                    sx={{ boxShadow: 3, borderRadius: 20 , justifyContent: 'center' }}
-                >
-                    <IconButton>
-                    <SearchIcon sx={{ p : 1 }} />
-                    </IconButton>
-                    <InputBase
-                        sx={{ width: '90%'  }}
-                        onChange={(t) => setText(t.target.value)}
-                        value={text}
-                        placeholder="Search Anything"
-                    />
-                </StyledForm>
-                </Container>
-
-            </Box> */}
-
-            
-    </Box>
+            </Box>       
+        </Box>
     );
 
 function Home(){
-
     return(
         <div>
                     <Box sx={{ display: 'flex' ,flexDirection: 'row' }}>
@@ -197,22 +154,9 @@ function Home(){
                     </Box>
                     <List>
                     {
-                        data.map( item => {
+                        data.map( (item,index) => {
                             return(
-                                <Box border={1} borderColor='rgb(240,240,240)' sx={{ display: 'flex' ,flexDirection: 'row' ,alignItems: 'center' }}>
-                                    <Box sx={{ flex: 1 }}>
-                                        <Typography sx={{ fontSize: 13 ,ml: 2 ,mb: 1 }}>{item.views} 조회수</Typography>
-                                        <Typography sx={{ fontSize: 13 ,ml: 2 ,mb: 1 }}>{item.answers} 답변</Typography>
-                                    </Box>
-                                    <Box sx={{ flex: 10 }}>
-                                        <Button sx={{ textAlignLast: 'start' ,m: 2 ,mb: 1 ,textAlign: 'start' ,textTransform: 'none' }}>{item.title}</Button>
-                                        <ListItem sx={{ display: 'flex' ,flexDirection: 'row'}}>
-                                            {
-                                                item.tags.map( tag => {return <Badge sx={{ backgroundColor: 'rgb(240,240,240)' ,p: 0.5 ,mr: 0.2 ,ml: 0.5,fontSize: 13}}>{tag}</Badge>})
-                                            }
-                                        </ListItem>
-                                    </Box>
-                                </Box>
+                                <QnAItem key={index} item={item}/>
                             );
                         })
                     }
@@ -238,26 +182,7 @@ function Questions(){
                     {
                         allQna.map( item => {
                             return(
-                                <Box border={1} borderColor='rgb(240,240,240)' sx={{ display: 'flex' ,flexDirection: 'row' ,alignItems: 'center' }}>
-                                    <Box sx={{ flex: 1 }}>
-                                        <Typography sx={{ fontSize: 13 ,ml: 2 ,mb: 1  ,mt: 1}}>100 조회수</Typography>
-                                        <Typography sx={{ fontSize: 13 ,ml: 2 ,mb: 1  }}>2 답변</Typography>
-                                    </Box>
-                                    <Box sx={{ flex: 10 }}>
-                                        <Button 
-                                            sx={{ textAlignLast: 'start' ,ml: 2 ,mb: 1,textAlign: 'start' ,textTransform: 'none'}}
-                                            onClick={() => { navigate('/qna',{ state : item}) }}
-                                        >
-                                            {item.title}
-                                        </Button>
-                                        <Typography sx={{ ml: 3.5 ,fontSize: 13 }}>{item.content.substr(0,100)}</Typography>
-                                        {/* <ListItem sx={{ display: 'flex' ,flexDirection: 'row'}}>
-                                            {
-                                                item.tags.map( tag => {return <Badge sx={{ backgroundColor: 'rgb(240,240,240)' ,p: 0.5 ,mr: 0.2 ,fontSize: 13}}>{tag}</Badge>})
-                                            }
-                                        </ListItem> */}
-                                    </Box>
-                                </Box>
+                                <QnAItem  key={item} item={item}/>
                             );
                         })
                     }
@@ -272,3 +197,35 @@ function Questions(){
 const StyledForm = styled('form')({  
 
 });
+
+// 검색창 메인화면 ( 이전버전 )
+    // {/* <Box sx={{ margin: 10 , textAlign: 'center'}}>
+
+    //     <Typography 
+    //         variant='h2' 
+    //         sx={{ color: 'black' , textAlign: 'center' , p: 5 }}
+    //     >
+    //         {"<Hello World"}
+    //         <Typography display='inline' variant="h2" sx={{ color: 'red' }}>
+    //             {"/>"}
+    //         </Typography>
+    //     </Typography>
+
+    //     <Container sx={{ width: '50%'}}>
+    //     <StyledForm 
+    //         onSubmit={handleSubmit}
+    //         sx={{ boxShadow: 3, borderRadius: 20 , justifyContent: 'center' }}
+    //     >
+    //         <IconButton>
+    //         <SearchIcon sx={{ p : 1 }} />
+    //         </IconButton>
+    //         <InputBase
+    //             sx={{ width: '90%'  }}
+    //             onChange={(t) => setText(t.target.value)}
+    //             value={text}
+    //             placeholder="Search Anything"
+    //         />
+    //     </StyledForm>
+    //     </Container>
+
+    // </Box> */}

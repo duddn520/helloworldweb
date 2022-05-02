@@ -148,6 +148,53 @@ function getAllQna(){
     });
 }
 
+// GET - Post 검색
+function getSearchedPost({ sentence }){
+    sentence = sentence.replace("[","%").replace("]","%");
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'GET' ,
+            url: '/api/search',
+            params: {
+                sentence: sentence
+            }
+        })
+        .then( res => {
+            if ( res.data.statusCode == status.GET_SUCCESS ){
+                resolve(res.data.data);
+            }
+        })
+        .catch( e => {
+            console.log(e);
+            // 실패 시 빈 리스트 리턴
+            reject([]);
+        })
+    });
+}
+
+// PUT - Post 조회수+1
+function updatePost(id){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'PUT' ,
+            url: '/api/post',
+            params: {
+                id: id
+            }
+        })
+        .then( res => {
+            if ( res.data.statusCode == status.PUT_SUCCESS ){
+                resolve();
+            }
+        })
+        .catch( e => {
+            console.log(e);
+            // 실패 시 빈 리스트 리턴
+            reject([]);
+        })
+    });
+}
+
 function registerUserWithNaver(code, state){
     return new Promise((resolve,reject) => {
         request({
@@ -229,4 +276,6 @@ function getMyBlogPosts(){
 
 
 
-export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , getMyBlogPosts, registerQnA} ;
+export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
+    getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , 
+    getMyBlogPosts, registerQnA ,getSearchedPost ,updatePost} ;

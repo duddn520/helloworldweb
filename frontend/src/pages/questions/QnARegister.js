@@ -1,8 +1,10 @@
 import React from 'react';
 import { Box , Typography ,Button 
         ,Card ,TextField , Container
+        ,IconButton
 } from '@mui/material';
 import { styled } from '@mui/material';
+import { Code as CodeIcon } from '@mui/icons-material';
 import CustomAppBar from '../../component/appbar/CustomAppBar';
 import { useNavigate } from 'react-router';
 import api from '../../api/api';
@@ -46,28 +48,79 @@ export default function(){
 
     // 본문 미리보기 
     const renderContentPreview = () => {
-        let tmp = content.split('```');
+        let tmp = content.split("```");
         return(
-            tmp.map( (text,index) => {
-                // 본문
-                if( index % 2 == 0){
-                    return(
-                        <Typography>
-                            <pre key={index} style={{ fontFamily: 'inherit' }}>{text}</pre>
-                        </Typography>
-                    );
-                }
-                // 코드
-                else {
-                    text = text.replace('\n','');
-                    return(
-                        <Typography key={index} sx={{ p: 2 ,backgroundColor: 'rgb(240,240,240)' }}>
-                            <pre style={{ fontFamily: 'inherit' }}>{text}</pre>
-                        </Typography>
-                    );
-                }
-            })
+            
+                tmp.map( (text,index) => {
+                    // 본문
+                    if( index % 2 == 0){
+                        return(
+                            <pre style={{ fontFamily: "inherit" ,verticalAlign: 'middle' }}>
+                                {renderStrongText(text)}
+                            </pre>
+                        );
+                    }
+                    // 코드
+                    else {
+                        text = text.replace('\n','');
+                        return(
+                            <Typography key={index} sx={{ p: 2 ,backgroundColor: 'rgb(240,240,240)' }}>
+                                <pre style={{ fontFamily: 'inherit' }}>{text}</pre>
+                            </Typography>
+                        );
+                    }
+                })
+                
         );
+
+    }
+    const renderStrongText = (value) => {
+        let text = value;
+        const regExp = /\*\*.{0,}\*\*/m;
+        let s = [];
+
+        // **text** 모두 찾을때까지
+        while( text && text.length > 0 ){
+            if( regExp.test(text) ){
+                const startIndex = text.search(regExp);
+                // normal text
+                s.push({ "type" : "normal" , "text" : text.substring(0,startIndex) });
+                let restText = text.substring(startIndex+2,text.length);
+                const finIndex = restText.search(/\*\*/); 
+                // // strong text
+                s.push({ "type" : "strong", "text" : restText.substring(0,finIndex) })
+                text = restText.substring(finIndex+2,restText.length);
+            }
+            else {
+                s.push({ "type": "normal", "text" : text });
+                text = "";
+            }
+        }
+        console.log(s);
+        return(
+            s.map( item => {
+                if( item.type === "normal") 
+                    return <pre style={{ fontFamily: 'inherit' }}>{item.text}</pre>
+                else if( item.type === "strong")
+                    return <b style={{ fontFamily: 'inherit' ,fontWeight: 'bold'}}>{item.text}</b>
+                    
+            })
+        )
+
+    }
+
+    function handleTextOptions(option){
+        const selectedText = window.getSelection().toString();
+        if( option === "code"){
+
+            if( selectedText.length > 0 ){
+                let s = content.split(selectedText);
+                s[0] += "```\n";
+                s[1] += "\n```\n";
+                setContent( s[0] + selectedText + s[1] );
+            }
+            // setContent(content + "```\n 코드를 입력하세요. \n```\n");
+        }
     }
 
     return(
@@ -84,7 +137,7 @@ export default function(){
                     <Typography sx={{ p: 2 ,fontWeight: 'bold' }}>
                         제목
                     </Typography>
-                    <Typography variant='body2' sx={{ paddingLeft : 2 }}>
+                    <Typography variant='body2' sx={{ paddingLeft : 2 ,fontSize: 12 }}>
                         구체적으로 말하고 다른 사람에게 질문을 하고 있다고 상상해 보세요.                    
                     </Typography>
                     <TextField 
@@ -98,18 +151,26 @@ export default function(){
                     <Typography sx={{ p: 2 ,fontWeight: 'bold' }}>
                         내용
                     </Typography>
-                    <Typography variant='body2' sx={{ paddingLeft : 2 }}>
+                    <Typography variant='body2' sx={{ paddingLeft : 2 ,fontSize: 12 }}>
                         누군가가 귀하의 질문에 대답하는 데 필요한 모든 정보를 포함하세요.
                     </Typography>
 
-                    
+                    <Box sx={{ width: '90%' , ml: 2 ,p: 2 ,border: 1 ,borderColor: 'lightgray' ,display: 'flex' ,flexDirection: 'row' ,height: 20 ,mt: 2 }}>
+                        <IconButton title="코드 샘플"  onClick={() => handleTextOptions("strong")}>
+                            <Typography sx={{ color: 'black' ,fontWeight: 'bold' }}>B</Typography>
+                        </IconButton>
+                        <IconButton title="코드 샘플"  onClick={() => handleTextOptions("code")}>
+                            <CodeIcon sx={{ color: 'black' }}/>
+                        </IconButton>
+                    </Box>
+                    <StyledForm>
                     <TextArea
-                        sx={{ width: '90%' ,m: 2 ,height: 300 , p : 2 ,borderColor: 'lightgray' }}
+                        sx={{ width: '90%' ,m: 2 ,height: 300 , p : 2 ,mt: 0 ,borderColor: 'lightgray' }}
                         value={content}
-                        onChange={value => setContent(value.target.value)}
+                        onChange={ event => setContent(event.target.value) }
                         size='small'
-                        placeholder='e.g. 리액트 질문'
                     />
+                    </StyledForm>
 
                     <Container>
                         {renderContentPreview()}

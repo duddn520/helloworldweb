@@ -15,6 +15,7 @@ public class PostResponseDto { // post결과로 전달할 데이터
     private String title;
     private String content;
     private String tags;
+    private Long views;
 
     public PostResponseDto(Post post) {
         this.id = post.getId();
@@ -23,5 +24,6 @@ public class PostResponseDto { // post결과로 전달할 데이터
         this.title = post.getTitle();
         this.content = post.getContent();
         this.tags = post.getTags();
+        this.views = post.getViews();
     }
 }

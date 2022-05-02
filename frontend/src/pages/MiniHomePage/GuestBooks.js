@@ -75,7 +75,7 @@ function GuestBooks({ userInfo }){
                     <Container sx={{ width: '100%' ,backgroundColor: 'rgb(240,240,240)' ,display: 'flex' ,flexDirection: 'row' ,alignItems: 'center' ,mt: 5 }}>
                         <Typography>No.{comment.id}</Typography> 
                         <Button sx={{ textTransform : 'none' }}>{comment.userName}</Button>
-                        <Typography>( 2022.04.27 11:20 )</Typography>
+                        <Typography>( {comment.createdTime} )</Typography>
     
                         <Button sx={{ marginLeft: 'auto' }}>비밀로 하기</Button>
                         <Divider orientation='vertical' flexItem sx={{ m: 1 }}/>
@@ -102,7 +102,7 @@ function GuestBooks({ userInfo }){
                         <Button 
                             variant='outlined' 
                             sx={{ backgroundColor: 'white' ,ml: 3 ,color: 'black' ,borderColor: 'lightgray'  }}
-                            onClick={() => api.updateGuestBook({ id: comment.id , reply: reply})}
+                            onClick={() => api.updateGuestBook({ id: comment.id , reply: reply}) }
                         >
                             확인
                         </Button>

@@ -75,6 +75,32 @@ public class PostController {
                 responseDtos), HttpStatus.OK);
     }
 
+
+    @GetMapping("/api/search")
+    public ResponseEntity<ApiResponse<List<PostRequestDto>>> getSearchedPost(@RequestParam(name="sentence") String sentence){
+        List<Post> posts = postService.getSearchedPost(sentence);
+
+        List<PostResponseDto> responseDtos = posts.stream()
+                .map(PostResponseDto::new)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity (ApiResponse.response(
+                HttpStatusCode.GET_SUCCESS,
+                HttpResponseMsg.GET_SUCCESS,
+                responseDtos), HttpStatus.OK);
+    }
+
+    // 조회수 + 1
+    @PutMapping("/api/post")
+    public ResponseEntity<ApiResponse> updatePost(@RequestParam(name="id")Long id){
+
+        postService.updatePost(postService.getPost(id));
+
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.PUT_SUCCESS,
+                HttpResponseMsg.PUT_SUCCESS), HttpStatus.OK);
+    }
+
     @DeleteMapping("/api/post")
     public ResponseEntity<ApiResponse> deletePost(@RequestBody PostRequestDto requestDto) {
 

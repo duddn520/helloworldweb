@@ -1,7 +1,7 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography ,TextField ,IconButton ,Avatar ,
     MenuList , MenuItem , ListItemText ,Divider , ListItemButton , Paper ,
-    Button ,Popover ,Drawer ,Box ,List ,ListItem ,ListItemIcon 
+    Button ,Popover ,Drawer ,Box ,List ,ListItem ,ListItemIcon ,Popper
 } from '@mui/material';
 import { Menu as MenuIcon ,Search as SearchIcon,Home as HomeIcon } from '@mui/icons-material';
 import { styled } from '@mui/material';
@@ -9,22 +9,49 @@ import { useNavigate } from "react-router-dom";
 import api from '../../api/api';
 
 export default function(){
+    // 화면이동
     const navigate = useNavigate();
     // 로그인 상태
     const [loginState,setLoginState] = React.useState(false);
     // 로그인 시 아바타 클릭 시 메뉴 활성화 
     const [loginMenuVisible,setLoginMenuVisible] = React.useState(false);
-    // 햄버거 메뉴 활성화
-    const [state,setState] = React.useState([{ right: false }]);
     // 프로필사진
     const [profileUrl,setProfileUrl] = React.useState("");
-
+    
+    // 검색어 추천 
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [sentence,setSentence] = React.useState("");
+    const searchBarRef = React.useRef(null);
+    const openPopper = Boolean(anchorEl);
+    const handlePopper = (event) => {
+        if( document.activeElement === searchBarRef.current && anchorEl ) {
+            return;
+        }
+        setAnchorEl(anchorEl ? null : event.currentTarget);
+    };
+    // 검색내용
+    const handleSentence = (value) => {
+        setSentence(value.target.value);
+    }
+    // 검색 - "Enter" 눌렀을 때  
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        api.getSearchedPost({sentence : sentence})
+            .then( res => {
+                navigate('/search',{ state: { res: res , sentence: sentence } })
+            })
+        .catch()
+    }
+    
+    // 햄버거 메뉴 활성화
+    const [state,setState] = React.useState([{ right: false }]);
     const toggleDrawer = (anchor, open) => (event) => {
         if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
           return;
         }    
         setState({ ...state, [anchor]: open });
     };        
+
 
     // 로그아웃 함수
     function logout(){
@@ -64,13 +91,35 @@ export default function(){
                         </Typography>
                     </IconButton>
                     
-                    <StyledForm>
+                    <StyledForm
+                        onClick={handlePopper}
+                        onBlur={handlePopper}
+                        onSubmit={handleSubmit}
+                        >
                         <TextField
+                            inputRef={searchBarRef}
+                            value={sentence}
+                            onChange={handleSentence}
                             size='small'
                             sx={{ width: '90%' ,ml: 2 }}
                             placeholder="Search Anything"
                             InputProps={{ startAdornment: <SearchIcon/> }}
+                            autoComplete="off"
                         />
+                        <Popper pos id="simple-popper" open={openPopper} anchorEl={anchorEl} placement="bottom-start">
+                        <Box sx={{ border: 2 ,borderColor: 'lightgray' ,width: document?.activeElement === null ? 0 : document.activeElement.clientWidth ,m: 2 ,p: 2 ,bgcolor: 'background.paper' ,borderRadius: 2 }}>
+                           <Box sx={{ display: 'flex',flexDirection: 'row' ,flexGrow: 1}}>
+                               <Box sx={{ flex: 1 ,display: 'flex',flexDirection: 'row' ,alignItems: 'center' }}>
+                                    <Typography sx={{ fontSize: 12 ,fontWeight: 'bold' }}>[태그]</Typography>
+                                    <Typography sx={{ color: 'gray' ,fontSize: 12 ,ml: 1}}>해당태그 포함</Typography>
+                               </Box>
+                               <Box sx={{ flex: 1 ,display: 'flex',flexDirection: 'row' }}>
+                                    <Typography sx={{ fontSize: 12 ,fontWeight: 'bold'}}>"정확한 검색"</Typography>
+                                    <Typography sx={{ color: 'gray' ,fontSize: 12 ,ml: 1}}>정확한 문구만 포함</Typography>
+                               </Box>
+                           </Box>
+                        </Box>
+                        </Popper>
                     </StyledForm>
                     {
                         loginState ? 
@@ -152,6 +201,8 @@ export default function(){
     );
 }
 
+
+// 미니홈용 ( 검색창 없음 )
 export function MiniHomeBar(){
     const navigate = useNavigate();
     // 로그인 상태

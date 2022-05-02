@@ -227,6 +227,7 @@ public class UserService {
             User newUser = User.builder()
                     .email(email)
                     .profileUrl(profileUrl)
+                    .repo_url(" ")
                     .role(Role.USER)
                     .build();
             User savedUser = userRepository.save(newUser);
