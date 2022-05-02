@@ -5,6 +5,7 @@ import com.helloworld.helloworldweb.domain.Post;
 import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.dto.Post.PostRequestDto;
 import com.helloworld.helloworldweb.dto.Post.PostResponseDto;
+import com.helloworld.helloworldweb.dto.Post.PostResponseDtoWithPostComments;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
@@ -88,10 +89,11 @@ public class PostController {
     }
 
     @GetMapping("/api/post")
-    public ResponseEntity<ApiResponse<PostResponseDto>> getPost(@RequestBody PostRequestDto requestDto) {
+    @Transactional
+    public ResponseEntity<ApiResponse> getPost(@RequestParam(name = "id") Long id) {
 
-        Post post = postService.getPost(requestDto.getPost_id());
-        PostResponseDto responseDto = new PostResponseDto(post);
+        Post post = postService.getPost(id);
+        PostResponseDtoWithPostComments responseDto = new PostResponseDtoWithPostComments(post);
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.GET_SUCCESS,

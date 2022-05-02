@@ -3,6 +3,7 @@ import { Box, Button } from "@mui/material";
 import { styled } from '@mui/system';
 import api from "../../api/api";
 import { useNavigate } from 'react-router';
+import axios from "axios";
 
 const TitleInput = styled('input')({
     flex: 1,
@@ -60,6 +61,41 @@ function WriteBlog(){
         //window.URL.revokeObjectURL(url);
     }
 
+    function InvokeKakaoOcrApi(e){
+        const file = e.target.files[0];
+        var total = ""
+        let formData = new FormData();
+        formData.append('image',file);
+        console.log(file)
+        axios.post("https://dapi.kakao.com/v2/vision/text/ocr",formData,{
+            headers:{
+                'Content-Type':'multipart/form-data',
+                'Authorization':'KakaoAK c4a54b62084183bdcbb9b92b09a21e32'
+            }
+        }).then(res=>{
+
+            console.log(res.data.result)
+            const recognizedResult = res.data.result;
+            
+            for(let i = 0 ; i<recognizedResult.length ; i++)
+            {
+                let word = recognizedResult[i].recognition_words
+                console.log(word)
+                total += word
+            }
+
+            const newDiv = document.createElement('div');
+            const newText = document.createTextNode(`${total}`);
+            newDiv.appendChild(newText);
+            document.getElementById('Container').appendChild(newDiv);
+
+        }).catch(e =>{
+            console.log(e)
+        })
+        
+
+    }
+
 
     function savePost(){
         const divC = document.getElementById('Container');
@@ -114,6 +150,13 @@ function WriteBlog(){
                     accept="image/png, image/jpeg, image/jpg"
                     multiple={true}
                     onChange={loadImage}/>
+                    <Button variant="contained" component="label" color="primary"> OCR
+                    <input 
+                    type="file"
+                    accept="image/png, image/jpeg, image/jpg"
+                    multiple={false}
+                    onChange={InvokeKakaoOcrApi} hidden/>
+                    </Button>
                 <Button onClick={()=>{savePost()}} variant={'contained'}>저장</Button>
             </Box>
             

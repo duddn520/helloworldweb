@@ -11,10 +11,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Getter
 @NoArgsConstructor
-public class PostResponseDto { // post결과로 전달할 데이터
+public class PostResponseDtoWithPostComments {
     private Long id;
     private Long user_id;
     private Category category;
@@ -22,8 +21,9 @@ public class PostResponseDto { // post결과로 전달할 데이터
     private String content;
     private String tags;
     private LocalDateTime createdTime;
+    private List<PostCommentResponseDto> postCommentResponseDtos = new ArrayList<>();
 
-    public PostResponseDto(Post post) {
+    public PostResponseDtoWithPostComments(Post post) {
         this.id = post.getId();
         this.user_id = post.getUser().getId();
         this.category = post.getCategory();
@@ -31,5 +31,17 @@ public class PostResponseDto { // post결과로 전달할 데이터
         this.content = post.getContent();
         this.tags = post.getTags();
         this.createdTime = post.getCreatedTime();
+        this.postCommentResponseDtos = postCommentsToResponseDtos(post.getPostComments());
+    }
+
+    //post의 PostComment List를 PostCommentResponseDto의 List로 바꿔주는함수.
+    private List<PostCommentResponseDto> postCommentsToResponseDtos(List<PostComment> postComments)
+    {
+        List<PostCommentResponseDto> responseDtos = new ArrayList<>();
+        for( PostComment p : postComments)
+        {
+            responseDtos.add(new PostCommentResponseDto(p));
+        }
+        return responseDtos;
     }
 }
