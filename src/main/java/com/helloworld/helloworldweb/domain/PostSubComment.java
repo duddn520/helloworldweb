@@ -39,11 +39,18 @@ public class PostSubComment extends BaseTimeEntity {
         postComment.getPostSubComments().add(this);
     }
 
+    public void updateUser(User user)
+    {
+        this.user = user;
+        user.getSubComments().add(this);
+    }
+
     public PostSubComment updatePostSubComment(PostSubComment postSubComment)
     {
         this.content = postSubComment.getContent();
 
         return this;
     }
+
 
 }

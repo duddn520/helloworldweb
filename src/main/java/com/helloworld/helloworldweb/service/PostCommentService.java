@@ -3,6 +3,7 @@ package com.helloworld.helloworldweb.service;
 import com.helloworld.helloworldweb.domain.Post;
 import com.helloworld.helloworldweb.domain.PostComment;
 import com.helloworld.helloworldweb.domain.PostSubComment;
+import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.repository.PostCommentRepository;
 import com.helloworld.helloworldweb.repository.PostSubCommentRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +18,11 @@ public class PostCommentService {
     private final PostSubCommentRepository postSubCommentRepository;
 
     @Transactional
-    public PostComment registerPostComment(PostComment postComment, Post post, PostSubComment postSubComment)
+    public PostComment registerPostComment(PostComment postComment, Post post, PostSubComment postSubComment, User user)
     {
         postComment.updatePost(post);
         postSubComment.updatePostComment(postComment);
+        postSubComment.updateUser(user);
         postSubCommentRepository.save(postSubComment);
         return postCommentRepository.save(postComment);
     }

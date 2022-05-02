@@ -89,6 +89,7 @@ public class PostController {
     }
 
     @GetMapping("/api/post")
+    @Transactional
     public ResponseEntity<ApiResponse> getPost(@RequestParam(name = "id") Long id) {
 
         Post post = postService.getPost(id);
