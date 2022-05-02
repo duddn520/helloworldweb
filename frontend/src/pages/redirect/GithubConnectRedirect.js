@@ -10,7 +10,7 @@ export default function GithubConnectRedirect(){
     {
         let code = window.location.search.split("code=")[1];
         request({
-            url:"http://localhost:8080/user/githubconnect",
+            url:"/user/githubconnect",
             params:{
                 "code":code
             },

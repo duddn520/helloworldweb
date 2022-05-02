@@ -91,7 +91,7 @@ public class UserService {
 
         // 필요한 정보들
         String email = userInfo.getAsString("email");
-        String profileUrl = "";
+        String profileUrl = userInfo.getAsString("profile_image");
         return addUser(email,profileUrl);
     }
 
@@ -228,6 +228,7 @@ public class UserService {
                     .email(email)
                     .profileUrl(profileUrl)
                     .role(Role.USER)
+                    .repo_url(" ")
                     .build();
             User savedUser = userRepository.save(newUser);
             return jwtTokenProvider.createToken(savedUser.getEmail(), Role.USER);

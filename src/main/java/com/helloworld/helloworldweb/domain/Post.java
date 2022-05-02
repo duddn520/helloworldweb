@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @Getter
-public class Post {
+public class Post extends BaseTimeEntity{
 
     @Id @GeneratedValue
     private Long id;
@@ -24,6 +24,9 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<PostComment> postComments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<PostImage> postImages = new ArrayList<>();
+
     @Enumerated(EnumType.STRING)
     private Category category;
 
@@ -34,11 +37,13 @@ public class Post {
     // 태그
     private String tags;
 
+
     @Builder
-    public Post(Long id, User user, List<PostComment> postComments, Category category, String content, String title ,String tags) {
+    public Post(Long id, User user, List<PostComment> postComments, List<PostImage> postImages, Category category, String content, String title ,String tags) {
         this.id = id;
         this.user = user;
         this.postComments = postComments;
+        this.postImages = postImages;
         this.category = category;
         this.content = content;
         this.title = title;

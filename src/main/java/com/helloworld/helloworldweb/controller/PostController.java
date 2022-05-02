@@ -18,7 +18,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,6 +32,31 @@ public class PostController {
     private final PostService postService;
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
+
+    @PostMapping("/api/post/image")
+    @Transactional
+    public ResponseEntity<ApiResponse> registerPostWithImage(@RequestHeader(value = "Auth") String jwtToken,
+                                                             @RequestParam(value = "files") List<MultipartFile> files,
+                                                             @RequestParam(value = "content") String content,
+                                                             @RequestParam(value = "category") Category category,
+                                                             @RequestParam(value = "title", required = false) String title,
+                                                             @RequestParam(value = "tags", required = false) String tags) throws IOException {
+
+        User findUser = userService.getUserByJwt(jwtToken);
+        Post post = Post.builder()
+                .category(category)
+                .title(title)
+                .content(content)
+                .postImages(new ArrayList<>())
+                .build();
+
+//        Post savedPost = postService.addPostWithImageForLocal(post, findUser, files);
+        postService.addPostWithImage(post, findUser, files);
+
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.POST_SUCCESS,
+                HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
+    }
 
     @PostMapping("/api/post")
     @Transactional
@@ -76,6 +104,7 @@ public class PostController {
     }
 
     @DeleteMapping("/api/post")
+    @Transactional
     public ResponseEntity<ApiResponse> deletePost(@RequestBody PostRequestDto requestDto) {
 
         Post findPost = postService.getPost(requestDto.getPost_id());

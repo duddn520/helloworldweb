@@ -10,7 +10,7 @@ export default function GithubRedirect(){
         let code = window.location.search.split("code=")[1];
 
         axios({
-            url:"http://localhost:8080/user/register/github",
+            url:"/user/register/github",
             params:{"code":code},
             method:"POST"
         }).then(res=>{

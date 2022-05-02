@@ -15,6 +15,7 @@ function Posts(){
     React.useEffect(()=>{
         api.getMyBlogPosts()
         .then(res => {
+            console.log(res);
             setPosts(res);
         })
         .catch(e => {
@@ -30,7 +31,7 @@ function Posts(){
             </Box>
             {posts.map((post)=>{
                 return(
-                    <PostThumbnail key={post.id} id={post.id} title={post.title}/>
+                    <PostThumbnail key={post.id} id={post.id} title={post.title} createdTime={post.createdTime}/>
                 )
             })}
         </div>
