@@ -28,11 +28,12 @@ public class PostRequestDto { //post요청과 함께 받을 데이터
     }
 
     @Builder
-    public PostRequestDto(Long post_id, Long user_id, Category category, String content, String title) {
+    public PostRequestDto(Long post_id, Long user_id, Category category, String content, String title, String tags) {
         this.post_id = post_id;
         this.user_id = user_id;
         this.category = category;
         this.content = content;
         this.title = title;
+        this.tags = tags;
     }
 }

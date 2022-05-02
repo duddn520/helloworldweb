@@ -1,9 +1,24 @@
 import React from "react";
 import { Box, Button } from "@mui/material";
-import { styled } from '@mui/system';
 import api from "../../api/api";
 import { useNavigate } from 'react-router';
+import styled from "styled-components";
+import imageCompression from "browser-image-compression";
 import axios from "axios";
+
+
+const TitleInput = styled.input`
+    flex: 1;
+    padding: 8px;
+`;
+
+const WriteSpace = styled.div`
+    padding: 10px; 
+    border: 1px solid #D6D6D6;
+    border-radius: 4px;
+    height: 75vh;
+    overflow: auto;
+`;
 
 const TitleInput = styled('input')({
     flex: 1,
@@ -16,10 +31,6 @@ const Content = styled('div')({
 
 function WriteBlog(){
     const navigate = useNavigate();
-    const [TitleValue, setTitleValue] = React.useState(""); 
-    const onTitleChange = (event) => { 
-        setTitleValue(event.currentTarget.value); 
-    };
 
     function strToHTML(str){
         const parser = new DOMParser();
@@ -28,39 +39,84 @@ function WriteBlog(){
         return element;
     }
 
-    const WriteSpace = () => {
-        return(
-            <Content id="Container" contentEditable="true" sx={{border: 2, borderColor: 'gray', borderRadius: 1, padding: 1, height: '75vh', overflow: 'auto'}}></Content>
-        );
-    }
+    const imageReader = async function(e) {
+        const selectedImage = e.target.files[0];
+        const options = { 
+            maxSizeMB: 2, 
+            maxWidthOrHeight: 400
+        }
+        const compressedFile = await imageCompression(selectedImage, options);
+        //blob 생성 
+        let blob = new Blob([compressedFile], { type: ["image/png", "image/jpeg", "image/jpg"] });
+        //url 생성
+        let url = window.URL.createObjectURL(blob);
 
-    function loadImage(e){
-        const selectedImages = e.target.files; //선택한 이미지 리스트
-
-        for (let i = 0; i < selectedImages.length; i++){
-            //blob 생성
-            let blob = new Blob([selectedImages[i]], { type: "image/png" });
-            console.log(blob);
-            //url 생성
-            let url = window.URL.createObjectURL(blob);
-
-            //image로 img HTML element를 만들어줌 
+        var fileReader = new FileReader();
+        fileReader.readAsDataURL(selectedImage);
+    
+        fileReader.onload = function(e) { 
+            //console.log(e.target.result); // base64 인코딩된 값
             let imgNode = document.createElement('img');
             imgNode.setAttribute("src", url);
-            imgNode.setAttribute("width", 300);
-            imgNode.setAttribute("height", 300);
+            imgNode.setAttribute("name", selectedImage.name);
+            imgNode.setAttribute("base64", e.target.result);
+            imgNode.setAttribute("maxWidth", 800);
+            imgNode.setAttribute("maxHeight", 400);
             imgNode.setAttribute("variant", "contained");
             imgNode.setAttribute("alt", "test image");
 
-            document.getElementById('Container').appendChild(imgNode);
-            window.URL.revokeObjectURL(url);
+            document.getElementById('Content').appendChild(imgNode);
+
+            const selection = window.getSelection();
+            const newRange = document.createRange();
+            newRange.selectNodeContents(document.getElementById('Content'));
+            newRange.collapse(false);
+            selection?.removeAllRanges();
+            selection?.addRange(newRange);
         }
+      }
 
-
-        // url 사용 후에 메모리에서 제거하기
-        //window.URL.revokeObjectURL(url);
+    /**
+     * 파일을 Base64 형식에서 > File 형식으로 (디코딩)변환합니다
+     * @param { String } image Base64 형식의 String
+     * @param { String } fileName Base64 에서는 파일 명을 저장할 수 없습니다.
+     */
+    function convertBase64IntoFile (image, fileName) {
+        const mimeType = image?.match(/[^:]\w+\/[\w-+\d.]+(?=;|,)/)[0]   // image/jpeg
+        const realData = image.split(',')[1]   // 이 경우에선 /9j/4AAQSkZJRgABAQAAAQABAAD...
+    
+        const blob = b64toBlob(realData, mimeType)
+        const raw = new File([blob], fileName, { type: mimeType })
+        
+        return raw;
     }
 
+    /**
+     * base64 를 Blob 오브젝트로 만드는 함수
+     * @param { String } b64Data
+     * @param { String } contentType mimeType
+     * @param { Number } sliceSize 쪼개는 사이즈
+     */
+    function b64toBlob (b64Data, contentType = '', sliceSize = 512) {
+        if (b64Data === '' || b64Data === undefined) return
+    
+        const byteCharacters = atob(b64Data)
+        const byteArrays = []
+    
+        for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+        const slice = byteCharacters.slice(offset, offset + sliceSize)
+        const byteNumbers = new Array(slice.length)
+        for (let i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i)
+        }
+        const byteArray = new Uint8Array(byteNumbers)
+        byteArrays.push(byteArray)
+        }
+    
+        const blob = new Blob(byteArrays, { type: contentType })
+        return blob
+    }
+    
     function InvokeKakaoOcrApi(e){
         const file = e.target.files[0];
         var total = ""
@@ -98,56 +154,79 @@ function WriteBlog(){
 
 
     function savePost(){
-        const divC = document.getElementById('Container');
+        const divC = document.getElementById('Content');
+        const divT = document.getElementById('Title');
         let content = strToHTML(divC.innerHTML);
+        let title = divT.value;
 
         let formdata = new FormData();
         let totalContent = '';
+
         for(let i = 0; i < content.length; i++){
             if(content[i].tagName === 'IMG'){
-                let imgUrl = content[i].currentSrc;
-                let name = imgUrl.split('/')[3];
-                let type = "multipart/form-data";
-                let imgUri = imgUrl;
-                formdata.append("files", { name: name , type: type, uri: imgUri });
 
-                totalContent += "&&&&&\n";
+                let imgUri = content[i].currentSrc;
+                let imgBase64 = content[i].getAttribute('base64')
+                let name = content[i].getAttribute('name').split('.')[0]+i+'.'+content[i].getAttribute('name').split('.')[1];
+                formdata.append('files', convertBase64IntoFile(imgBase64, name));
+
+                totalContent += "&&&&\n";
+
+                // url 사용 후에 메모리에서 제거하기
+                window.URL.revokeObjectURL(imgUri);
             }
             else{
                 if( i === 0) {
-                    totalContent += content[i].textContent+'\n';
+                    totalContent += content[i].textContent === '\n' ? content[i].textContent : content[i].textContent+'\n';
                 }
                 else {
-                    totalContent += content[i].innerText+'\n';
+                    totalContent += content[i].innerText === '\n' ? content[i].innerText : content[i].innerText+'\n';
                 }
             }
         }
 
-        // console.log(formdata);
-        // console.log(totalContent);
-
-        api.registerPost(formdata, TitleValue, totalContent)
+        api.registerPost(formdata, title, totalContent)
         .then(res => {
             console.log('블로그 게시 성공');
             navigate("/minihome", {replace: true, state: {tabIndex: 1}});
         })
         .catch(e => {
             console.log('블로그 게시 실패');
+            alert("작성 실패");
         });
     }
 
     return(
-        <Box sx={{paddingTop: 3, paddingLeft: 2, paddingRight: 3, paddingBottom: 5, height: '100vh'}}>
-            <Box sx={{display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5}}>
+        <Box sx={{paddingTop: 3, paddingLeft: 2, paddingRight: 2, paddingBottom: 3, height: '90vh'}}>
+            <Box sx={{display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3}}>
                 <label>제목: </label> 
-                <TitleInput onChange={onTitleChange} value={TitleValue} type="text" name="title"/>
+                <TitleInput id="Title" type="text" name="title"/>
             </Box>
-            <WriteSpace/>
+            {/* <div class="editor-menu"> 
+                <button id="btn-bold"> 
+                    <b>B</b> 
+                </button> 
+                <button id="btn-italic"> 
+                    <i>I</i> 
+                </button> 
+                <button id="btn-underline"> 
+                    <u>U</u>
+                </button> 
+                <button id="btn-strike"> 
+                    <s>S</s> 
+                </button> 
+                <button id="btn-ordered-list"> OL </button> 
+                <button id="btn-unordered-list"> UL </button> 
+                <button id="btn-image"> IMG </button> 
+            </div> */}
+            <WriteSpace id="Content" contentEditable="true"/>
             <Box sx={{display: 'flex', justifyContent: 'space-between', marginTop: 2}}>
                 <input 
                     type="file"
                     id="avatar" name="avatar"
                     accept="image/png, image/jpeg, image/jpg"
+                    multiple={false}
+                    onChange={imageReader}/>
                     multiple={true}
                     onChange={loadImage}/>
                     <Button variant="contained" component="label" color="primary"> OCR

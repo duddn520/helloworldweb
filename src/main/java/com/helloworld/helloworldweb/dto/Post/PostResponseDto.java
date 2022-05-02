@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class PostResponseDto { // post결과로 전달할 데이터
     private String title;
     private String content;
     private String tags;
-    private LocalDateTime createdTime;
+    private String createdTime;
 
     public PostResponseDto(Post post) {
         this.id = post.getId();
@@ -30,6 +31,6 @@ public class PostResponseDto { // post결과로 전달할 데이터
         this.title = post.getTitle();
         this.content = post.getContent();
         this.tags = post.getTags();
-        this.createdTime = post.getCreatedTime();
+        this.createdTime = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(post.getCreatedTime());
     }
 }
