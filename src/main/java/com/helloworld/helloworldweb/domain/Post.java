@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @Getter
-public class Post {
+public class Post extends BaseTimeEntity {
 
     @Id @GeneratedValue
     private Long id;

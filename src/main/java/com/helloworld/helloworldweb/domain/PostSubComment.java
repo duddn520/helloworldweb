@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @Getter
-public class PostSubComment {
+public class PostSubComment extends BaseTimeEntity {
 
     @Id @GeneratedValue
     private Long id;
