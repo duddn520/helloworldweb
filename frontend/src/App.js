@@ -10,6 +10,7 @@ import QnA from './pages/questions/QnA';
 import MiniHome from "./pages/MiniHomePage/MiniHome";
 import WriteBlog from './pages/MiniHomePage/WriteBlog';
 import GithubConnectRedirect from "./pages/redirect/GithubConnectRedirect";
+import Search from './pages/search/Search';
 
 function App() {
   return (
@@ -24,6 +25,8 @@ function App() {
         {/* QnA */}
         <Route exact path="/qna" element={<QnA />} />
         <Route exact path="/qna/register" element={<QnARegister />} />
+        {/* search */}
+        <Route path="/search" element={<Search />} />
         
         <Route path="/minihome" element={<MiniHome />} />
         <Route path="/minihome/write" element={<WriteBlog />} />

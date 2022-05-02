@@ -87,7 +87,8 @@ export default function RepoCardFlatList()
                     m:3
                 }}>
                     <Button
-                        startIcon={<Avatar sx={{position : "absolute", left:5, alignSelf:"center", bottom:4.2}} onClick={getGitCode} src={require(`../../images/github_icon.png`)} alt='LoginButtonImage' width='50' height='50' />}
+                        onClick={getGitCode} 
+                        startIcon={<Avatar sx={{position : "absolute", left:5, alignSelf:"center", bottom:4.2}} src={require(`../../images/github_icon.png`)} alt='LoginButtonImage' width='50' height='50' />}
                         sx={{ color: 'gray', width : 300, height: 50, fontSize:14 ,backgroundColor : "white" ,boxShadow:0 , borderColor:"gray", borderWidth:0.9 ,":hover":{ boxShadow:0, backgroundColor:"whitesmoke", borderColor:"gray"}}}
                         variant={"outlined"}
                     >

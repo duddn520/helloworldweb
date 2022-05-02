@@ -13,4 +13,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      Optional<Post> findById(Long postId);
      Optional<List<Post>> findByCategory(Category category);
      Optional<List<Post>> findByUserIdAndCategory(Long id, Category category);
+     Optional<List<Post>> findAllByTitleContainingOrContentContaining(String s1,String s2);
+     Optional<List<Post>> findAllByTagsContaining(String s);
 }
