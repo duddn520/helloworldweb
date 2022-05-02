@@ -3,6 +3,7 @@ import {Box} from "@mui/material";
 import {Typography} from "@mui/material";
 import {Stack} from "@mui/material";
 import LoginButton from "../component/login/LoginButton";
+import CustomAppBar from "../component/appbar/CustomAppBar";
 import axios from "axios";
 import api from "../api/api";
 import { Button } from "@mui/material";
@@ -36,6 +37,7 @@ export default function (){
 
     return(
         <Box className="App">
+            <CustomAppBar />
             <Box sx={{
                 alignItems:'center',
                 marginTop:20

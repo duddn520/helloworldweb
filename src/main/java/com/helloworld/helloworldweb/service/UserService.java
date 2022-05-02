@@ -91,7 +91,7 @@ public class UserService {
 
         // 필요한 정보들
         String email = userInfo.getAsString("email");
-        String profileUrl = "";
+        String profileUrl = userInfo.getAsString("profile_image");
         return addUser(email,profileUrl);
     }
 
@@ -100,6 +100,7 @@ public class UserService {
     {
         String repo_url = (String) userInfoJsonObject.get("repos_url");
         String email = (userInfoJsonObject.get("login") + "@github.com");
+        String profile_url = (String) userInfoJsonObject.get("avatar_url");
 
         Optional<User> userOptional = userRepository.findByEmail(email);
         if(userOptional.isPresent())
@@ -110,6 +111,7 @@ public class UserService {
             User user = User.builder()
                     .email(email)
                     .repo_url(repo_url)
+                    .profileUrl(profile_url)
                     .role(Role.USER)
                     .build();
 
@@ -229,6 +231,7 @@ public class UserService {
                     .profileUrl(profileUrl)
                     .repo_url(" ")
                     .role(Role.USER)
+                    .repo_url(" ")
                     .build();
             User savedUser = userRepository.save(newUser);
             return jwtTokenProvider.createToken(savedUser.getEmail(), Role.USER);

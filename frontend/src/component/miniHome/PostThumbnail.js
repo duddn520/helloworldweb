@@ -10,12 +10,14 @@ const OnePost = styled(Box)({
     paddingRight: 1,
     paddingLeft: 1,
     display: 'flex',
+    justifyContent: 'space-between'
 })
 
-function PostThumbnail({id, title}){
+function PostThumbnail({id, title, createdTime}){
     return(
         <OnePost sx={{borderBottom: 1, borderColor: 'gray'}}>
             <Typography>{title}</Typography>
+            <Typography>{createdTime}</Typography>
         </OnePost>
     )
 }

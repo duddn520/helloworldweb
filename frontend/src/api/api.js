@@ -1,3 +1,4 @@
+import axios from 'axios';
 import request from './request';
 
 // Http Response statusCode 정리
@@ -235,25 +236,53 @@ function getUser(){
 }
 
 function registerPost(formdata, title, totalContent){
-    return new Promise((resolve,reject) => {
-        request({
-            method: 'POST',
-            url : '/api/post',
-            data: {
-                formdata: formdata,
-                content: totalContent,
-                category: "BLOG",
-                title: title,
+    if(formdata.get('files') === null){
+        return new Promise((resolve,reject) => {
+            request({
+                method: 'POST',
+                url : '/api/post',
+                data: {
+                    content: totalContent,
+                    category: "BLOG",
+                    title: title,
+                }
+            })
+            .then( res => {
+                resolve(res.data);
+            })
+            .catch( e => {
+                console.log(e);
+                reject();
+            })
+        });
+    }
+    else{
+        const token = window.sessionStorage.getItem("Auth");
+        formdata.append('content', totalContent);
+        formdata.append('category', "BLOG");
+        formdata.append('title', title);
+        return new Promise((resolve,reject) => {
+            if(token === null){
+                reject();
             }
-        })
-        .then( res => {
-            resolve(res.data);
-        })
-        .catch( e => {
-            console.log(e);
-            reject();
-        })
-    });
+            else{
+                axios.post('/api/post/image', formdata, {
+                    headers: {
+                        'content-type': 'multipart/form-data',
+                        Auth: token
+                    }
+                })
+                .then( res => {
+                    resolve(res.data);
+                })
+                .catch( e => {
+                    console.log(e);
+                    reject();
+                })
+            }
+        });
+    }
+    
 }
 
 function getMyBlogPosts(){
