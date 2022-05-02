@@ -1,16 +1,15 @@
 package com.helloworld.helloworldweb.controller;
 
-import com.helloworld.helloworldweb.domain.Post;
-import com.helloworld.helloworldweb.domain.PostComment;
-import com.helloworld.helloworldweb.domain.PostSubComment;
-import com.helloworld.helloworldweb.domain.Role;
+import com.helloworld.helloworldweb.domain.*;
 import com.helloworld.helloworldweb.dto.PostComment.PostCommentRequestDto;
 import com.helloworld.helloworldweb.dto.PostComment.PostCommentResponseDto;
+import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
 import com.helloworld.helloworldweb.model.HttpStatusCode;
 import com.helloworld.helloworldweb.service.PostCommentService;
 import com.helloworld.helloworldweb.service.PostService;
+import com.helloworld.helloworldweb.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.Authenticator;
 
 @Controller
@@ -27,13 +27,18 @@ public class PostCommentController {
 
     private final PostCommentService postCommentService;
     private final PostService postService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
 
     //PostComment CRUD
 
     @Transactional
     @PostMapping("/api/postcomment")
-    public ResponseEntity<ApiResponse<PostCommentResponseDto>> registerPostComment(@RequestBody PostCommentRequestDto postCommentRequestDto)
+    public ResponseEntity<ApiResponse<PostCommentResponseDto>> registerPostComment(@RequestBody PostCommentRequestDto postCommentRequestDto, HttpServletRequest request)
     {
+        String token = jwtTokenProvider.getTokenByHeader(request);
+        User user = userService.getUserByEmail(jwtTokenProvider.getUserEmail(token));
+
         Post post = postService.getPost(postCommentRequestDto.getPostId());
         PostComment postComment = PostComment.builder()
                 .build();
@@ -41,7 +46,7 @@ public class PostCommentController {
                 .content(postCommentRequestDto.getContent())
                 .build();
 
-        PostCommentResponseDto responseDto = new PostCommentResponseDto(postCommentService.registerPostComment(postComment,post,postSubComment));
+        PostCommentResponseDto responseDto = new PostCommentResponseDto(postCommentService.registerPostComment(postComment,post,postSubComment,user));
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.OK,

@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @Getter
-public class PostComment {
+public class PostComment extends BaseTimeEntity{
 
     @Id @GeneratedValue
     private Long id;

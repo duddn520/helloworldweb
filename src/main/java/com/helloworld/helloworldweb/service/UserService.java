@@ -100,6 +100,7 @@ public class UserService {
     {
         String repo_url = (String) userInfoJsonObject.get("repos_url");
         String email = (userInfoJsonObject.get("login") + "@github.com");
+        String profile_url = (String) userInfoJsonObject.get("avatar_url");
 
         Optional<User> userOptional = userRepository.findByEmail(email);
         if(userOptional.isPresent())
@@ -110,6 +111,7 @@ public class UserService {
             User user = User.builder()
                     .email(email)
                     .repo_url(repo_url)
+                    .profileUrl(profile_url)
                     .role(Role.USER)
                     .build();
 

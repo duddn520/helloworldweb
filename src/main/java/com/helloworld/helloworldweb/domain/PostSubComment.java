@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @Getter
-public class PostSubComment {
+public class PostSubComment extends BaseTimeEntity {
 
     @Id @GeneratedValue
     private Long id;
@@ -39,11 +39,18 @@ public class PostSubComment {
         postComment.getPostSubComments().add(this);
     }
 
+    public void updateUser(User user)
+    {
+        this.user = user;
+        user.getSubComments().add(this);
+    }
+
     public PostSubComment updatePostSubComment(PostSubComment postSubComment)
     {
         this.content = postSubComment.getContent();
 
         return this;
     }
+
 
 }

@@ -4,6 +4,8 @@ import api from "../../api/api";
 import { useNavigate } from 'react-router';
 import styled from "styled-components";
 import imageCompression from "browser-image-compression";
+import axios from "axios";
+
 
 const TitleInput = styled.input`
     flex: 1;
@@ -17,6 +19,15 @@ const WriteSpace = styled.div`
     height: 75vh;
     overflow: auto;
 `;
+
+const TitleInput = styled('input')({
+    flex: 1,
+    padding: 8,
+    borderRadius: 4,
+});
+const Content = styled('div')({
+})
+
 
 function WriteBlog(){
     const navigate = useNavigate();
@@ -106,6 +117,42 @@ function WriteBlog(){
         return blob
     }
     
+    function InvokeKakaoOcrApi(e){
+        const file = e.target.files[0];
+        var total = ""
+        let formData = new FormData();
+        formData.append('image',file);
+        console.log(file)
+        axios.post("https://dapi.kakao.com/v2/vision/text/ocr",formData,{
+            headers:{
+                'Content-Type':'multipart/form-data',
+                'Authorization':'KakaoAK c4a54b62084183bdcbb9b92b09a21e32'
+            }
+        }).then(res=>{
+
+            console.log(res.data.result)
+            const recognizedResult = res.data.result;
+            
+            for(let i = 0 ; i<recognizedResult.length ; i++)
+            {
+                let word = recognizedResult[i].recognition_words
+                console.log(word)
+                total += word
+            }
+
+            const newDiv = document.createElement('div');
+            const newText = document.createTextNode(`${total}`);
+            newDiv.appendChild(newText);
+            document.getElementById('Container').appendChild(newDiv);
+
+        }).catch(e =>{
+            console.log(e)
+        })
+        
+
+    }
+
+
     function savePost(){
         const divC = document.getElementById('Content');
         const divT = document.getElementById('Title');
@@ -180,6 +227,15 @@ function WriteBlog(){
                     accept="image/png, image/jpeg, image/jpg"
                     multiple={false}
                     onChange={imageReader}/>
+                    multiple={true}
+                    onChange={loadImage}/>
+                    <Button variant="contained" component="label" color="primary"> OCR
+                    <input 
+                    type="file"
+                    accept="image/png, image/jpeg, image/jpg"
+                    multiple={false}
+                    onChange={InvokeKakaoOcrApi} hidden/>
+                    </Button>
                 <Button onClick={()=>{savePost()}} variant={'contained'}>저장</Button>
             </Box>
             
