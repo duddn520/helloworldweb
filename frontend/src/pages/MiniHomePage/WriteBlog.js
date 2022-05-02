@@ -3,6 +3,7 @@ import { Box, Button } from "@mui/material";
 import { styled } from '@mui/system';
 import api from "../../api/api";
 import { useNavigate } from 'react-router';
+import axios from "axios";
 
 const TitleInput = styled('input')({
     flex: 1,
@@ -83,12 +84,10 @@ function WriteBlog(){
                 total += word
             }
 
-            console.log(`${total}`)
-
             const newDiv = document.createElement('div');
-            const newText = document.createTextNode(total);
+            const newText = document.createTextNode(`${total}`);
             newDiv.appendChild(newText);
-            document.getElementById('Content').appendChild(newText);
+            document.getElementById('Container').appendChild(newDiv);
 
         }).catch(e =>{
             console.log(e)
