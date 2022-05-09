@@ -119,7 +119,8 @@ export default function(){
                 s[1] += "\n```\n";
                 setContent( s[0] + selectedText + s[1] );
             }
-            // setContent(content + "```\n 코드를 입력하세요. \n```\n");
+            else
+                setContent(content + "```\n 코드를 입력하세요. \n```\n");
         }
     }
 

@@ -26,7 +26,8 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         String token = ((HttpServletRequest)request).getHeader("Auth");
         response.setCharacterEncoding("UTF-8");
 
-        if (token != null && jwtTokenProvider.verifyToken(token)) {     //토큰 유효성 검증 및 auth객체 생성 후 SecurityContextHolder에 등록.
+        //토큰 유효성 검증 및 auth객체 생성 후 SecurityContextHolder에 등록.
+        if (token != null && jwtTokenProvider.verifyToken(token)) {
             Role role =  Role.valueOf((String)jwtTokenProvider.getRole(token));
             Authentication auth = jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(auth);

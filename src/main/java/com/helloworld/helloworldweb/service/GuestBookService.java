@@ -1,4 +1,4 @@
-package com.helloworld.helloworldweb.service.guestbook;
+package com.helloworld.helloworldweb.service;
 
 import com.helloworld.helloworldweb.domain.GuestBook;
 import com.helloworld.helloworldweb.domain.GuestBookComment;

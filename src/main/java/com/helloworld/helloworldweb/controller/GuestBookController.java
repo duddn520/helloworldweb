@@ -1,4 +1,4 @@
-package com.helloworld.helloworldweb.controller.guestbook;
+package com.helloworld.helloworldweb.controller;
 
 import com.helloworld.helloworldweb.domain.GuestBookComment;
 import com.helloworld.helloworldweb.domain.User;
@@ -9,7 +9,7 @@ import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
 import com.helloworld.helloworldweb.model.HttpStatusCode;
 import com.helloworld.helloworldweb.service.UserService;
-import com.helloworld.helloworldweb.service.guestbook.GuestBookService;
+import com.helloworld.helloworldweb.service.GuestBookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +31,7 @@ public class GuestBookController {
 
     @GetMapping("/api/guestbook")
     @Transactional
-    public ResponseEntity<ApiResponse<List<GuestBookRequestDto>>> getGuestBooks(@RequestParam(name="id") Long id, HttpServletRequest request){
+    public ResponseEntity<ApiResponse<List<GuestBookRequestDto>>> getGuestBooks(HttpServletRequest request){
 
         // 유저 찾기
         String findEmail = jwtTokenProvider.getUserEmail(jwtTokenProvider.getTokenByHeader(request));

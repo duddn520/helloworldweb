@@ -20,11 +20,6 @@ const WriteSpace = styled.div`
     overflow: auto;
 `;
 
-const TitleInput = styled('input')({
-    flex: 1,
-    padding: 8,
-    borderRadius: 4,
-});
 const Content = styled('div')({
 })
 
@@ -143,7 +138,7 @@ function WriteBlog(){
             const newDiv = document.createElement('div');
             const newText = document.createTextNode(`${total}`);
             newDiv.appendChild(newText);
-            document.getElementById('Container').appendChild(newDiv);
+            document.getElementById('Content').appendChild(newDiv);
 
         }).catch(e =>{
             console.log(e)
@@ -227,8 +222,6 @@ function WriteBlog(){
                     accept="image/png, image/jpeg, image/jpg"
                     multiple={false}
                     onChange={imageReader}/>
-                    multiple={true}
-                    onChange={loadImage}/>
                     <Button variant="contained" component="label" color="primary"> OCR
                     <input 
                     type="file"
