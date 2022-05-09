@@ -1,9 +1,12 @@
 import React from "react";
+import { useNavigate } from 'react-router';
 import { Box ,Typography ,Badge} from '@mui/material';
 import {  LocationOn as LocationOnIcon } from '@mui/icons-material';
 
-
 function Profile({ userInfo }){
+
+    const navigate = useNavigate();
+
     return(
         <Box sx={{flex: 1, marginTop: 5, textAlign: 'center'}}>
             <Box 
@@ -13,7 +16,7 @@ function Profile({ userInfo }){
                 justifyContent="center"
                 flex={1}
             >
-                <Box sx={{width: 200, height: 200, borderRadius: 100, overflow: 'hidden'}}>
+                <Box sx={{width: 200, height: 200, borderRadius: 100, overflow: 'hidden'}} >
                     <img src={userInfo.profileUrl} width={200} height={200} alt={'프로필 사진'}></img>
                 </Box>
             </Box>
@@ -26,9 +29,11 @@ function Profile({ userInfo }){
                 <Badge sx={{ m: 1 ,backgroundColor: 'green' ,p: 0.5 ,color: 'white'}}>Python</Badge>
                 <Badge sx={{ m: 1 ,backgroundColor: 'orange' ,p: 0.5 ,color: 'white' }}>Java</Badge>
             </Box>
+            <Box onClick={()=>{navigate("/makeusername")}}>
+                <h3>{userInfo.userName}</h3>
+            </Box>
             {/* <h5>{userInfo.userName}의 블로그 입니다^^(고정)</h5> */}
-        </Box>
-       
+        </Box>      
     )
 }
 

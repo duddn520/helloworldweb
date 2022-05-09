@@ -15,9 +15,6 @@ const WriteSpace = styled.div`
     margin-bottom: 10px;
 `;
 
-const Content = styled('div')({
-});
-
 
 function WriteBlog(){
     const navigate = useNavigate();

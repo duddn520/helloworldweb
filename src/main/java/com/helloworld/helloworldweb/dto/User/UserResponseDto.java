@@ -18,7 +18,7 @@ public class UserResponseDto {
     public UserResponseDto(User user, boolean isOwner) {
         this.id = user.getId();
         this.email = user.getEmail();
-        this.userName = user.getUsername().split("/")[0];
+        this.userName = user.getNickName();
         this.profileUrl = user.getProfileUrl();
         this.IsOwner = isOwner;
     }
