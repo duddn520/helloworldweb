@@ -1,42 +1,36 @@
 import React from "react";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography, TextField } from "@mui/material";
 import api from "../../api/api";
-import { useNavigate } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 import styled from "styled-components";
 import imageCompression from "browser-image-compression";
 import axios from "axios";
 
-
-const TitleInput = styled.input`
-    flex: 1;
-    padding: 8px;
-`;
-
 const WriteSpace = styled.div`
     padding: 10px; 
-    border: 1px solid #D6D6D6;
+    border: 1px solid lightgray;
     border-radius: 4px;
-    height: 75vh;
+    height: 47vh;
     overflow: auto;
+    margin-bottom: 10px;
 `;
-
-const TitleInput = styled('input')({
-    flex: 1,
-    padding: 8,
-    borderRadius: 4,
-});
-const Content = styled('div')({
-})
 
 
 function WriteBlog(){
     const navigate = useNavigate();
+    const { state } = useLocation();
+    const [targetEmail, setTargetEmail] = React.useState(state.targetEmail);
 
     function strToHTML(str){
         const parser = new DOMParser();
         const doc = parser.parseFromString(str, 'text/html')
         const element = doc.body.childNodes;
         return element;
+    }
+
+    function extractOnlyFilename(original){
+        let stringArray = original.split(".")
+        return original.replace("."+stringArray[ stringArray.length -1 ], "");
     }
 
     const imageReader = async function(e) {
@@ -55,15 +49,14 @@ function WriteBlog(){
         fileReader.readAsDataURL(selectedImage);
     
         fileReader.onload = function(e) { 
-            //console.log(e.target.result); // base64 인코딩된 값
             let imgNode = document.createElement('img');
             imgNode.setAttribute("src", url);
-            imgNode.setAttribute("name", selectedImage.name);
-            imgNode.setAttribute("base64", e.target.result);
+            imgNode.setAttribute("name", extractOnlyFilename(selectedImage.name)+"."+selectedImage.type.split("/")[1]);
+            imgNode.setAttribute("base64", e.target.result); // base64 인코딩된 값
             imgNode.setAttribute("maxWidth", 800);
             imgNode.setAttribute("maxHeight", 400);
             imgNode.setAttribute("variant", "contained");
-            imgNode.setAttribute("alt", "test image");
+            imgNode.setAttribute("alt", selectedImage.name);
 
             document.getElementById('Content').appendChild(imgNode);
 
@@ -117,6 +110,7 @@ function WriteBlog(){
         return blob
     }
     
+    //OCR 기능
     function InvokeKakaoOcrApi(e){
         const file = e.target.files[0];
         var total = ""
@@ -143,7 +137,7 @@ function WriteBlog(){
             const newDiv = document.createElement('div');
             const newText = document.createTextNode(`${total}`);
             newDiv.appendChild(newText);
-            document.getElementById('Container').appendChild(newDiv);
+            document.getElementById('Content').appendChild(newDiv);
 
         }).catch(e =>{
             console.log(e)
@@ -152,23 +146,27 @@ function WriteBlog(){
 
     }
 
-
+    //마지막으로 서버에 보낼 정보 만들기
     function savePost(){
         const divC = document.getElementById('Content');
-        const divT = document.getElementById('Title');
+        const TitleElement = document.getElementById('Title');
+        const TagsElement = document.getElementById('Tags');
         let content = strToHTML(divC.innerHTML);
-        let title = divT.value;
+        let title = TitleElement.value;
+        let tags = TagsElement.value;
 
         let formdata = new FormData();
         let totalContent = '';
 
         for(let i = 0; i < content.length; i++){
             if(content[i].tagName === 'IMG'){
-
                 let imgUri = content[i].currentSrc;
-                let imgBase64 = content[i].getAttribute('base64')
-                let name = content[i].getAttribute('name').split('.')[0]+i+'.'+content[i].getAttribute('name').split('.')[1];
-                formdata.append('files', convertBase64IntoFile(imgBase64, name));
+                let imgBase64 = content[i].getAttribute('base64');
+                let name = content[i].getAttribute('name');
+                let nameTempArray = name.split(".");
+                let NewName = name.replace('.'+name.split('.')[ nameTempArray.length - 1 ], i+'.'+name.split('.')[ nameTempArray.length - 1 ]);
+                console.log(convertBase64IntoFile(imgBase64, NewName));
+                formdata.append('files', convertBase64IntoFile(imgBase64, NewName));
 
                 totalContent += "&&&&\n";
 
@@ -177,18 +175,17 @@ function WriteBlog(){
             }
             else{
                 if( i === 0) {
-                    totalContent += content[i].textContent === '\n' ? content[i].textContent : content[i].textContent+'\n';
+                    totalContent += content[i].textContent === '' ? '\n' : content[i].textContent+'\n';
                 }
                 else {
-                    totalContent += content[i].innerText === '\n' ? content[i].innerText : content[i].innerText+'\n';
+                    totalContent += content[i].innerHTML === '<br>' ? '\n' : content[i].innerText+'\n';
                 }
             }
         }
-
-        api.registerPost(formdata, title, totalContent)
+        api.registerPost(formdata, title, totalContent, tags)
         .then(res => {
             console.log('블로그 게시 성공');
-            navigate("/minihome", {replace: true, state: {tabIndex: 1}});
+            navigate("/minihome", {replace: true, state: {tabIndex: 1, targetEmail: targetEmail}});
         })
         .catch(e => {
             console.log('블로그 게시 실패');
@@ -198,10 +195,16 @@ function WriteBlog(){
 
     return(
         <Box sx={{paddingTop: 3, paddingLeft: 2, paddingRight: 2, paddingBottom: 3, height: '90vh'}}>
-            <Box sx={{display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3}}>
-                <label>제목: </label> 
-                <TitleInput id="Title" type="text" name="title"/>
+            <Typography sx={{fontWeight: 'bold', marginBottom: 2 }}>제목</Typography>
+            <Box sx={{flex: 1, display: 'flex', marginBottom: 3}}>
+                {/* <TitleInput id="Title" type="text" name="title"/> */}
+                <TextField 
+                    id="Title"
+                    sx={{ flex: 1, color: 'black' }}
+                    size='small'
+                />
             </Box>
+
             {/* <div class="editor-menu"> 
                 <button id="btn-bold"> 
                     <b>B</b> 
@@ -219,23 +222,37 @@ function WriteBlog(){
                 <button id="btn-unordered-list"> UL </button> 
                 <button id="btn-image"> IMG </button> 
             </div> */}
+            <Typography sx={{fontWeight: 'bold', marginBottom: 2 }}>내용</Typography>
             <WriteSpace id="Content" contentEditable="true"/>
-            <Box sx={{display: 'flex', justifyContent: 'space-between', marginTop: 2}}>
+            
+            <Box sx={{marginBottom: 2}}>
+                <Button component="label" variant="outlined" sx={{height: 30, marginRight: 2}}> 이미지 업로드
                 <input 
                     type="file"
                     id="avatar" name="avatar"
                     accept="image/png, image/jpeg, image/jpg"
                     multiple={false}
-                    onChange={imageReader}/>
-                    multiple={true}
-                    onChange={loadImage}/>
-                    <Button variant="contained" component="label" color="primary"> OCR
+                    onChange={imageReader} hidden/>
+                </Button>
+
+                <Button variant="outlined" component="label" sx={{height: 30}}> OCR
                     <input 
                     type="file"
                     accept="image/png, image/jpeg, image/jpg"
                     multiple={false}
                     onChange={InvokeKakaoOcrApi} hidden/>
-                    </Button>
+                </Button>
+            </Box>
+            <Typography sx={{fontWeight: 'bold', marginBottom: 2 }}>태그</Typography>
+            <Box sx={{flex: 1, display: 'flex', marginBottom: 2}}>
+                <TextField 
+                    id="Tags"
+                    sx={{ flex: 1, color: 'black'}}
+                    size='small'
+                    placeholder='e.g. Java, Spring'
+                />
+            </Box>
+            <Box sx={{flex: 1, justifyContent: 'flex-end', display: 'flex', marginBottom: 2}}>
                 <Button onClick={()=>{savePost()}} variant={'contained'}>저장</Button>
             </Box>
             

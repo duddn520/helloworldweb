@@ -14,6 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -49,7 +51,7 @@ public class PostService {
     //AWS S3에 파일을 업로드 하는 서비스
     //controller로 부터 Post 객체, User 객체, front에서 받은 file을 받음
     @Transactional
-    public void addPostWithImage(Post post, User user, List<MultipartFile> files) {
+    public void addPostWithImage(Post post, User user, List<MultipartFile> files) throws UnsupportedEncodingException {
 
         //Post와 User 연관관계 맺어줌
         post.updateUser(user);
@@ -61,7 +63,7 @@ public class PostService {
 
             PostImage postImage = PostImage.builder()
                     .originalFileName(file.getOriginalFilename())
-                    .storedFileName(fileProcessService.getFileName(uploadImageUrl))
+                    .storedFileName(fileProcessService.getFileName(URLDecoder.decode(uploadImageUrl, "UTF-8")))
                     .storedUrl(uploadImageUrl)
                     .fileSize(file.getSize())
                     .build();

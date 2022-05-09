@@ -17,6 +17,8 @@ export default function(){
     const [loginMenuVisible,setLoginMenuVisible] = React.useState(false);
     // 프로필사진
     const [profileUrl,setProfileUrl] = React.useState("");
+    // 사용자 이메일
+    const [userEmail, setUserEmail] = React.useState(null);
     
     // 검색어 추천 
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -68,6 +70,7 @@ export default function(){
                 api.getUser()
                 .then( res=> {
                     setProfileUrl(res.profileUrl);
+                    setUserEmail(res.email);
                 })
                 .catch();
             } else {
@@ -75,6 +78,15 @@ export default function(){
             }
         }
     },[]);
+
+    function MoveToMyBlog(){
+        if(userEmail !== null){
+            navigate("/minihome", {state: {tabIndex: 0, targetEmail: userEmail}});
+        }
+        else{
+            alert("로그인이 필요합니다.");
+        } 
+    }
 
     return(
         <AppBar position='static' sx={{ backgroundColor: 'white' ,boxShadow: 0 }} >
@@ -171,7 +183,7 @@ export default function(){
                                 >
                                     <List>
                                         <Button 
-                                            onClick={() => { navigate('/minihome') }} 
+                                            onClick={() => {MoveToMyBlog()}} 
                                             sx={{ width: '100%' ,color: 'black' }}
                                         >
                                             <ListItem>
@@ -212,6 +224,8 @@ export function MiniHomeBar(){
     const [state,setState] = React.useState(false);
     // 프로필사진
     const [profileUrl,setProfileUrl] = React.useState("");
+    // 사용자 이메일
+    const [userEmail, setUserEmail] = React.useState(null);
 
     const toggleDrawer = (anchor, open) => (event) => {
         if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -224,6 +238,7 @@ export function MiniHomeBar(){
     function logout(){
         window.sessionStorage.removeItem("Auth");
         setLoginState(false);
+        navigate("/", {replace: true});
     }
 
     // 화면 로딩 시 호출
@@ -242,6 +257,15 @@ export function MiniHomeBar(){
         }
     }
     },[]);
+
+    function MoveToMyBlog(){
+        if(userEmail !== null){
+            navigate("/minihome", {state: {tabIndex: 0, targetEmail: userEmail}});
+        }
+        else{
+            alert("로그인이 필요합니다.");
+        } 
+    }
 
     return(
         <Box sx={{ display: 'flex' ,flexDirection: 'row' ,flex: 1}}>
@@ -307,7 +331,7 @@ export function MiniHomeBar(){
                     >
                         <List>
                             <Button 
-                                onClick={() => { navigate('/minihome') }} 
+                                onClick={() => { MoveToMyBlog() }} 
                                 sx={{ width: '100%' ,color: 'black' }}
                             >
                                 <ListItem>

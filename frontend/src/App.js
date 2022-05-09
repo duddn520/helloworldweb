@@ -11,6 +11,7 @@ import MiniHome from "./pages/MiniHomePage/MiniHome";
 import WriteBlog from './pages/MiniHomePage/WriteBlog';
 import GithubConnectRedirect from "./pages/redirect/GithubConnectRedirect";
 import Search from './pages/search/Search';
+import Blog from './pages/Blog';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         
         <Route path="/minihome" element={<MiniHome />} />
         <Route path="/minihome/write" element={<WriteBlog />} />
+        <Route path="/blog" element={<Blog/>} />
       </Routes>
     </BrowserRouter>
   );
