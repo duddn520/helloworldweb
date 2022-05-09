@@ -15,6 +15,9 @@ const WriteSpace = styled.div`
     margin-bottom: 10px;
 `;
 
+const Content = styled('div')({
+});
+
 
 function WriteBlog(){
     const navigate = useNavigate();
@@ -236,6 +239,7 @@ function WriteBlog(){
                 </Button>
 
                 <Button variant="outlined" component="label" sx={{height: 30}}> OCR
+
                     <input 
                     type="file"
                     accept="image/png, image/jpeg, image/jpg"

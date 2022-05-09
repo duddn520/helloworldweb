@@ -4,6 +4,7 @@ import com.helloworld.helloworldweb.domain.GuestBook;
 import com.helloworld.helloworldweb.domain.GuestBookComment;
 import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.service.UserService;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,14 @@ public class GuestBookRequestDto {
                 .content(content)
                 .reply(reply)
                 .build();
+    }
+
+    @Builder
+    public GuestBookRequestDto(Long id, String content, String targetUserEmail, String reply) {
+        this.id = id;
+        this.content = content;
+        this.targetUserEmail = targetUserEmail;
+        this.reply = reply;
     }
 
     public GuestBookRequestDto(GuestBookComment guestBookComment) {

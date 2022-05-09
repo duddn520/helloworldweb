@@ -15,28 +15,28 @@ import api from "../api/api";
 const data = [
     {
         title: 'why could not found the symbol even define the fields name',
-        content: '내용',
+        content: 'sending client auth code to express server to allow',
         tags: ['java'],
         views: 120,
         answers: 2
     } ,
     {
         title: 'sending client auth code to express server to allow server to modify clients  erver to modify clienerver to modify clien ienerver to modify clieienerver to modify clie ',
-        content: '내용',
+        content: 'eview data automatically',
         tags: ['javascript','node.js','express'],
         views: 230,
         answers: 0
     } ,
     {
         title: 'React Native - Review data automatically in real time from AsyncStorage',
-        content: '내용',
+        content: 'why could not found the symbol even defin',
         tags: ['react native'],
         views: 10,
         answers: 1
     } ,
     {
         title: 'why could not found the symbol even define the fields name',
-        content: '내용',
+        content: 'sending client auth code to express server to allow se',
         tags: ['java'],
         views: 120,
         answers: 2

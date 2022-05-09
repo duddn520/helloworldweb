@@ -1,12 +1,10 @@
-package com.helloworld.helloworldweb.Post;
+package com.helloworld.helloworldweb.service;
 
 import com.helloworld.helloworldweb.domain.Post;
 import com.helloworld.helloworldweb.domain.Role;
 import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.repository.UserRepository;
-import com.helloworld.helloworldweb.service.PostService;
-import com.helloworld.helloworldweb.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
