@@ -23,10 +23,11 @@ public class PostResponseDtoWithPostComments {
     private String createdTime;
     private List<PostCommentResponseDto> postCommentResponseDtos = new ArrayList<>();
     private List<PostImageResponseDto> postImageResponseDtos = new ArrayList<>();
+    private boolean IsOwner;
 
-    public PostResponseDtoWithPostComments(Post post) {
+    public PostResponseDtoWithPostComments(Post post, boolean isOwner) {
         this.id = post.getId();
-        this.userResponseDto = new UserResponseDto(post.getUser());
+        this.userResponseDto = new UserResponseDto(post.getUser(), isOwner);
         this.category = post.getCategory();
         this.title = post.getTitle();
         this.content = post.getContent();
@@ -34,6 +35,7 @@ public class PostResponseDtoWithPostComments {
         this.createdTime = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(post.getCreatedTime());
         this.postCommentResponseDtos = postCommentsToResponseDtos(post.getPostComments());
         this.postImageResponseDtos = postImageResponseDtos(post.getPostImages());
+        this.IsOwner = isOwner;
     }
 
     //post의 PostComment List를 PostCommentResponseDto의 List로 바꿔주는함수.

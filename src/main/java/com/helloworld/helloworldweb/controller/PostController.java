@@ -71,19 +71,13 @@ public class PostController {
     }
 
     @GetMapping("/api/post/blogs")
-    public ResponseEntity<ApiResponse<PostResponseDtoWithIsOwner>> getBlogs(@RequestHeader(value = "Auth", required = false) String jwtToken,
+    public ResponseEntity<ApiResponse<PostResponseDtoWithIsOwner>> getBlogs(@RequestHeader(value = "Auth") String jwtToken,
                                                                             @RequestParam(value = "email") String email) {
         User findUser = userService.getUserByEmail(email);
 
         // api 호출한 유저가 게시물의 주인인지 판단
-        boolean isOwner;
-        if(jwtToken == null){
-            isOwner = false;
-        }
-        else{
-            User caller = userService.getUserByJwt(jwtToken);
-            isOwner = caller.getId() == findUser.getId();
-        }
+        User caller = userService.getUserByJwt(jwtToken);
+        boolean isOwner = caller.getId() == findUser.getId();
 
         List<Post> blogs = postService.getAllUserPosts(findUser.getId(), Category.BLOG);
 
@@ -152,10 +146,13 @@ public class PostController {
 
     @GetMapping("/api/post")
     @Transactional
-    public ResponseEntity<ApiResponse> getPost(@RequestParam(name = "id") Long id) {
+    public ResponseEntity<ApiResponse> getPost(@RequestHeader(value = "Auth") String jwtToken,
+                                               @RequestParam(name = "id") Long id) {
 
+        User caller = userService.getUserByJwt(jwtToken);
         Post post = postService.getPost(id);
-        PostResponseDtoWithPostComments responseDto = new PostResponseDtoWithPostComments(post);
+        boolean isOwner = caller.getId() == post.getUser().getId();
+        PostResponseDtoWithPostComments responseDto = new PostResponseDtoWithPostComments(post, isOwner);
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.GET_SUCCESS,

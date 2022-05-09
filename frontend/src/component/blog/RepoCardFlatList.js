@@ -5,10 +5,11 @@ import request from "../../api/request";
 import {Avatar, Box, Button, Typography} from "@mui/material";
 //useEffect사용하여 getPosts 로 postList 받고, 렌더링.
 
-export default function RepoCardFlatList()
+export default function RepoCardFlatList({email, isOwner})
 {
     const [jsonList,setJsonList] = React.useState([])
     const [flag,setFlag] = React.useState([])
+    const [userEmail,setUserEmail] = React.useState(email)
 
     const github_url = "https://github.com/login/oauth/authorize?client_id=105e0b50eefc27b4dc81&redirect_uri=http://localhost:3000/login/redirect/github/connect";
 
@@ -20,6 +21,9 @@ export default function RepoCardFlatList()
         request({
             method:"GET",
             url:"/user/repos_url",
+            params:{
+                email:userEmail
+            }
         })
             .then( res =>{
                 console.log(res)
@@ -65,7 +69,7 @@ export default function RepoCardFlatList()
             </ul>
         )
     }
-    else if(flag[0]===false)
+    else if(flag[0]===false && isOwner)
     {
         return(
             <div>
@@ -98,11 +102,10 @@ export default function RepoCardFlatList()
             </div>
         )
     }
-    else
+    else 
     {
         return(
             <div>
-                <Typography variant="h5">서버 오류.</Typography>
             </div>
         )
     }

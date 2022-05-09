@@ -1,9 +1,6 @@
 package com.helloworld.helloworldweb.controller;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.helloworld.helloworldweb.domain.User;
-import com.helloworld.helloworldweb.dto.Post.PostRequestDto;
-import com.helloworld.helloworldweb.dto.Post.PostResponseDto;
 import com.helloworld.helloworldweb.dto.User.UserResponseDto;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
@@ -14,7 +11,6 @@ import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jose.shaded.json.parser.ParseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -96,10 +92,9 @@ public class UserController extends HttpServlet {
 
     //유저 db에 저장된 repo_url 통해 깃허브 레포지토리 조회, 레포지토리 json 리스트 반환.
     @GetMapping("/user/repos_url")
-    public ResponseEntity<ApiResponse> getGithubRepositories(HttpServletRequest request, HttpServletResponse response)
+    public ResponseEntity<ApiResponse> getGithubRepositories(@RequestParam(name = "email") String email, HttpServletRequest request, HttpServletResponse response)
     {
-         String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.getTokenByHeader(request));
-         User user = userService.getUserByEmail(email);
+        User user = userService.getUserByEmail(email);
 
         response.addHeader("Access-Control-Allow-Origin", "*");
         response.addHeader("Access-Control-Expose-Headers", "Auth");
@@ -134,9 +129,10 @@ public class UserController extends HttpServlet {
     public ResponseEntity<ApiResponse<UserResponseDto>> getUser(@RequestHeader(value = "Auth") String jwtToken,
                                                                 @RequestParam(value = "email", required = false) String email) {
         if(email == null){
+            // 자기가 자기자신의 정보 조회(customAppbar 에서 사용)
             String userEmail = jwtTokenProvider.getUserEmail(jwtToken);
             User findUser = userService.getUserByEmail(userEmail);
-            UserResponseDto responseDto = new UserResponseDto(findUser);
+            UserResponseDto responseDto = new UserResponseDto(findUser, true);
 
             return new ResponseEntity<>(ApiResponse.response(
                     HttpStatusCode.GET_SUCCESS,
@@ -144,8 +140,10 @@ public class UserController extends HttpServlet {
                     responseDto), HttpStatus.OK);
         }
         else{
+            //이메일로 유저 정보 조회
+            User caller = userService.getUserByJwt(jwtToken);
             User findUser = userService.getUserByEmail(email);
-            UserResponseDto responseDto = new UserResponseDto(findUser);
+            UserResponseDto responseDto = new UserResponseDto(findUser, caller.getId() == findUser.getId());
 
             return new ResponseEntity<>(ApiResponse.response(
                     HttpStatusCode.GET_SUCCESS,
@@ -158,8 +156,6 @@ public class UserController extends HttpServlet {
     @PostMapping("/user/githubconnect")
     public ResponseEntity<ApiResponse> connectUserToGithub(@RequestParam(name = "code") String code, HttpServletRequest request, HttpServletResponse response)
     {
-        System.out.println("method init");
-        System.out.println("code = " + code);
         String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.getTokenByHeader(request));
         User user = userService.getUserByEmail(email);
 
