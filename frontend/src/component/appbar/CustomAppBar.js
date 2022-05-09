@@ -19,6 +19,8 @@ export default function(){
     const [profileUrl,setProfileUrl] = React.useState("");
     // 사용자 이메일
     const [userEmail, setUserEmail] = React.useState(null);
+    // 사용자 id
+    const [id,setId] = React.useState(1);
     
     // 검색어 추천 
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -71,6 +73,7 @@ export default function(){
                 .then( res=> {
                     setProfileUrl(res.profileUrl);
                     setUserEmail(res.email);
+                    setId(res.id);
                 })
                 .catch();
             } else {
@@ -138,7 +141,7 @@ export default function(){
                         <Paper sx={{ alignItems: 'center', boxShadow: 0 , display: 'flex' ,flexDirection: 'row' }}>
                             <ListItemButton 
                                 sx={{ alignItems: 'center' }}
-                                onClick={() => { setLoginMenuVisible(!loginMenuVisible) }}
+                                onClick={MoveToMyBlog}
                             >
                                 <Avatar src={profileUrl}>
                                     유저
