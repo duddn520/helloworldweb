@@ -13,15 +13,20 @@ export default function GithubRedirect(){
             url:"/user/register/github",
             params:{"code":code},
             method:"POST"
-        }).then(res=>{
-            console.log(res)
-            let token = res.headers.auth
-            // SessionStorage에 jwt 저장
-            window.sessionStorage.setItem("Auth",token);
-            // 메인화면으로 이동
-            navigate("/")
+        }).then(async (res)=>{
+             // SessionStorage에 jwt 저장
+             console.log(res);
+             window.sessionStorage.setItem("Auth", res.data.data.token);
 
-             }).catch(e=>{
+             if( res.data.data.isAlreadyRegister ){
+                 // 미니홈피페이지로 이동
+                 navigate("/", {replace: true});
+             }
+             else{
+                 navigate("/makeusername", {replace: true});
+             }
+
+        }).catch(e=>{
             console.log(e);
         })
     },[]);

@@ -12,6 +12,7 @@ import WriteBlog from './pages/MiniHomePage/WriteBlog';
 import GithubConnectRedirect from "./pages/redirect/GithubConnectRedirect";
 import Search from './pages/search/Search';
 import Blog from './pages/Blog';
+import MakeUserName from './pages/MakeUserName';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/login/redirect/github" element={<GithubRedirect />} />
         <Route path="/login/redirect/naver" element={<NaverRedirect />} />
         <Route path="/login/redirect/github/connect" element={<GithubConnectRedirect />} />
+        <Route path="/makeusername" element={<MakeUserName />} />
         {/* QnA */}
         <Route exact path="/qna" element={<QnA />} />
         <Route exact path="/qna/register" element={<QnARegister />} />

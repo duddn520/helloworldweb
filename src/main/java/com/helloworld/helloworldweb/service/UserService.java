@@ -65,7 +65,7 @@ public class UserService {
     }
 
     @Transactional
-    public String addKakaoUser(String accessToken) throws ParseException {
+    public Map<String,Object> addKakaoUser(String accessToken) throws ParseException {
 
         String userInfoFromKakao = getUserInfoFromKakao(accessToken);
 
@@ -82,7 +82,7 @@ public class UserService {
     }
 
     @Transactional
-    public String addNaverUser(String accessToken) throws ParseException {
+    public Map<String,Object> addNaverUser(String accessToken) throws ParseException {
 
         String userInfoRespnoseFromNaver = getUserInfoFromNaver(accessToken);
 
@@ -97,28 +97,38 @@ public class UserService {
     }
 
     @Transactional
-    public String addGithubUser(JSONObject userInfoJsonObject)
+    public Map<String,Object> addGithubUser(JSONObject userInfoJsonObject)
     {
         String repo_url = (String) userInfoJsonObject.get("repos_url");
         String email = (userInfoJsonObject.get("login") + "@github.com");
         String profile_url = (String) userInfoJsonObject.get("avatar_url");
 
         Optional<User> userOptional = userRepository.findByEmail(email);
+
+        Map<String,Object> map = new HashMap<>();
+
         if(userOptional.isPresent())
         {
-            return jwtTokenProvider.createToken(email,Role.USER);
+            map.put("token", jwtTokenProvider.createToken(email,Role.USER));
+            map.put("isAlreadyRegister", true);
+
+            return map;
         }else
         {
             User user = User.builder()
                     .email(email)
                     .repo_url(repo_url)
                     .profileUrl(profile_url)
+                    .nickName(email)
                     .role(Role.USER)
                     .build();
 
-            addUser(user);
+            userRepository.save(user);
 
-            return jwtTokenProvider.createToken(email,Role.USER);
+            map.put("token", jwtTokenProvider.createToken(email,Role.USER));
+            map.put("isAlreadyRegister", false);
+
+            return map;
         }
     }
 
@@ -218,24 +228,35 @@ public class UserService {
 
     //각 소셜 로그인으로부터 받은 정보로 회원가입 시키는 함수
     //JWT를 반환
-    private String addUser(String email,String profileUrl){
+    private Map<String,Object> addUser(String email,String profileUrl){
 
         // 유저가 이미 DB에 존재하는지 확인
         Optional<User> findUser = userRepository.findByEmail(email);
 
+        Map<String,Object> map = new HashMap<>();
+
         // 존재 유무 isPresent()로 확인
         if( findUser.isPresent() ){
-            return jwtTokenProvider.createToken(findUser.get().getEmail(),findUser.get().getRole());
+
+            map.put("token", jwtTokenProvider.createToken(findUser.get().getEmail(),findUser.get().getRole()));
+            map.put("isAlreadyRegister", true);
+
+            return map;
         } else{
             User newUser = User.builder()
                     .email(email)
                     .profileUrl(profileUrl)
                     .repo_url(" ")
                     .role(Role.USER)
+                    .nickName(email.split("/")[0])
                     .repo_url(" ")
                     .build();
             User savedUser = userRepository.save(newUser);
-            return jwtTokenProvider.createToken(savedUser.getEmail(), Role.USER);
+
+            map.put("token", jwtTokenProvider.createToken(savedUser.getEmail(), Role.USER));
+            map.put("isAlreadyRegister", false);
+
+            return map;
         }
 
     }
@@ -326,6 +347,12 @@ public class UserService {
     public void updateUserRepoUrl(User user, String repo_url)
     {
         user.updateRepoUrl(repo_url);
+        userRepository.save(user);
+    }
+
+    public void updateNickName(User user, String nickName) {
+
+        user.updateNickName(nickName);
         userRepository.save(user);
     }
 

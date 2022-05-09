@@ -28,13 +28,19 @@ export default function Redirect(){
             .then( async(res) => {
 
                 // 서버에 요청 ( Promise 함수 호출을 통해 jwt 리턴 보장 )
-                const token = await api.registerUserWithKakao( res.data.access_token );
+                api.registerUserWithKakao( res.data.access_token )
+                .then(async (res) => {
+                    // SessionStorage에 jwt 저장
+                    window.sessionStorage.setItem("Auth", res.token);
 
-                // SessionStorage에 jwt 저장
-                window.sessionStorage.setItem("Auth",token);
-
-                // 메인화면으로 이동
-                navigate("/");
+                    if( res.isAlreadyRegister ){
+                        // 미니홈피페이지로 이동
+                        navigate("/", {replace: true});
+                    }
+                    else{
+                        navigate("/makeusername", {replace: true});
+                    }
+                });
 
             })
             .catch( e => {  

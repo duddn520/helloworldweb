@@ -20,10 +20,16 @@ function NaverRedirect(){
             api.registerUserWithNaver(code, state)
             .then( async (res) => {
                 // SessionStorage에 jwt 저장
-                window.sessionStorage.setItem("Auth", res);
+                window.sessionStorage.setItem("Auth", res.token);
 
-                // 미니홈피페이지로 이동
-                navigate("/", {replace: true});
+                if( res.isAlreadyRegister ){
+                    // 미니홈피페이지로 이동
+                    navigate("/", {replace: true});
+                }
+                else{
+                    navigate("/makeusername", {replace: true});
+                }
+                
             })
             .catch(e => {
                 console.log(e);

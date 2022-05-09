@@ -24,7 +24,7 @@ function registerUserWithKakao(token){
         .then( res => {
             // Jwt 반환
             if ( res.data.statusCode === status.POST_SUCCESS ){
-                resolve (res.headers.auth);
+                resolve (res.data.data);
             }
         })
         .catch( e => {
@@ -208,7 +208,7 @@ function registerUserWithNaver(code, state){
         .then( res => {
             // Jwt 반환
             if ( res.data.statusCode === status.POST_SUCCESS ){
-                resolve (res.headers.auth);
+                resolve (res.data.data);
             }
         })
         .catch( e => {
@@ -366,6 +366,25 @@ function getOtherUser(email){
     });
 }
 
+function updateNickName(nickName){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'PUT',
+            url : '/api/user/nickname',
+            params: {
+                nickName: nickName
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
+
 
 
 
@@ -373,4 +392,4 @@ function getOtherUser(email){
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
     getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , 
     getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
-    getOtherUser} ;
+    getOtherUser, updateNickName} ;

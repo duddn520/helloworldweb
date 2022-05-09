@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -46,14 +47,18 @@ public class UserController extends HttpServlet {
         response.addHeader("Access-Control-Expose-Headers", "Auth");
 
         // 카카오로 부터 받아온 정보로 유저로 등록
-        String jwt = userService.addKakaoUser(request.getHeader("token"));
+        Map<String, Object> stringObjectMap = userService.addKakaoUser(request.getHeader("token"));
+
+        String jwt = (String) stringObjectMap.get("token");
+        boolean isAlreadyRegister = (boolean) stringObjectMap.get("isAlreadyRegister");
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Auth", jwt);
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.POST_SUCCESS,
-                HttpResponseMsg.POST_SUCCESS), headers, HttpStatus.OK);
+                HttpResponseMsg.POST_SUCCESS,
+                stringObjectMap), headers, HttpStatus.OK);
     }
 
     //네이버로그인 및 회원가입 요청
@@ -64,7 +69,10 @@ public class UserController extends HttpServlet {
         String accessToken = userService.getAccessTokenFromNaver(state, code);
 
         //받아온 엑세스 토큰을 사용하여 네이버에서 유저 정보를 받아온 후 유저로 등록
-        String jwt = userService.addNaverUser(accessToken);
+        Map<String, Object> stringObjectMap = userService.addNaverUser(accessToken);
+
+        String jwt = (String) stringObjectMap.get("token");
+        boolean isAlreadyRegister = (boolean) stringObjectMap.get("isAlreadyRegister");
 
         response.addHeader("Auth", jwt);
         response.addHeader("Access-Control-Allow-Origin","*");
@@ -72,7 +80,8 @@ public class UserController extends HttpServlet {
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.POST_SUCCESS,
-                HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
+                HttpResponseMsg.POST_SUCCESS,
+                stringObjectMap), HttpStatus.OK);
     }
 
     @PostMapping("/user/register/github")
@@ -85,13 +94,17 @@ public class UserController extends HttpServlet {
 
         JSONObject userInfo = userService.getGithubUserInfoByAccessToken(token);
 
-        String jwt = userService.addGithubUser(userInfo);
+        Map<String, Object> stringObjectMap = userService.addGithubUser(userInfo);
+
+        String jwt = (String) stringObjectMap.get("token");
+        boolean isAlreadyRegister = (boolean) stringObjectMap.get("isAlreadyRegister");
 
         servletresponse.addHeader("Auth",jwt);
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.POST_SUCCESS,
-                HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
+                HttpResponseMsg.POST_SUCCESS,
+                stringObjectMap), HttpStatus.OK);
     }
 
     //유저 db에 저장된 repo_url 통해 깃허브 레포지토리 조회, 레포지토리 json 리스트 반환.
@@ -180,5 +193,17 @@ public class UserController extends HttpServlet {
                 HttpStatusCode.PUT_SUCCESS,
                 HttpResponseMsg.PUT_SUCCESS), HttpStatus.OK);
 
+    }
+
+    @PutMapping("/api/user/nickname")
+    public ResponseEntity<ApiResponse> updateNickName(@RequestHeader(value = "Auth") String jwtToken,
+                                                      @RequestParam(name="nickName")String nickName){
+
+        User targetUser = userService.getUserByJwt(jwtToken);
+        userService.updateNickName(targetUser, nickName);
+
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.PUT_SUCCESS,
+                HttpResponseMsg.PUT_SUCCESS), HttpStatus.OK);
     }
 }
