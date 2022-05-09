@@ -26,11 +26,11 @@ function App() {
         <Route path="/login/redirect/github/connect" element={<GithubConnectRedirect />} />
         <Route path="/makeusername" element={<MakeUserName />} />
         {/* QnA */}
-        <Route exact path="/qna" element={<QnA />} />
+        <Route exact path="/qna/:id" element={<QnA />} />
         <Route exact path="/qna/register" element={<QnARegister />} />
         {/* search */}
         <Route path="/search" element={<Search />} />
-        
+
         <Route path="/minihome" element={<MiniHome />} />
         <Route path="/minihome/write" element={<WriteBlog />} />
         <Route path="/blog" element={<Blog/>} />

@@ -45,7 +45,7 @@ function MiniHome() {
          <Box sx={{flex: 1}}>
             <div>
                 <ChromeTabBar index={index} setIndex={setIndex} tabNames={['내 정보', '게시물', '방명록']}/>
-                {index === 0 && <MyInfoTab/>}
+                {index === 0 && <MyInfoTab userInfo={userInfo}/>}
                 {index === 1 && <BlogsTab userInfo={userInfo}/>}
                 {index === 2 && <GuestBooksTab userInfo={userInfo}/>}
             </div> 

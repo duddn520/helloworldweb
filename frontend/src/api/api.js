@@ -366,6 +366,7 @@ function getOtherUser(email){
     });
 }
 
+
 function updateNickName(nickName){
     return new Promise((resolve,reject) => {
         request({
@@ -385,11 +386,26 @@ function updateNickName(nickName){
     });
 }
 
-
-
-
+function getUserQnas(id){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'GET',
+            url : '/user/qnas',
+            params: {
+                id: id
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
 
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
     getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , 
     getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
-    getOtherUser, updateNickName} ;
+    getOtherUser, updateNickName ,getUserQnas} ;
