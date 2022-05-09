@@ -39,7 +39,9 @@ public class FileProcessService {
 
     //유니크한 새로운 파일 이름을 생성하는 함수
     private String createFileName(String originalFileName) {
-        return UUID.randomUUID().toString().concat(originalFileName);
+        String newName = UUID.randomUUID().toString().concat(originalFileName);
+        System.out.println("newName = " + newName);
+        return newName;
     }
 
     //파일의 확장자를 리턴하는 함수

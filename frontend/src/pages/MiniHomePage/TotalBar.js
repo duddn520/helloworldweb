@@ -19,6 +19,7 @@ const drawerWidth = 300;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
   ({ theme, open }) => ({
+    width: '100vh',
     flexGrow: 1,
     paddingRight: theme.spacing(3),
     paddingLeft: theme.spacing(3),

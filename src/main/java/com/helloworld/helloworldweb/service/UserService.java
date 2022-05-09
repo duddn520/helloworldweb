@@ -90,9 +90,10 @@ public class UserService {
         JSONObject userInfo = stringToJson(userInfoRespnoseFromNaver, "response");
 
         // 필요한 정보들
-        String email = userInfo.getAsString("email");
+        String email = userInfo.getAsString("email") + "/";
         String profileUrl = userInfo.getAsString("profile_image");
-        return addUser(email,profileUrl);
+
+        return addUser(email, profileUrl);
     }
 
     @Transactional

@@ -4,7 +4,7 @@ import { Box ,Container ,styled ,Avatar ,Button ,Typography ,Divider ,
 } from "@mui/material";
 import api from "../../api/api";
 
-function GuestBooks({ userInfo }){
+function GuestBooksTab({ userInfo }){
     const [newComment,setNewComment] = React.useState("하이하이👆");
     const [comments,setComments] = React.useState([]);
     const [refresh,setRefresh] = React.useState(false);
@@ -112,7 +112,7 @@ function GuestBooks({ userInfo }){
     }
 
 }
-export default GuestBooks;
+export default GuestBooksTab;
 
 
 

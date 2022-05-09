@@ -1,13 +1,13 @@
 package com.helloworld.helloworldweb.dto.Post;
 
-import com.helloworld.helloworldweb.domain.Category;
-import com.helloworld.helloworldweb.domain.Post;
-import com.helloworld.helloworldweb.domain.PostComment;
+import com.helloworld.helloworldweb.domain.*;
 import com.helloworld.helloworldweb.dto.PostComment.PostCommentResponseDto;
+import com.helloworld.helloworldweb.dto.User.UserResponseDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,23 +15,25 @@ import java.util.List;
 @NoArgsConstructor
 public class PostResponseDtoWithPostComments {
     private Long id;
-    private Long user_id;
+    private UserResponseDto userResponseDto;
     private Category category;
     private String title;
     private String content;
     private String tags;
-    private LocalDateTime createdTime;
+    private String createdTime;
     private List<PostCommentResponseDto> postCommentResponseDtos = new ArrayList<>();
+    private List<PostImageResponseDto> postImageResponseDtos = new ArrayList<>();
 
     public PostResponseDtoWithPostComments(Post post) {
         this.id = post.getId();
-        this.user_id = post.getUser().getId();
+        this.userResponseDto = new UserResponseDto(post.getUser());
         this.category = post.getCategory();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.tags = post.getTags();
-        this.createdTime = post.getCreatedTime();
+        this.createdTime = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(post.getCreatedTime());
         this.postCommentResponseDtos = postCommentsToResponseDtos(post.getPostComments());
+        this.postImageResponseDtos = postImageResponseDtos(post.getPostImages());
     }
 
     //post의 PostComment List를 PostCommentResponseDto의 List로 바꿔주는함수.
@@ -41,6 +43,14 @@ public class PostResponseDtoWithPostComments {
         for( PostComment p : postComments)
         {
             responseDtos.add(new PostCommentResponseDto(p));
+        }
+        return responseDtos;
+    }
+
+    private List<PostImageResponseDto> postImageResponseDtos(List<PostImage> postImages) {
+        List<PostImageResponseDto> responseDtos = new ArrayList<>();
+        for( PostImage postImage : postImages) {
+            responseDtos.add(new PostImageResponseDto(postImage));
         }
         return responseDtos;
     }

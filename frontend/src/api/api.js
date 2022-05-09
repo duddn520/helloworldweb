@@ -110,12 +110,11 @@ function registerQnA( {content,type,title,tags}){
         request({
             method: 'POST' ,
             url: '/api/post',
-            data: {
+            params: {
                 title: title ,
                 tags: tags ,
                 content: content ,
                 category: type ,
-                user_id: 1
             }
         })
         .then( res => {
@@ -235,20 +234,23 @@ function getUser(){
     });
 }
 
-function registerPost(formdata, title, totalContent){
+function registerPost(formdata, title, totalContent, tags){
     if(formdata.get('files') === null){
         return new Promise((resolve,reject) => {
             request({
                 method: 'POST',
                 url : '/api/post',
-                data: {
-                    content: totalContent,
+                params: {
+                    content: encodeURIComponent(totalContent),
                     category: "BLOG",
-                    title: title,
+                    title: encodeURIComponent(title),
+                    tags: encodeURIComponent(tags),
                 }
             })
             .then( res => {
-                resolve(res.data);
+                if ( res.data.statusCode === status.POST_SUCCESS ){
+                    resolve(res.data);
+                }
             })
             .catch( e => {
                 console.log(e);
@@ -258,22 +260,25 @@ function registerPost(formdata, title, totalContent){
     }
     else{
         const token = window.sessionStorage.getItem("Auth");
-        formdata.append('content', totalContent);
+        formdata.append('content', encodeURIComponent(totalContent));
         formdata.append('category', "BLOG");
-        formdata.append('title', title);
+        formdata.append('title', encodeURIComponent(title));
+        formdata.append('tags', encodeURIComponent(tags));
         return new Promise((resolve,reject) => {
             if(token === null){
                 reject();
             }
             else{
-                axios.post('/api/post/image', formdata, {
+                axios.post('/api/post', formdata, {
                     headers: {
                         'content-type': 'multipart/form-data',
                         Auth: token
                     }
                 })
                 .then( res => {
-                    resolve(res.data);
+                    if ( res.data.statusCode === status.POST_SUCCESS ){
+                        resolve(res.data);
+                    }
                 })
                 .catch( e => {
                     console.log(e);
@@ -285,11 +290,71 @@ function registerPost(formdata, title, totalContent){
     
 }
 
-function getMyBlogPosts(){
+function getBlogPosts(email){
     return new Promise((resolve,reject) => {
         request({
             method: 'GET',
-            url : "/api/post/myblogs",
+            url : "/api/post/blogs",
+            params: {
+                email: email
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
+
+function deletePost(postId){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'DELETE',
+            url : "/api/post",
+            params: {
+                id: postId,
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
+
+function getPost(postId){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'GET',
+            url : "/api/post",
+            params: {
+                id: postId,
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
+
+function getOtherUser(email){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'GET',
+            url : '/api/user',
+            params: {
+                email: email
+            }
         })
         .then( res => {
             resolve(res.data.data);
@@ -307,4 +372,5 @@ function getMyBlogPosts(){
 
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
     getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , 
-    getMyBlogPosts, registerQnA ,getSearchedPost ,updatePost} ;
+    getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
+    getOtherUser} ;
