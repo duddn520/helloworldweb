@@ -50,21 +50,28 @@ export default function( props ){
     }
     
     React.useEffect(() => {
-       setQna(state);
+        // naivgate state가 없을 경우
+       if( state == null){
+            api.getPost( props.id )
+            .then( res =>{
+                console.log(res);
+            })
+       } else {
+            setQna(state);
+        
+            // 조회수+1
+            api.updatePost(state.id);
 
-        // 조회수+1
-        api.updatePost(state.id);
+            api.getPost(state.id)
+            .then( res => {
+                setTargetUserEmail(res.userResponseDto.email);
+            })
+            .catch( e => { })
 
-        api.getPost(state.id)
-        .then( res => {
-            setTargetUserEmail(res.userResponseDto.email);
-        })
-        .catch( e => { })
-
-       if( state.tags != null ){
-          setTags( state.tags.split(',') );
-       }
-
+            if( state.tags != null ){
+                setTags( state.tags.split(',') );
+            }
+        }
     },[]);
 
     return(
