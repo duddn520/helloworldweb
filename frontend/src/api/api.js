@@ -35,13 +35,13 @@ function registerUserWithKakao(token){
 }
 
 // GET - 나의 방명록 조회
-function getGuestBooks(){
+function getGuestBooks( email ){
     return new Promise((resolve,reject) => {
         request({
             method: 'GET' ,
             url: '/api/guestbook',
             params: { 
-                id: 1
+                email : email
             },
         })
         .then( res => {

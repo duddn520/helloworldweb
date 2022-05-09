@@ -10,7 +10,7 @@ function GuestBooksTab({ userInfo }){
     const [refresh,setRefresh] = React.useState(false);
     React.useEffect(() => {
 
-        api.getGuestBooks()
+        api.getGuestBooks(userInfo.email)
         .then( res => {
             
             setComments(res.reverse());

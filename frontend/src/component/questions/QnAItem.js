@@ -13,7 +13,7 @@ export default function QnAItem({item}){
             <Box sx={{ flex: 10 ,alignItems: 'start' ,display: 'flex' ,justifyContent: 'start' }}>
                 <Box>
                     <Button 
-                        sx={{ textAlignLast: 'start' ,ml: 1,mb: 0.5 ,textTransform: 'none' ,justifyContent: 'start' }}
+                        sx={{ textAlignLast: 'start' ,ml: 1,mb: 0.5 ,textTransform: 'none' ,justifyContent: 'start' ,textAlign: 'start'}}
                         onClick={() => { navigate('/qna',{ state : item }) }}
                     >
                         {item.title}

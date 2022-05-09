@@ -4,8 +4,10 @@ import { Search as SearchIcon } from '@mui/icons-material';
 import { useLocation } from 'react-router';
 import api from '../../api/api';
 import CustomAppBar from '../../component/appbar/CustomAppBar';
+import { useNavigate } from 'react-router';
 
 export default function( props ){
+    const navigate = useNavigate();
     const { state } = useLocation();
     const [value, setValue] = React.useState(1);
     const [qna,setQna] = React.useState({});
@@ -13,6 +15,8 @@ export default function( props ){
     const [reply,setReply] = React.useState("");
     // 태그
     const [tags,setTags] = React.useState([]);
+    // 유저 이메일
+    const [targetUserEmail,setTargetUserEmail] = React.useState("");
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -49,7 +53,13 @@ export default function( props ){
        setQna(state);
 
         // 조회수+1
-        api.updatePost(state.id)
+        api.updatePost(state.id);
+
+        api.getPost(state.id)
+        .then( res => {
+            setTargetUserEmail(res.userResponseDto.email);
+        })
+        .catch( e => { })
 
        if( state.tags != null ){
           setTags( state.tags.split(',') );
@@ -78,9 +88,10 @@ export default function( props ){
                 <Container>
                     <Box sx={{ justifyContent: 'start' }}>
                         <Typography sx={{ m : 1 ,ml: 2 ,fontSize: 25 ,fontWeight: '600'}}>{qna.title}</Typography>
-                        <Box sx={{ display: 'flex' ,flexDirection: 'row' ,mb: 2 }}>
+                        <Box sx={{ display: 'flex' ,flexDirection: 'row' ,mb: 2 ,alignItems: 'center'}}>
                             <Typography sx={{ ml: 2 ,fontSize: 13}}>조회수 {qna.views}</Typography>
                             <Typography sx={{ ml: 2 ,fontSize: 13}}>작성일 2022.04.28</Typography>
+                            <Button onClick={() => navigate("/minihome", {state: {tabIndex: 0, targetEmail: targetUserEmail}}) }>이새끼 홈피로 이동해주세요.</Button>
                         </Box>
                     </Box>
                     <Divider variant="fullWidth" sx={{ flexGrow: 1 }}/>
