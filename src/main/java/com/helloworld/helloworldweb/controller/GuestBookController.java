@@ -31,11 +31,11 @@ public class GuestBookController {
 
     @GetMapping("/api/guestbook")
     @Transactional
-    public ResponseEntity<ApiResponse<List<GuestBookRequestDto>>> getGuestBooks(HttpServletRequest request){
+    public ResponseEntity<ApiResponse<List<GuestBookRequestDto>>> getGuestBooks(HttpServletRequest request,@RequestParam(name = "email")String email){
 
         // 유저 찾기
-        String findEmail = jwtTokenProvider.getUserEmail(jwtTokenProvider.getTokenByHeader(request));
-        User findUser = userService.getUserByEmail(findEmail);
+//        String findEmail = jwtTokenProvider.getUserEmail(jwtTokenProvider.getTokenByHeader(request));
+        User findUser = userService.getUserByEmail(email);
 
         // 유저를 통해 방명록들 불러옴.
         List<GuestBookComment> findGuestBookComments = guestBookService.getGuestBookComments(findUser);
