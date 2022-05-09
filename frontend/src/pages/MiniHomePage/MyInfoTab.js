@@ -2,7 +2,7 @@ import React from "react";
 import { Box } from "@mui/material";
 import RepoCardFlatList from "../../component/blog/RepoCardFlatList";
 
-function MyInfo(){
+function MyInfoTab(){
     return(
         <Box>
             <RepoCardFlatList />
@@ -10,4 +10,4 @@ function MyInfo(){
     )
 }
 
-export default MyInfo;
+export default MyInfoTab;

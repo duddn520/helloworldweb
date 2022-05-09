@@ -23,7 +23,7 @@ function NaverRedirect(){
                 window.sessionStorage.setItem("Auth", res);
 
                 // 미니홈피페이지로 이동
-                navigate("/minihome", {replace: true});
+                navigate("/", {replace: true});
             })
             .catch(e => {
                 console.log(e);

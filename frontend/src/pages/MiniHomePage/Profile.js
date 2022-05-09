@@ -16,7 +16,7 @@ function Profile({ userInfo }){
                 </Box>
             </Box>
             <h3>{userInfo.userName}</h3>
-            <h5>난...ㄱㅏ끔...눈물을...흘린ㄷr...</h5>
+            <h5>{userInfo.userName}의 블로그 입니다^^(고정)</h5>
         </Box>
        
     )

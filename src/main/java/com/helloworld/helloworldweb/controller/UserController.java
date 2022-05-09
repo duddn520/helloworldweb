@@ -131,16 +131,27 @@ public class UserController extends HttpServlet {
     }
 
     @GetMapping("/api/user")
-    public ResponseEntity<ApiResponse<UserResponseDto>> getUser(@RequestHeader(value = "Auth") String jwtToken) {
+    public ResponseEntity<ApiResponse<UserResponseDto>> getUser(@RequestHeader(value = "Auth") String jwtToken,
+                                                                @RequestParam(value = "email", required = false) String email) {
+        if(email == null){
+            String userEmail = jwtTokenProvider.getUserEmail(jwtToken);
+            User findUser = userService.getUserByEmail(userEmail);
+            UserResponseDto responseDto = new UserResponseDto(findUser);
 
-        String userEmail = jwtTokenProvider.getUserEmail(jwtToken);
-        User findUser = userService.getUserByEmail(userEmail);
-        UserResponseDto responseDto = new UserResponseDto(findUser);
+            return new ResponseEntity<>(ApiResponse.response(
+                    HttpStatusCode.GET_SUCCESS,
+                    HttpResponseMsg.GET_SUCCESS,
+                    responseDto), HttpStatus.OK);
+        }
+        else{
+            User findUser = userService.getUserByEmail(email);
+            UserResponseDto responseDto = new UserResponseDto(findUser);
 
-        return new ResponseEntity<>(ApiResponse.response(
-                HttpStatusCode.GET_SUCCESS,
-                HttpResponseMsg.GET_SUCCESS,
-                responseDto), HttpStatus.OK);
+            return new ResponseEntity<>(ApiResponse.response(
+                    HttpStatusCode.GET_SUCCESS,
+                    HttpResponseMsg.GET_SUCCESS,
+                    responseDto), HttpStatus.OK);
+        }
     }
 
     //프론트에서 생성할 연동하기 버튼에서, 인가코드를 받아온 후 이 컨트롤러 메서드 실행.

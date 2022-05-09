@@ -17,7 +17,7 @@ public class UserResponseDto {
     public UserResponseDto(User user) {
         this.id = user.getId();
         this.email = user.getEmail();
-        this.userName = user.getUsername();
+        this.userName = user.getUsername().split("/")[0];
         this.profileUrl = user.getProfileUrl();
     }
 }
