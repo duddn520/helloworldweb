@@ -134,9 +134,10 @@ public class UserController extends HttpServlet {
     public ResponseEntity<ApiResponse<UserResponseDto>> getUser(@RequestHeader(value = "Auth") String jwtToken,
                                                                 @RequestParam(value = "email", required = false) String email) {
         if(email == null){
+            // 자기가 자기자신의 정보 조회(customAppbar 에서 사용)
             String userEmail = jwtTokenProvider.getUserEmail(jwtToken);
             User findUser = userService.getUserByEmail(userEmail);
-            UserResponseDto responseDto = new UserResponseDto(findUser);
+            UserResponseDto responseDto = new UserResponseDto(findUser, true);
 
             return new ResponseEntity<>(ApiResponse.response(
                     HttpStatusCode.GET_SUCCESS,
@@ -144,8 +145,10 @@ public class UserController extends HttpServlet {
                     responseDto), HttpStatus.OK);
         }
         else{
+            //이메일로 유저 정보 조회
+            User caller = userService.getUserByJwt(jwtToken);
             User findUser = userService.getUserByEmail(email);
-            UserResponseDto responseDto = new UserResponseDto(findUser);
+            UserResponseDto responseDto = new UserResponseDto(findUser, caller.getId() == findUser.getId());
 
             return new ResponseEntity<>(ApiResponse.response(
                     HttpStatusCode.GET_SUCCESS,

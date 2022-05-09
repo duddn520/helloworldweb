@@ -13,11 +13,13 @@ public class UserResponseDto {
     private String email;
     private String userName;
     private String profileUrl;
+    private boolean IsOwner;
 
-    public UserResponseDto(User user) {
+    public UserResponseDto(User user, boolean isOwner) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.userName = user.getUsername().split("/")[0];
         this.profileUrl = user.getProfileUrl();
+        this.IsOwner = isOwner;
     }
 }
