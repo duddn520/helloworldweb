@@ -36,7 +36,6 @@ function PostThumbnail({post, isOwner}){
     function deletePost(postId){
         api.deletePost(postId)
         .then(res=>{
-            console.log(res);
             window.location.reload();
         })
         .catch(e=>{

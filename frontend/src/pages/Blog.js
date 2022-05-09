@@ -27,10 +27,12 @@ const ContentBox = styled.div`
 function Blog(){
     const { state } = useLocation();
     const [post, setPost] = React.useState(null);
+    const [isOwner, setIsOwner] = React.useState(false);
 
     React.useEffect(()=>{
         api.getPost(state.postId)
         .then(res=>{
+            setIsOwner(res.isOwner);
             setPost(res);
         })
         .catch(e=>{
@@ -69,9 +71,9 @@ function Blog(){
                     <TitleBox>
                         <Box sx={{justifyContent: 'space-between', display: 'flex', width: '100%', alignItems: 'center', marginBottom: 1}}>
                             <Typography sx={{fontWeight :'bold', fontSize: 30}}>{post.title}</Typography>
-                            <IconButton>
+                            {isOwner && <IconButton>
                                 <DeleteOutline/>
-                            </IconButton>
+                            </IconButton>}
                         </Box>
                         {SmallUserProfile(post.userResponseDto)}
                         <Box sx={{justifyContent: 'space-between', display: 'flex', width: '100%', marginBottom: 1}}>
