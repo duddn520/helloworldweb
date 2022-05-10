@@ -12,7 +12,7 @@ function MyInfoTab({ userInfo }){
     // 작성한 답변들
     const [comments,setComments] = React.useState([]);
     React.useEffect(()=>{
-        
+
         // 이 유저가 올린 질문들 조회
         api.getUserQnas(userInfo.id)
         .then( res => {
@@ -63,7 +63,7 @@ function MyInfoTab({ userInfo }){
                 tabIndex == 1 && <User qnas={qnas} comments={comments}/>
             }
             {
-                tabIndex == 2 && <RepoCardFlatList email={userInfo.email} />
+                tabIndex == 2 && <RepoCardFlatList email={userInfo.email} isOwner={userInfo.isOwner}/>
             }
         </Box>
     )

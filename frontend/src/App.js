@@ -31,7 +31,7 @@ function App() {
         {/* search */}
         <Route path="/search" element={<Search />} />
 
-        <Route path="/minihome/:username" element={<MiniHome />} />
+        <Route path="/minihome" element={<MiniHome />} />
         <Route path="/minihome/write" element={<WriteBlog />} />
         <Route path="/blog" element={<Blog/>} />
       </Routes>

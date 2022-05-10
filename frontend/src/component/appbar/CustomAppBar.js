@@ -84,7 +84,7 @@ export default function(){
 
     function MoveToMyBlog(){
         if(userEmail !== null){
-            navigate(`/minihome/${userName}`, {state: {tabIndex: 0, targetEmail: userEmail}});
+            navigate(`/minihome/`, {state: {tabIndex: 0, targetEmail: userEmail}});
         }
         else{
             alert("로그인이 필요합니다.");
