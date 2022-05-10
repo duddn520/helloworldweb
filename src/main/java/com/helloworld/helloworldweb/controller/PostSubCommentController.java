@@ -3,6 +3,7 @@ package com.helloworld.helloworldweb.controller;
 import com.helloworld.helloworldweb.domain.Post;
 import com.helloworld.helloworldweb.domain.PostComment;
 import com.helloworld.helloworldweb.domain.PostSubComment;
+import com.helloworld.helloworldweb.dto.Post.PostResponseDto;
 import com.helloworld.helloworldweb.dto.PostSubComment.PostSubCommentRequestDto;
 import com.helloworld.helloworldweb.dto.PostSubComment.PostSubCommentResponseDto;
 import com.helloworld.helloworldweb.model.ApiResponse;
@@ -16,6 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -71,5 +75,21 @@ public class PostSubCommentController {
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.OK,
                 HttpResponseMsg.DELETE_SUCCESS), HttpStatus.OK);
+    }
+
+    // 특정 유저가 작성한 답변들만 조회
+    @GetMapping("/user/comments")
+    public ResponseEntity<ApiResponse<List<PostSubCommentResponseDto>>> getUserComments(@RequestParam(name= "id") Long id){
+        List<PostSubComment> findAllUserComments = postSubCommentService.getAllUserComments(id);
+
+        // List -> ResponseDto
+        List<PostSubCommentResponseDto> responseDtos = findAllUserComments.stream()
+                .map(PostSubCommentResponseDto::new)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity (ApiResponse.response(
+                HttpStatusCode.GET_SUCCESS,
+                HttpResponseMsg.GET_SUCCESS,
+                responseDtos), HttpStatus.OK);
     }
 }

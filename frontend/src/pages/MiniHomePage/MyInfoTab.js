@@ -7,9 +7,10 @@ import RepoCardFlatList from "../../component/blog/RepoCardFlatList";
 function MyInfoTab({ userInfo }){
     // 탭
     const [tabIndex,setTabIndex] = React.useState(1);
-    //
+    // 작성한 질문들
     const [qnas,setQnas] = React.useState([]);
-
+    // 작성한 답변들
+    const [comments,setComments] = React.useState([]);
     React.useEffect(()=>{
         
         // 이 유저가 올린 질문들 조회
@@ -18,8 +19,15 @@ function MyInfoTab({ userInfo }){
             setQnas(res);
         })
         .catch( e => {
-
         })
+        // 이 유저가 올린 답변들 조회
+        api.getUserComments(userInfo.id)
+        .then( res => {
+           setComments(res);
+        })
+        .catch( e => {
+        })
+        
 
     },[]);
 
@@ -29,11 +37,11 @@ function MyInfoTab({ userInfo }){
                     <Typography sx={{ mt: 1 ,fontSize: 20 ,fontWeight: 'bold' }}>🏅 Stats</Typography>
                     <Box sx={{ m: 1 }}>
                         <Typography sx={{ fontSize: 15}}>{qnas.length}</Typography>
-                        <Typography sx={{ color: 'lightgray',fontSize: 15}}>질문</Typography>
+                        <Typography sx={{ color: 'gray',fontSize: 15}}>질문</Typography>
                     </Box>
                     <Box sx={{ m: 1 }}>
                         <Typography sx={{ fontSize: 15}}>{qnas.length}</Typography>
-                        <Typography sx={{ color: 'lightgray',fontSize: 15}}>답변</Typography>
+                        <Typography sx={{ color: 'gray',fontSize: 15}}>답변</Typography>
                     </Box>
             </Container>
 
@@ -52,10 +60,10 @@ function MyInfoTab({ userInfo }){
                 </Button>
             </Container>
             {
-                tabIndex == 1 && <User qnas={qnas}/>
+                tabIndex == 1 && <User qnas={qnas} comments={comments}/>
             }
             {
-                tabIndex == 2 && <RepoCardFlatList />
+                tabIndex == 2 && <RepoCardFlatList email={userInfo.email} />
             }
         </Box>
     )

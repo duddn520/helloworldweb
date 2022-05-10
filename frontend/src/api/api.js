@@ -111,10 +111,10 @@ function registerQnA( {content,type,title,tags}){
             method: 'POST' ,
             url: '/api/post',
             params: {
-                title: title ,
-                tags: tags ,
-                content: content ,
-                category: type ,
+                title: encodeURIComponent(title) ,
+                tags: encodeURIComponent(tags) ,
+                content: encodeURIComponent(content) ,
+                category: encodeURIComponent(type) ,
             }
         })
         .then( res => {
@@ -405,7 +405,26 @@ function getUserQnas(id){
     });
 }
 
+function getUserComments(id){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'GET',
+            url : '/user/comments',
+            params: {
+                id: id
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });    
+}
+
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
     getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , 
     getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
-    getOtherUser, updateNickName ,getUserQnas} ;
+    getOtherUser, updateNickName ,getUserQnas ,getUserComments } ;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box , Typography ,Button 
         ,Card ,TextField , Container
-        ,IconButton
+        ,IconButton ,Grid
 } from '@mui/material';
 import { styled } from '@mui/material';
 import { Code as CodeIcon } from '@mui/icons-material';
@@ -56,7 +56,9 @@ export default function(){
                     if( index % 2 == 0){
                         return(
                             <pre style={{ fontFamily: "inherit" ,verticalAlign: 'middle' }}>
-                                {renderStrongText(text)}
+                                <Grid container spacing={2}>
+                                {renderLine(text)}
+                                </Grid>
                             </pre>
                         );
                     }
@@ -65,7 +67,7 @@ export default function(){
                         text = text.replace('\n','');
                         return(
                             <Typography key={index} sx={{ p: 2 ,backgroundColor: 'rgb(240,240,240)' }}>
-                                <pre style={{ fontFamily: 'inherit' }}>{text}</pre>
+                                <pre style={{ fontFamily: 'inherit' }}>{renderLine(text)}</pre>
                             </Typography>
                         );
                     }
@@ -74,11 +76,24 @@ export default function(){
         );
 
     }
+
+    const renderLine = (text) => {
+        return(
+            text.split("\n").map( line => {
+                return(
+                    <Grid item xs={12} sx={{ flexDirection: 'row' ,display: 'flex' ,justfiyContent: 'center' ,alignItems: 'center' }}>
+                        {renderStrongText(line)}
+                    </Grid>
+                );
+            })
+        );
+    }
+
     const renderStrongText = (value) => {
         let text = value;
         const regExp = /\*\*.{0,}\*\*/m;
         let s = [];
-
+        
         // **text** 모두 찾을때까지
         while( text && text.length > 0 ){
             if( regExp.test(text) ){
@@ -96,14 +111,14 @@ export default function(){
                 text = "";
             }
         }
-        console.log(s);
+
+        // console.log(s);
         return(
-            s.map( item => {
-                if( item.type === "normal") 
-                    return <pre style={{ fontFamily: 'inherit' }}>{item.text}</pre>
-                else if( item.type === "strong")
-                    return <b style={{ fontFamily: 'inherit' ,fontWeight: 'bold'}}>{item.text}</b>
-                    
+                s.map( item => {
+                    if( item.type === "normal") 
+                        return <pre style={{ fontFamily: 'inherit' }}>{item.text}</pre>
+                    else if( item.type === "strong")
+                        return <b style={{ fontFamily: 'inherit' ,fontWeight: 'bold'}}>{item.text}</b>    
             })
         )
 
@@ -111,6 +126,7 @@ export default function(){
 
     function handleTextOptions(option){
         const selectedText = window.getSelection().toString();
+
         if( option === "code"){
 
             if( selectedText.length > 0 ){
@@ -122,6 +138,21 @@ export default function(){
             else
                 setContent(content + "```\n 코드를 입력하세요. \n```\n");
         }
+    }
+
+    function handleSubmit(){
+        let tmp = ""
+        buttonTags.map( tag => {
+            tmp += tag + ','
+        },[]);
+        console.log(content);
+        api.registerQnA({ title: title ,content: content , type: "QNA" ,tags:  tmp }) 
+        .then( res => {
+            navigate('/');
+        })
+        .catch( e => {
+            alert("다시 시도해주세요.");
+        })
     }
 
     return(
@@ -157,7 +188,7 @@ export default function(){
                     </Typography>
 
                     <Box sx={{ width: '90%' , ml: 2 ,p: 2 ,border: 1 ,borderColor: 'lightgray' ,display: 'flex' ,flexDirection: 'row' ,height: 20 ,mt: 2 }}>
-                        <IconButton title="코드 샘플"  onClick={() => handleTextOptions("strong")}>
+                        <IconButton title="굵게"  onClick={() => handleTextOptions("strong")}>
                             <Typography sx={{ color: 'black' ,fontWeight: 'bold' }}>B</Typography>
                         </IconButton>
                         <IconButton title="코드 샘플"  onClick={() => handleTextOptions("code")}>
@@ -197,14 +228,7 @@ export default function(){
                     <Button 
                         variant='contained' 
                         sx={{ m: 2 }}
-                        onClick={() => { 
-                            let tmp = ""
-                            buttonTags.map( tag => {
-                                tmp += tag + ','
-                            },[]);
-                            if( api.registerQnA({ title: title ,content: content , type: "QNA" ,tags:  tmp }) )
-                                navigate('/');
-                        }}
+                        onClick={() => handleSubmit()}
                     >
                         작성하기
                     </Button>
