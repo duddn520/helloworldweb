@@ -12,13 +12,8 @@ export default function GithubConnectRedirect(){
     useEffect(()=>
     {
         let code = window.location.search.split("code=")[1];
-        request({
-            url:"/user/githubconnect",
-            params:{
-                "code":code
-            },
-            method:"POST"
-        }).then(()=> {
+        api.connectUserToGithub(code)
+        .then(()=> {
             // 미니홈으로 이동
             api.getUser()
             .then(res=>{

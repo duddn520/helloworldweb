@@ -46,7 +46,7 @@ public class UserController extends HttpServlet {
     private final PostSubCommentService postSubCommentService;
 
     // 카카오 로그인 및 회원가입 요청
-    @PostMapping("/user/register/kakao")
+    @PostMapping("/api/user/register/kakao")
     public ResponseEntity<ApiResponse> registerUserWithKakao(HttpServletRequest request,HttpServletResponse response) throws ParseException {
 
         response.addHeader("Access-Control-Allow-Origin","*");
@@ -68,7 +68,7 @@ public class UserController extends HttpServlet {
     }
 
     //네이버로그인 및 회원가입 요청
-    @PostMapping("/user/register/naver")
+    @PostMapping("/api/user/register/naver")
     public ResponseEntity<ApiResponse> registerUserWithNaver(@RequestParam(name = "code") String code, @RequestParam("state") String state, HttpServletResponse response) throws ParseException {
 
         //네이버로 부터 엑세스 토큰을 받아옴.
@@ -90,7 +90,7 @@ public class UserController extends HttpServlet {
                 stringObjectMap), HttpStatus.OK);
     }
 
-    @PostMapping("/user/register/github")
+    @PostMapping("/api/user/register/github")
     public ResponseEntity<ApiResponse> registerUserWithGithub(@RequestParam(name = "code") String code,HttpServletResponse servletresponse) throws ParseException {
 
         servletresponse.addHeader("Access-Control-Allow-Origin","*");
@@ -114,7 +114,7 @@ public class UserController extends HttpServlet {
     }
 
     //유저 db에 저장된 repo_url 통해 깃허브 레포지토리 조회, 레포지토리 json 리스트 반환.
-    @GetMapping("/user/repos_url")
+    @GetMapping("/api/user/repos_url")
     public ResponseEntity<ApiResponse> getGithubRepositories(@RequestParam(name = "email") String email, HttpServletRequest request, HttpServletResponse response)
     {
         User user = userService.getUserByEmail(email);
@@ -176,7 +176,7 @@ public class UserController extends HttpServlet {
     }
 
     //프론트에서 생성할 연동하기 버튼에서, 인가코드를 받아온 후 이 컨트롤러 메서드 실행.
-    @PostMapping("/user/githubconnect")
+    @PostMapping("/api/user/githubconnect")
     public ResponseEntity<ApiResponse> connectUserToGithub(@RequestParam(name = "code") String code, HttpServletRequest request, HttpServletResponse response)
     {
         String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.getTokenByHeader(request));

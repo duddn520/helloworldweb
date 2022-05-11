@@ -1,6 +1,7 @@
 import React, {useEffect} from "react";
 import axios from "axios";
 import {useNavigate} from "react-router";
+import api from "../../api/api";
 
 export default function GithubRedirect(){
     const navigate = useNavigate()
@@ -9,14 +10,11 @@ export default function GithubRedirect(){
     {
         let code = window.location.search.split("code=")[1];
 
-        axios({
-            url:"/user/register/github",
-            params:{"code":code},
-            method:"POST"
-        }).then(async (res)=>{
+        api.registerUserWithGithub(code)
+        .then(async (res)=>{
              // SessionStorage에 jwt 저장
              console.log(res);
-             window.sessionStorage.setItem("Auth", res.data.data.token);
+             window.sessionStorage.setItem("Auth", res.token);
 
              if( res.data.data.isAlreadyRegister ){
                  // 미니홈피페이지로 이동
