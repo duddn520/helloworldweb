@@ -18,7 +18,7 @@ const BlankUser = {
 function MiniHome() {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const [index, setIndex] = React.useState((state.tabIndex === null) ? 0 : state.tabIndex);
+  const [index, setIndex] = React.useState((state.tabIndex === null || state.tabIndex === undefined) ? 0 : state.tabIndex);
   const [userInfo, setUserInfo]= React.useState(null);
   const [thisHomeOwner, setThisHomeOwner] = React.useState(state.targetEmail);
 

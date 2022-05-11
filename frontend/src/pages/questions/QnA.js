@@ -66,7 +66,17 @@ export default function( props ){
     }
     
     React.useEffect(() => {
-       setQna(state);
+        // naivgate state가 없을 경우
+       if( state == null){
+            api.getPost( props.id )
+            .then( res =>{
+                console.log(res);
+            })
+       } else {
+            setQna(state);
+        
+            // 조회수+1
+            api.updatePost(state.id);
 
         // 조회수+1
         api.updatePost(state.id);
@@ -85,8 +95,6 @@ export default function( props ){
 
     },[ refresh ]);
 
-
-    
 
     return(
         <Box sx={{ flexGrow: 1 }}>

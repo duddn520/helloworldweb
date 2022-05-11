@@ -160,4 +160,20 @@ public class PostController {
                 responseDto), HttpStatus.OK);
     }
 
+    // 특정 유저가 작성한 질문들만 조회
+    @GetMapping("/user/qnas")
+    public ResponseEntity<ApiResponse<List<PostResponseDto>>> getUserQnas(@RequestParam(name= "id") Long id){
+        List<Post> findQnas = postService.getAllUserPosts(id, Category.QNA);
+
+        List<PostResponseDto> responseDtos = findQnas.stream()
+                .map(PostResponseDto::new)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity (ApiResponse.response(
+                HttpStatusCode.GET_SUCCESS,
+                HttpResponseMsg.GET_SUCCESS,
+                responseDtos), HttpStatus.OK);
+    }
+
+
 }
