@@ -218,7 +218,7 @@ function registerUserWithNaver(code, state){
     });
 }
 
-정//jwt로 자기자신의 정보를 조회
+//jwt로 자기자신의 정보를 조회
 function getUser(){
     return new Promise((resolve,reject) => {
         request({
@@ -465,25 +465,27 @@ function getUserQnas(id){
     });
 }
 
-function registerPostComment(postId, content){
-    return new Promise((resolve,reject) => {
-        request({
-            method: 'POST',
-            url : '/api/postcomment',
-            data: {
-                postId: postId,
-                content: content,
-            }
-        })
-        .then( res => {
-            resolve(res.data.data);
-        })
-        .catch( e => {
-            console.log(e);
-            reject();
-        })
-    });
-  function getUserComments(id){
+// function registerPostComment(postId, content){
+//     return new Promise((resolve,reject) => {
+//         request({
+//             method: 'POST',
+//             url : '/api/postcomment',
+//             data: {
+//                 postId: postId,
+//                 content: content,
+//             }
+//         })
+//         .then( res => {
+//             resolve(res.data.data);
+//         })
+//         .catch( e => {
+//             console.log(e);
+//             reject();
+//         })
+//     })
+// };
+
+function getUserComments(id){
     return new Promise((resolve,reject) => {
         request({
             method: 'GET',
@@ -505,4 +507,5 @@ function registerPostComment(postId, content){
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
     getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , 
     getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
-    getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName ,getUserQnas,getUserComments} ;
+    getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName 
+    ,getUserQnas ,getUserComments} ;

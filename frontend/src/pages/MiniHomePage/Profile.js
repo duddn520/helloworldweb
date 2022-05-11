@@ -1,8 +1,7 @@
 import React from "react";
 import { useNavigate } from 'react-router';
-import {  EditOutlined, LocationOn as LocationOnIcon,  } from '@mui/icons-material';
+import {  EditOutlined, LocationOn as LocationOnIcon, Edit as EditIcon  } from '@mui/icons-material';
 import { Box ,Typography ,Badge ,IconButton} from '@mui/material';
-import {  LocationOn as LocationOnIcon , Edit as EditIcon } from '@mui/icons-material';
 
 function Profile({ userInfo }){
 
