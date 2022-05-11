@@ -484,7 +484,7 @@ function getUserComments(id){
     });    
 }
 
-function getGithubRepositories(){
+function getGithubRepositories(email){
     return new Promise((resolve,reject) => {
         request({
             method:"GET",

@@ -3,6 +3,7 @@ import FlatList from 'flatlist-react';
 import RepoCard from "./RepoCard";
 import request from "../../api/request";
 import {Avatar, Box, Button, Typography} from "@mui/material";
+import api from "../../api/api";
 //useEffect사용하여 getPosts 로 postList 받고, 렌더링.
 
 export default function RepoCardFlatList({email, isOwner})
@@ -18,19 +19,13 @@ export default function RepoCardFlatList({email, isOwner})
 
     }
     useEffect(()=>{
-        request({
-            method:"GET",
-            url:"/user/repos_url",
-            params:{
-                email: email
-            }
-        })
+        api.getGithubRepositories(userEmail)
             .then( res =>{
                 console.log(res)
 
                 if(res.status===200)   //github 연동 되어있는 경우
                 {
-                    setJsonList(res.data.data)
+                    setJsonList(res)
                     setFlag([true])
                 }
                 else if(res.status===204) //github 연동 안되어있는 경우
