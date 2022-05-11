@@ -71,6 +71,7 @@ public class PostController {
     }
 
     @GetMapping("/api/post/blogs")
+    //blog 리스트로 썸네일 구성시 사용
     public ResponseEntity<ApiResponse<PostResponseDtoWithIsOwner>> getBlogs(@RequestHeader(value = "Auth") String jwtToken,
                                                                             @RequestParam(value = "email") String email) {
         User findUser = userService.getUserByEmail(email);
@@ -122,7 +123,7 @@ public class PostController {
 
     // 조회수 + 1
     @PutMapping("/api/post")
-    public ResponseEntity<ApiResponse> updatePost(@RequestParam(name="id")Long id){
+    public ResponseEntity<ApiResponse> updatePost(@RequestParam(name="post_id")Long id){
 
         postService.updatePost(postService.getPost(id));
 
@@ -134,7 +135,7 @@ public class PostController {
     //프론트에서 게시물 주인에게만 삭제버튼이 생기므로 호출유저 비교 필요 없음.
     @DeleteMapping("/api/post")
     @Transactional
-    public ResponseEntity<ApiResponse> deletePost(@RequestParam(value = "id") Long postId) {
+    public ResponseEntity<ApiResponse> deletePost(@RequestParam(value = "post_id") Long postId) {
 
         Post findPost = postService.getPost(postId);
         postService.deletePost(findPost);
@@ -146,8 +147,9 @@ public class PostController {
 
     @GetMapping("/api/post")
     @Transactional
+    //Post 하나를 표현할 때 사용.
     public ResponseEntity<ApiResponse> getPost(@RequestHeader(value = "Auth") String jwtToken,
-                                               @RequestParam(name = "id") Long id) {
+                                               @RequestParam(name = "post_id") Long id) {
 
         User caller = userService.getUserByJwt(jwtToken);
         Post post = postService.getPost(id);
@@ -160,22 +162,5 @@ public class PostController {
                 HttpResponseMsg.GET_SUCCESS,
                 responseDto), HttpStatus.OK);
     }
-
-    // 특정 유저가 작성한 질문들만 조회
-    @GetMapping("/user/qnas")
-    public ResponseEntity<ApiResponse<List<PostResponseDto>>> getUserQnas(@RequestParam(name= "id") Long id){
-        List<Post> findQnas = postService.getAllUserPosts(id, Category.QNA);
-
-        List<PostResponseDto> responseDtos = findQnas.stream()
-                .map(PostResponseDto::new)
-                .collect(Collectors.toList());
-
-        return new ResponseEntity (ApiResponse.response(
-                HttpStatusCode.GET_SUCCESS,
-                HttpResponseMsg.GET_SUCCESS,
-                responseDtos), HttpStatus.OK);
-    }
-
-
 
 }

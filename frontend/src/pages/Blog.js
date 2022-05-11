@@ -43,6 +43,7 @@ function Blog(){
     const [isOpenComment, setIsOpenComment] = React.useState(false);
     const [isOpenCommentEditer, setIsOpenCommentEditor] = React.useState(false);
     const [myInfo, setMyInfo] = React.useState(null);
+    const [reRender, setReRender] = React.useState(true);
 
     React.useEffect(()=>{
         api.getPost(state.postId)
@@ -53,7 +54,7 @@ function Blog(){
         .catch(e=>{
             console.log(e);
         })
-    },[]);
+    },[reRender]);
 
     function PutImage(content, imageArray){
         const contentArray = content.split('&&&&');
@@ -110,6 +111,7 @@ function Blog(){
             api.registerPostComment(state.postId, commentString)
             .then((res)=>{
                 setIsOpenCommentEditor(false);
+                setReRender(!reRender);
             })
             .catch(e=>{
                 alert("댓글 등록에 실패했습니다.");

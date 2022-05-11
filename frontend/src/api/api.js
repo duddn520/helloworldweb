@@ -179,7 +179,7 @@ function updatePost(id){
             method: 'PUT' ,
             url: '/api/post',
             params: {
-                id: id
+                post_id: id
             }
         })
         .then( res => {
@@ -316,7 +316,7 @@ function deletePost(postId){
             method: 'DELETE',
             url : "/api/post",
             params: {
-                id: postId,
+                post_id: postId,
             }
         })
         .then( res => {
@@ -335,7 +335,7 @@ function getPost(postId){
             method: 'GET',
             url : "/api/post",
             params: {
-                id: postId,
+                post_id: postId,
             }
         })
         .then( res => {
@@ -450,7 +450,7 @@ function getUserQnas(id){
     return new Promise((resolve,reject) => {
         request({
             method: 'GET',
-            url : '/user/qnas',
+            url : '/api/user/qnas',
             params: {
                 id: id
             }
@@ -489,7 +489,7 @@ function getUserComments(id){
     return new Promise((resolve,reject) => {
         request({
             method: 'GET',
-            url : '/user/comments',
+            url : '/api/user/comments',
             params: {
                 id: id
               }
@@ -507,5 +507,4 @@ function getUserComments(id){
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
     getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , 
     getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
-    getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName 
-    ,getUserQnas ,getUserComments} ;
+    getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName ,getUserQnas,getUserComments} ;

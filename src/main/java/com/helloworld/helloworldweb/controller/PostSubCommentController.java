@@ -86,19 +86,4 @@ public class PostSubCommentController {
                 HttpResponseMsg.DELETE_SUCCESS), HttpStatus.OK);
     }
 
-    // 특정 유저가 작성한 답변들만 조회
-    @GetMapping("/user/comments")
-    public ResponseEntity<ApiResponse<List<PostSubCommentResponseDto>>> getUserComments(@RequestParam(name= "id") Long id){
-        List<PostSubComment> findAllUserComments = postSubCommentService.getAllUserComments(id);
-
-        // List -> ResponseDto
-        List<PostSubCommentResponseDto> responseDtos = findAllUserComments.stream()
-                .map(PostSubCommentResponseDto::new)
-                .collect(Collectors.toList());
-
-        return new ResponseEntity (ApiResponse.response(
-                HttpStatusCode.GET_SUCCESS,
-                HttpResponseMsg.GET_SUCCESS,
-                responseDtos), HttpStatus.OK);
-    }
 }
