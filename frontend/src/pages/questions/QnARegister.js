@@ -138,6 +138,16 @@ export default function(){
             else
                 setContent(content + "```\n 코드를 입력하세요. \n```\n");
         }
+        else if( option === "strong" ){
+            if( selectedText.length > 0 ){
+                let s = content.split(selectedText);
+                s[0] += "**";
+                s[1] += "**";
+                setContent( s[0] + selectedText + s[1] );
+            }
+            else
+                setContent(content + "**텍스트를 입력하세요.**");
+        }
     }
 
     function handleSubmit(){
@@ -266,6 +276,10 @@ const tipContents = [
     {
         header: '코드작성( ``` )',
         body: '```\nyour text here\n```'
+    } ,
+    {
+        header: '강조( ** )',
+        body: '**text here**'
     } ,
     {
         header: '태그작성( , )',
