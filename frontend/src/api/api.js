@@ -366,6 +366,64 @@ function getOtherUser(email){
     });
 }
 
+function registerPostComment(postId, content){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'POST',
+            url : '/api/postcomment',
+            data:{
+                postId:postId,
+                content:content
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
+
+function getPostComment(postId){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'GET',
+            url : '/api/postcomment',
+            params:{
+                id:postId
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
+
+function registerPostSubComment(postCommentId, content){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'POST',
+            url : '/api/postsubcomment',
+            data:{
+                postCommentId:postCommentId,
+                content:content
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
 
 function updateNickName(nickName){
     return new Promise((resolve,reject) => {
@@ -408,4 +466,4 @@ function getUserQnas(id){
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
     getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , 
     getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
-    getOtherUser, updateNickName ,getUserQnas} ;
+    getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName ,getUserQnas} ;

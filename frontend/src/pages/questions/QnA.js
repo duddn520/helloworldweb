@@ -5,6 +5,8 @@ import { useLocation } from 'react-router';
 import api from '../../api/api';
 import CustomAppBar from '../../component/appbar/CustomAppBar';
 import { useNavigate } from 'react-router';
+import QnAComment from '../../component/questions/QnAComment';
+import QnACommentList from '../../component/questions/QnACommentList';
 
 export default function( props ){
     const navigate = useNavigate();
@@ -13,14 +15,28 @@ export default function( props ){
     const [qna,setQna] = React.useState({});
     // 답변
     const [reply,setReply] = React.useState("");
+    const [postComment,setPostComment] = React.useState([]);
     // 태그
     const [tags,setTags] = React.useState([]);
     // 유저 이메일
     const [targetUserEmail,setTargetUserEmail] = React.useState("");
+    //refresh
+    const [refresh,setRefresh] = React.useState(false);
+
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+
+    function registerPostComment(postId,content){
+        api.registerPostComment(postId,content)
+        .then(res=>{
+            console.log(res)
+            setRefresh(!refresh)
+        }).catch(e=>{
+            console.log(e)
+        })
+    }
 
     const renderContent = () => {
         if( qna?.content != null  ){
@@ -62,17 +78,23 @@ export default function( props ){
             // 조회수+1
             api.updatePost(state.id);
 
-            api.getPost(state.id)
-            .then( res => {
-                setTargetUserEmail(res.userResponseDto.email);
-            })
-            .catch( e => { })
+        // 조회수+1
+        api.updatePost(state.id);
 
-            if( state.tags != null ){
-                setTags( state.tags.split(',') );
-            }
-        }
-    },[]);
+        api.getPost(state.id)
+        .then( res => {
+            console.log(res)
+            setPostComment(res.postCommentResponseDtos)
+            setTargetUserEmail(res.userResponseDto.email);
+        })
+        .catch( e => { })
+    
+       if( state.tags != null ){
+          setTags( state.tags.split(',') );
+       }
+
+    },[ refresh ]);
+
 
     return(
         <Box sx={{ flexGrow: 1 }}>
@@ -109,6 +131,9 @@ export default function( props ){
                         tags.map( tag => { if( tag.length ) return <Badge sx={{ backgroundColor: 'rgb(240,240,240)' ,ml: 2 ,p: 1,mt: 10,fontSize: 13}}>{tag}</Badge>})
                     }
                     <Divider variant="fullWidth" sx={{ flexGrow: 1 ,mt: 10}}/>
+                    {
+                        postComment.length && <QnACommentList postComments={postComment} />
+                    }
                     <Typography sx={{ m : 2 ,fontSize: 25 ,fontWeight: '600' }}>{'당신의 답변'}</Typography>
                     <Box>
                         <TextArea
@@ -123,6 +148,7 @@ export default function( props ){
                         <Button 
                             variant='contained' 
                             sx={{ m: 2 ,mb: 10 }}
+                            onClick={()=>registerPostComment(state.id,reply)}
                         >
                             작성하기
                         </Button>
