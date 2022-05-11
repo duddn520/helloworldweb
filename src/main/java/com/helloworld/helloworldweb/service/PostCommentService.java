@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+
 @Service
 @RequiredArgsConstructor
 public class PostCommentService {
@@ -29,7 +31,7 @@ public class PostCommentService {
 
     public PostComment getPostCommentById(Long id)
     {
-        PostComment postComment = postCommentRepository.findById(id).orElseThrow(()->new RuntimeException("해당 댓글이 존재하지 않습니다."));
+        PostComment postComment = postCommentRepository.findById(id).orElseGet(()-> new PostComment());
 
         return postComment;
     }

@@ -2,6 +2,7 @@ package com.helloworld.helloworldweb.service;
 
 import com.helloworld.helloworldweb.domain.PostComment;
 import com.helloworld.helloworldweb.domain.PostSubComment;
+import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.repository.PostSubCommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,9 +20,10 @@ public class PostSubCommentService {
     }
 
     @Transactional
-    public PostSubComment registerPostSubComment(PostSubComment postSubComment, PostComment postComment)
+    public PostSubComment registerPostSubComment(PostSubComment postSubComment, PostComment postComment, User user)
     {
         postSubComment.updatePostComment(postComment);
+        postSubComment.updateUser(user);
         return postSubCommentRepository.save(postSubComment);
     }
 
