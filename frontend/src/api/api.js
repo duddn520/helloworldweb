@@ -179,7 +179,7 @@ function updatePost(id){
             method: 'PUT' ,
             url: '/api/post',
             params: {
-                id: id
+                post_id: id
             }
         })
         .then( res => {
@@ -316,7 +316,7 @@ function deletePost(postId){
             method: 'DELETE',
             url : "/api/post",
             params: {
-                id: postId,
+                post_id: postId,
             }
         })
         .then( res => {
@@ -335,7 +335,7 @@ function getPost(postId){
             method: 'GET',
             url : "/api/post",
             params: {
-                id: postId,
+                post_id: postId,
             }
         })
         .then( res => {
@@ -450,7 +450,7 @@ function getUserQnas(id){
     return new Promise((resolve,reject) => {
         request({
             method: 'GET',
-            url : '/user/qnas',
+            url : '/api/user/qnas',
             params: {
                 id: id
             }
@@ -465,31 +465,11 @@ function getUserQnas(id){
     });
 }
 
-// function registerPostComment(postId, content){
-//     return new Promise((resolve,reject) => {
-//         request({
-//             method: 'POST',
-//             url : '/api/postcomment',
-//             data: {
-//                 postId: postId,
-//                 content: content,
-//             }
-//         })
-//         .then( res => {
-//             resolve(res.data.data);
-//         })
-//         .catch( e => {
-//             console.log(e);
-//             reject();
-//         })
-//     })
-// };
-
 function getUserComments(id){
     return new Promise((resolve,reject) => {
         request({
             method: 'GET',
-            url : '/user/comments',
+            url : '/api/user/comments',
             params: {
                 id: id
               }

@@ -1,11 +1,18 @@
 package com.helloworld.helloworldweb.controller;
 
+import com.helloworld.helloworldweb.domain.Category;
+import com.helloworld.helloworldweb.domain.Post;
+import com.helloworld.helloworldweb.domain.PostSubComment;
 import com.helloworld.helloworldweb.domain.User;
+import com.helloworld.helloworldweb.dto.Post.PostResponseDto;
+import com.helloworld.helloworldweb.dto.PostSubComment.PostSubCommentResponseDto;
 import com.helloworld.helloworldweb.dto.User.UserResponseDto;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
 import com.helloworld.helloworldweb.model.HttpStatusCode;
+import com.helloworld.helloworldweb.service.PostService;
+import com.helloworld.helloworldweb.service.PostSubCommentService;
 import com.helloworld.helloworldweb.service.UserService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jose.shaded.json.parser.ParseException;
@@ -27,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -34,6 +42,8 @@ public class UserController extends HttpServlet {
 
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final PostService postService;
+    private final PostSubCommentService postSubCommentService;
 
     // 카카오 로그인 및 회원가입 요청
     @PostMapping("/api/user/register/kakao")
@@ -198,5 +208,36 @@ public class UserController extends HttpServlet {
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.PUT_SUCCESS,
                 HttpResponseMsg.PUT_SUCCESS), HttpStatus.OK);
+    }
+
+    // 특정 유저가 작성한 질문들만 조회
+    @GetMapping("/api/user/qnas")
+    public ResponseEntity<ApiResponse<List<PostResponseDto>>> getUserQnas(@RequestParam(name= "id") Long id){
+        List<Post> findQnas = postService.getAllUserPosts(id, Category.QNA);
+
+        List<PostResponseDto> responseDtos = findQnas.stream()
+                .map(PostResponseDto::new)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity (ApiResponse.response(
+                HttpStatusCode.GET_SUCCESS,
+                HttpResponseMsg.GET_SUCCESS,
+                responseDtos), HttpStatus.OK);
+    }
+
+    // 특정 유저가 작성한 답변들만 조회
+    @GetMapping("/api/user/comments")
+    public ResponseEntity<ApiResponse<List<PostSubCommentResponseDto>>> getUserComments(@RequestParam(name= "id") Long id){
+        List<PostSubComment> findAllUserComments = postSubCommentService.getAllUserComments(id);
+
+        // List -> ResponseDto
+        List<PostSubCommentResponseDto> responseDtos = findAllUserComments.stream()
+                .map(PostSubCommentResponseDto::new)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity (ApiResponse.response(
+                HttpStatusCode.GET_SUCCESS,
+                HttpResponseMsg.GET_SUCCESS,
+                responseDtos), HttpStatus.OK);
     }
 }
