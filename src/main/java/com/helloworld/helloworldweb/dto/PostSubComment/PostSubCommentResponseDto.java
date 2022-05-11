@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 @NoArgsConstructor
@@ -12,12 +13,12 @@ public class PostSubCommentResponseDto {
 
     private Long id;
     private String content;
-    private LocalDateTime createdTime;
+    private String createdTime;
 
     public PostSubCommentResponseDto (PostSubComment postSubComment)
     {
         this.id = postSubComment.getId();
         this.content = postSubComment.getContent();
-        this.createdTime = postSubComment.getCreatedTime();
+        this.createdTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(postSubComment.getCreatedTime());
     }
 }

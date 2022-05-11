@@ -23,6 +23,7 @@ public class PostResponseDtoWithIsOwner {
         this.IsOwner = isOwner;
     }
 
+    // 게시물의 썸네일 표시에 필요한 정보
     private List<PostResponseDto> postResponseDtos (List<Post> posts) {
         List<PostResponseDto> responseDtos = new ArrayList<>();
 
