@@ -2,10 +2,14 @@ package com.helloworld.helloworldweb.service;
 
 import com.helloworld.helloworldweb.domain.PostComment;
 import com.helloworld.helloworldweb.domain.PostSubComment;
+import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.repository.PostSubCommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,10 +23,16 @@ public class PostSubCommentService {
     }
 
     @Transactional
-    public PostSubComment registerPostSubComment(PostSubComment postSubComment, PostComment postComment)
+    public PostSubComment registerPostSubComment(PostSubComment postSubComment, PostComment postComment, User user)
     {
         postSubComment.updatePostComment(postComment);
+        postSubComment.updateUser(user);
         return postSubCommentRepository.save(postSubComment);
+    }
+
+    // 유저가 작성한 모든 답변들 조회
+    public List<PostSubComment> getAllUserComments(Long userId){
+        return postSubCommentRepository.findAllById(userId).orElse(new ArrayList<PostSubComment>());
     }
 
     @Transactional

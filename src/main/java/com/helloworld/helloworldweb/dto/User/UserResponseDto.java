@@ -22,4 +22,12 @@ public class UserResponseDto {
         this.profileUrl = user.getProfileUrl();
         this.IsOwner = isOwner;
     }
+
+    public UserResponseDto(User user)
+    {
+        this.id = user.getId();
+        this.email = user.getEmail();
+        this.userName = user.getUsername().split("/")[0];
+        this.profileUrl = user.getProfileUrl();
+    }
 }

@@ -111,10 +111,10 @@ function registerQnA( {content,type,title,tags}){
             method: 'POST' ,
             url: '/api/post',
             params: {
-                title: title ,
-                tags: tags ,
-                content: content ,
-                category: type ,
+                title: encodeURIComponent(title) ,
+                tags: encodeURIComponent(tags) ,
+                content: encodeURIComponent(content) ,
+                category: encodeURIComponent(type) ,
             }
         })
         .then( res => {
@@ -368,6 +368,64 @@ function getOtherUser(email){
     });
 }
 
+function registerPostComment(postId, content){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'POST',
+            url : '/api/postcomment',
+            data:{
+                postId:postId,
+                content:content
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
+
+function getPostComment(postId){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'GET',
+            url : '/api/postcomment',
+            params:{
+                id:postId
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
+
+function registerPostSubComment(postCommentId, content){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'POST',
+            url : '/api/postsubcomment',
+            data:{
+                postCommentId:postCommentId,
+                content:content
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
 
 function updateNickName(nickName){
     return new Promise((resolve,reject) => {
@@ -425,9 +483,26 @@ function registerPostComment(postId, content){
             reject();
         })
     });
+  function getUserComments(id){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'GET',
+            url : '/user/comments',
+            params: {
+                id: id
+              }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });    
 }
 
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
     getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , 
     getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
-    getOtherUser, updateNickName ,getUserQnas, registerPostComment} ;
+    getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName ,getUserQnas,getUserComments} ;

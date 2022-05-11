@@ -1,7 +1,8 @@
 import React from "react";
 import { useNavigate } from 'react-router';
-import { Box, Typography, Badge, IconButton} from '@mui/material';
 import {  EditOutlined, LocationOn as LocationOnIcon,  } from '@mui/icons-material';
+import { Box ,Typography ,Badge ,IconButton} from '@mui/material';
+import {  LocationOn as LocationOnIcon , Edit as EditIcon } from '@mui/icons-material';
 
 function Profile({ userInfo }){
 
@@ -25,6 +26,7 @@ function Profile({ userInfo }){
                 <EditOutlined sx={{ ml: 1 }}/>
             </div>
             <Box sx={{ display: 'flex' , flexDirection: 'row' ,justifyContent: 'center', mt: 3 }}>
+
                 <LocationOnIcon sx={{ color: 'gray'}}/>
                 <Typography sx={{ color: 'gray' ,ml: 2 }}>서울, 대한민국</Typography>
             </Box>
