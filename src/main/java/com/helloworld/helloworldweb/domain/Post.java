@@ -34,6 +34,7 @@ public class Post extends BaseTimeEntity {
     private String title;
     // 내용
     @Lob
+//    @Column(length = 5000)
     private String content;
     // 태그
     private String tags;

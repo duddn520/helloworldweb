@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class PostSubCommentService {
@@ -25,6 +28,11 @@ public class PostSubCommentService {
         postSubComment.updatePostComment(postComment);
         postSubComment.updateUser(user);
         return postSubCommentRepository.save(postSubComment);
+    }
+
+    // 유저가 작성한 모든 답변들 조회
+    public List<PostSubComment> getAllUserComments(Long userId){
+        return postSubCommentRepository.findAllById(userId).orElse(new ArrayList<PostSubComment>());
     }
 
     @Transactional

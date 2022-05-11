@@ -9,7 +9,7 @@ export default function RepoCardFlatList({email, isOwner})
 {
     const [jsonList,setJsonList] = React.useState([])
     const [flag,setFlag] = React.useState([])
-    const [userEmail,setUserEmail] = React.useState(email)
+    const [userEmail,setUserEmail] = React.useState(email);
 
     const github_url = "https://github.com/login/oauth/authorize?client_id=105e0b50eefc27b4dc81&redirect_uri=http://localhost:3000/login/redirect/github/connect";
 
@@ -22,7 +22,7 @@ export default function RepoCardFlatList({email, isOwner})
             method:"GET",
             url:"/user/repos_url",
             params:{
-                email:userEmail
+                email: email
             }
         })
             .then( res =>{

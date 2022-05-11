@@ -3,7 +3,7 @@ import { AppBar, Toolbar, Typography ,TextField ,IconButton ,Avatar ,
     MenuList , MenuItem , ListItemText ,Divider , ListItemButton , Paper ,
     Button ,Popover ,Drawer ,Box ,List ,ListItem ,ListItemIcon ,Popper
 } from '@mui/material';
-import { Menu as MenuIcon ,Search as SearchIcon,Home as HomeIcon } from '@mui/icons-material';
+import { Menu as MenuIcon ,Search as SearchIcon,Home as HomeIcon ,Edit as EditIcon } from '@mui/icons-material';
 import { styled } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import api from '../../api/api';
@@ -20,7 +20,7 @@ export default function(){
     // 사용자 이메일
     const [userEmail, setUserEmail] = React.useState(null);
     // 사용자 id
-    const [id,setId] = React.useState(1);
+    const [userName,setUserName] = React.useState("anonymous");
     
     // 검색어 추천 
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -73,7 +73,7 @@ export default function(){
                 .then( res=> {
                     setProfileUrl(res.profileUrl);
                     setUserEmail(res.email);
-                    setId(res.id);
+                    setUserName(res.userName);
                 })
                 .catch();
             } else {
@@ -84,7 +84,7 @@ export default function(){
 
     function MoveToMyBlog(){
         if(userEmail !== null){
-            navigate("/minihome", {state: {tabIndex: 0, targetEmail: userEmail}});
+            navigate(`/minihome/`, {state: {tabIndex: 0, targetEmail: userEmail}});
         }
         else{
             alert("로그인이 필요합니다.");
@@ -287,14 +287,12 @@ export function MiniHomeBar(){
         {
             loginState ? 
             <Paper sx={{ alignItems: 'center', boxShadow: 0 , display: 'flex' ,flexDirection: 'row' ,marginLeft: 'auto' }}>
-                <ListItemButton 
+                {/* <ListItemButton 
                     sx={{ alignItems: 'center' }}
                     onClick={() => { setLoginMenuVisible(!loginMenuVisible) }}
                 >
-                    <Avatar src={profileUrl}>
-                        유저
-                    </Avatar>
-                </ListItemButton>
+                    <MenuIcon color='black' />
+                </ListItemButton> */}
                 
                 <Popover
                     open={loginMenuVisible}
@@ -334,14 +332,14 @@ export function MiniHomeBar(){
                     >
                         <List>
                             <Button 
-                                onClick={() => { MoveToMyBlog() }} 
+                                onClick={() => navigate('/qna/register')}
                                 sx={{ width: '100%' ,color: 'black' }}
                             >
                                 <ListItem>
-                                    <ListItemIcon>
-                                        <HomeIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary={'내 블로그'} />
+                                    <ListItemButton disabled>
+                                    <EditIcon />
+                                    </ListItemButton>
+                                    <ListItemText>질문 작성하기</ListItemText>
                                 </ListItem>
                             </Button>
                         </List>
