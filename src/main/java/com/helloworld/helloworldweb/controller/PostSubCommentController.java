@@ -4,13 +4,16 @@ import com.helloworld.helloworldweb.domain.Post;
 import com.helloworld.helloworldweb.domain.PostComment;
 import com.helloworld.helloworldweb.domain.PostSubComment;
 import com.helloworld.helloworldweb.dto.Post.PostResponseDto;
+import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.dto.PostSubComment.PostSubCommentRequestDto;
 import com.helloworld.helloworldweb.dto.PostSubComment.PostSubCommentResponseDto;
+import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
 import com.helloworld.helloworldweb.model.HttpStatusCode;
 import com.helloworld.helloworldweb.service.PostCommentService;
 import com.helloworld.helloworldweb.service.PostSubCommentService;
+import com.helloworld.helloworldweb.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,16 +31,21 @@ public class PostSubCommentController {
 
     private final PostCommentService postCommentService;
     private final PostSubCommentService postSubCommentService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
 
     @Transactional
     @PostMapping("/api/postsubcomment")
-    public ResponseEntity<ApiResponse<PostSubCommentResponseDto>> registerPostSubComment(@RequestBody PostSubCommentRequestDto requestDto)
+    public ResponseEntity<ApiResponse<PostSubCommentResponseDto>> registerPostSubComment(@RequestBody PostSubCommentRequestDto requestDto, HttpServletRequest request)
     {
+        String token = jwtTokenProvider.getTokenByHeader(request);
+        User user = userService.getUserByEmail(jwtTokenProvider.getUserEmail(token));
+
         PostComment postComment = postCommentService.getPostCommentById(requestDto.getPostCommentId());
 
         PostSubComment postSubComment = requestDto.toEntity();
 
-        PostSubCommentResponseDto responseDto = new PostSubCommentResponseDto(postSubCommentService.registerPostSubComment(postSubComment,postComment));
+        PostSubCommentResponseDto responseDto = new PostSubCommentResponseDto(postSubCommentService.registerPostSubComment(postSubComment,postComment,user));
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.OK,
