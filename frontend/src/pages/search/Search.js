@@ -8,6 +8,23 @@ import { useNavigate } from 'react-router';
 export default function Search(){
     const navigate = useNavigate();
     const { state } = useLocation();
+    const [qnaList,setQnaList] = React.useState([]);
+    const [blogList,setBlogList] = React.useState([]);
+    
+    // Post -> QNA,Blog로 구분
+    React.useEffect(() => {
+        let s1 = [];
+        let s2 = [];
+        state.res.map( item => {
+            if ( item.category == "QNA" ) 
+                s1.push(item);
+            else
+                s2.push(item);
+        });
+        setQnaList(s1);
+        setBlogList(s2);
+    },[]);
+
     return(
         <Box sx={{ flexGrow: 1 }}>
             <CustomAppBar />
@@ -23,13 +40,24 @@ export default function Search(){
                         </Button>
             </Box>
             <Box sx={{ alignItems: 'center' ,m: 2 ,flex: 1 }}>
-            {
-                state.res.map( item => {
-                    return(
-                        <QnAItem key={item} item={item}/>
-                    );
-                })
-            }
+                <Typography sx={{ m: 2 }}>질문</Typography>
+                {
+                    qnaList.map( item => {
+                        return(
+                            <QnAItem key={item} item={item}/>
+                        );
+                    })
+                }
+            </Box>
+            <Box sx={{ alignItems: 'center' ,m: 2 ,flex: 1 }}>
+                <Typography sx={{ m: 2 }}>블로그</Typography>
+                {
+                    blogList.map( item => {
+                        return(
+                            <QnAItem key={item} item={item}/>
+                        );
+                    })
+                }
             </Box>
         </Box>
     );

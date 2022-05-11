@@ -10,74 +10,6 @@ import CustomAppBar from "../component/appbar/CustomAppBar";
 import QnAItem from "../component/questions/QnAItem";
 import api from "../api/api";
 
-
-// 임시데이터
-const data = [
-    {
-        title: 'why could not found the symbol even define the fields name',
-        content: 'sending client auth code to express server to allow',
-        tags: ['java'],
-        views: 120,
-        answers: 2
-    } ,
-    {
-        title: 'sending client auth code to express server to allow server to modify clients  erver to modify clienerver to modify clien ienerver to modify clieienerver to modify clie ',
-        content: 'eview data automatically',
-        tags: ['javascript','node.js','express'],
-        views: 230,
-        answers: 0
-    } ,
-    {
-        title: 'React Native - Review data automatically in real time from AsyncStorage',
-        content: 'why could not found the symbol even defin',
-        tags: ['react native'],
-        views: 10,
-        answers: 1
-    } ,
-    {
-        title: 'why could not found the symbol even define the fields name',
-        content: 'sending client auth code to express server to allow se',
-        tags: ['java'],
-        views: 120,
-        answers: 2
-    } ,
-    {
-        title: 'sending client auth code to express server to allow server to modify client spreadsheets',
-        content: '내용',
-        tags: ['javascript','node.js','express'],
-        views: 230,
-        answers: 0
-    } ,
-    {
-        title: 'React Native - Review data automatically in real time from AsyncStorage',
-        content: '내용',
-        tags: ['react native'],
-        views: 10,
-        answers: 1
-    } ,
-    {
-        title: 'why could not found the symbol even define the fields name',
-        content: '내용',
-        tags: ['java'],
-        views: 120,
-        answers: 2
-    } ,
-    {
-        title: 'sending client auth code to express server to allow server to modify client spreadsheets',
-        content: '내용',
-        tags: ['javascript','node.js','express'],
-        views: 230,
-        answers: 0
-    } ,
-    {
-        title: 'React Native - Review data automatically in real time from AsyncStorage',
-        content: '내용',
-        tags: ['react native'],
-        views: 10,
-        answers: 1
-    } ,
-]
-
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
 
@@ -88,8 +20,7 @@ function TabPanel(props) {
           </Box>
         )
     );
-}
-  
+}  
 
 export default function ( props ){
     const navigate = useNavigate();
@@ -98,15 +29,14 @@ export default function ( props ){
     const [allQna,setAllQna] = React.useState([]);
 
     const handleChange = (event, newValue) => {
-
-        if( newValue === 1 ){
-            api.getAllQna()
-            .then( res => { setAllQna(res) })
-            .catch( e => { });
-        }
-
         setValue(newValue);
     };
+
+    React.useEffect(() => {
+        api.getAllQna()
+        .then( res => { setAllQna(res) })
+        .catch( e => { });
+    },[]);
 
     return(
         <Box sx={{ flexGrow: 1 }}> 
@@ -154,7 +84,7 @@ function Home(){
                     </Box>
                     <List>
                     {
-                        data.map( (item,index) => {
+                        allQna.map( (item,index) => {
                             return(
                                 <QnAItem key={index} item={item}/>
                             );
@@ -197,35 +127,3 @@ function Questions(){
 const StyledForm = styled('form')({  
 
 });
-
-// 검색창 메인화면 ( 이전버전 )
-    // {/* <Box sx={{ margin: 10 , textAlign: 'center'}}>
-
-    //     <Typography 
-    //         variant='h2' 
-    //         sx={{ color: 'black' , textAlign: 'center' , p: 5 }}
-    //     >
-    //         {"<Hello World"}
-    //         <Typography display='inline' variant="h2" sx={{ color: 'red' }}>
-    //             {"/>"}
-    //         </Typography>
-    //     </Typography>
-
-    //     <Container sx={{ width: '50%'}}>
-    //     <StyledForm 
-    //         onSubmit={handleSubmit}
-    //         sx={{ boxShadow: 3, borderRadius: 20 , justifyContent: 'center' }}
-    //     >
-    //         <IconButton>
-    //         <SearchIcon sx={{ p : 1 }} />
-    //         </IconButton>
-    //         <InputBase
-    //             sx={{ width: '90%'  }}
-    //             onChange={(t) => setText(t.target.value)}
-    //             value={text}
-    //             placeholder="Search Anything"
-    //         />
-    //     </StyledForm>
-    //     </Container>
-
-    // </Box> */}
