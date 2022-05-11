@@ -151,6 +151,7 @@ public class PostController {
 
         User caller = userService.getUserByJwt(jwtToken);
         Post post = postService.getPost(id);
+        postService.updatePost(post);
         boolean isOwner = caller.getId() == post.getUser().getId();
         PostResponseDtoWithPostComments responseDto = new PostResponseDtoWithPostComments(post, isOwner);
 

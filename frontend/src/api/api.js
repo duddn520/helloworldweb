@@ -218,6 +218,7 @@ function registerUserWithNaver(code, state){
     });
 }
 
+정//jwt로 자기자신의 정보를 조회
 function getUser(){
     return new Promise((resolve,reject) => {
         request({
@@ -347,6 +348,7 @@ function getPost(postId){
     });
 }
 
+//PK 인 email을 사용하여 다른 유저의 정보를 조회하는 함수
 function getOtherUser(email){
     return new Promise((resolve,reject) => {
         request({
@@ -463,14 +465,32 @@ function getUserQnas(id){
     });
 }
 
-function getUserComments(id){
+function registerPostComment(postId, content){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'POST',
+            url : '/api/postcomment',
+            data: {
+                postId: postId,
+                content: content,
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+  function getUserComments(id){
     return new Promise((resolve,reject) => {
         request({
             method: 'GET',
             url : '/user/comments',
             params: {
                 id: id
-            }
+              }
         })
         .then( res => {
             resolve(res.data.data);

@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from 'react-router';
+import {  EditOutlined, LocationOn as LocationOnIcon,  } from '@mui/icons-material';
 import { Box ,Typography ,Badge ,IconButton} from '@mui/material';
 import {  LocationOn as LocationOnIcon , Edit as EditIcon } from '@mui/icons-material';
 
@@ -16,17 +17,16 @@ function Profile({ userInfo }){
                 justifyContent="center"
                 flex={1}
             >
-                <Box sx={{width: 200, height: 200, borderRadius: 100, overflow: 'hidden'}} >
+                <Box sx={{width: 200, height: 200, borderRadius: 100, overflow: 'hidden', mb: 5}} >
                     <img src={userInfo.profileUrl} width={200} height={200} alt={'프로필 사진'}></img>
                 </Box>
             </Box>
-            <Box sx={{ display: 'flex' , flexDirection: 'row' ,justifyContent: 'center' ,alignItems: 'center' }}>
-                <h3>{userInfo.userName}</h3>
-                <IconButton onClick={()=>{navigate("/makeusername")}}>
-                    <EditIcon sx={{ color: 'gray' ,fontSize: 15}}/>
-                </IconButton>
-            </Box>
-            <Box sx={{ display: 'flex' , flexDirection: 'row' ,justifyContent: 'center' }}>
+            <div style={{ padding: 7, display: 'flex', justifyContent: 'center' }} onClick={()=>{navigate("/makeusername")}}>
+                <Typography sx={{ fontWeight: 'bold' }}>{userInfo.userName}</Typography>
+                <EditOutlined sx={{ ml: 1 }}/>
+            </div>
+            <Box sx={{ display: 'flex' , flexDirection: 'row' ,justifyContent: 'center', mt: 3 }}>
+
                 <LocationOnIcon sx={{ color: 'gray'}}/>
                 <Typography sx={{ color: 'gray' ,ml: 2 }}>서울, 대한민국</Typography>
             </Box>

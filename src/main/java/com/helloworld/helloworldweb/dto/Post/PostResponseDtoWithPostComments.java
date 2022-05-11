@@ -25,6 +25,7 @@ public class PostResponseDtoWithPostComments {
     private List<PostImageResponseDto> postImageResponseDtos = new ArrayList<>();
     private boolean IsOwner;
 
+    // 한 게시물 전체를 표현하기 위해 필요한 정보
     public PostResponseDtoWithPostComments(Post post, boolean isOwner) {
         this.id = post.getId();
         this.userResponseDto = new UserResponseDto(post.getUser(), isOwner);
