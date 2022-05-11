@@ -91,7 +91,7 @@ export default function( props ){
     
        if( state.tags != null ){
           setTags( state.tags.split(',') );
-       }
+       }}
 
     },[ refresh ]);
 
