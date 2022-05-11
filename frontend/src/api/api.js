@@ -15,7 +15,7 @@ function registerUserWithKakao(token){
     return new Promise((resolve,reject) => {
         request({
             method: 'POST' ,
-            url: '/user/register/kakao',
+            url: '/api/user/register/kakao',
             headers: { 
                 token: token
                 // "Access-Control-Allow-Origin" : true
@@ -199,7 +199,7 @@ function registerUserWithNaver(code, state){
     return new Promise((resolve,reject) => {
         request({
             method: 'POST',
-            url : `/user/register/naver`,
+            url : `/api/user/register/naver`,
             params: {
                 state : state,
                 code: code,
@@ -504,8 +504,65 @@ function getUserComments(id){
     });    
 }
 
+function getGithubRepositories(){
+    return new Promise((resolve,reject) => {
+        request({
+            method:"GET",
+            url:"/api/user/repos_url",
+            params:{
+                email: email
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
+
+function registerUserWithGithub(code){
+    return new Promise((resolve,reject) => {
+        request({
+            url:"/api/user/register/github",
+            params:{
+                "code":code
+            },
+            method:"POST"
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
+
+function connectUserToGithub(code){
+    return new Promise((resolve,reject) => {
+        request({
+            url:"/api/user/githubconnect",
+            params:{
+                "code":code
+            },
+            method:"POST"
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
+
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
     getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , 
     getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
     getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName 
-    ,getUserQnas ,getUserComments} ;
+    ,getUserQnas ,getUserComments, getGithubRepositories, registerUserWithGithub, connectUserToGithub} ;
