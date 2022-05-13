@@ -60,7 +60,7 @@ You can use your own local db server
 
 * 0.0.1
     * 프로젝트 진행 중
-    * [@DB 설계] (https://round-nose-fe5.notion.site/DB-Domain-Scheme-31cbe25367224dfc8ae7871f23a4c9ff)
+    * [@DB_Scheme](https://round-nose-fe5.notion.site/DB-Domain-Scheme-31cbe25367224dfc8ae7871f23a4c9ff)
 
 ## 정보
 
