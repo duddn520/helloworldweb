@@ -51,7 +51,7 @@ public class PostService {
     //AWS S3에 파일을 업로드 하는 서비스
     //controller로 부터 Post 객체, User 객체, front에서 받은 file을 받음
     @Transactional
-    public void addPostWithImage(Post post, User user, List<MultipartFile> files) throws UnsupportedEncodingException {
+    public Post addPostWithImage(Post post, User user, List<MultipartFile> files) throws UnsupportedEncodingException {
 
         //Post와 User 연관관계 맺어줌
         post.updateUser(user);
@@ -72,7 +72,7 @@ public class PostService {
             postImage.updatePost(post);
         }
 
-        postRepository.save(post);
+        return postRepository.save(post);
 
     }
 

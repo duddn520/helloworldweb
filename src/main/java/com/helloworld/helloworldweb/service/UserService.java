@@ -249,7 +249,6 @@ public class UserService {
                     .repo_url(" ")
                     .role(Role.USER)
                     .nickName(email.split("/")[0])
-                    .repo_url(" ")
                     .build();
             User savedUser = userRepository.save(newUser);
 
