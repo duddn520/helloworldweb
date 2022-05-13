@@ -50,7 +50,7 @@ Sync Gradle Settings in ./build.gradle
 ```sh
 You need an endPoint from admin
 ```
-2. h2 Databse (Test)
+2. h2 Database (Test)
 ```sh
 You can use your own local db server
 ```
