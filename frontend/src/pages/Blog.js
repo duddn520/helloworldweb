@@ -1,28 +1,18 @@
 import React from "react";
 import { useNavigate, useLocation } from 'react-router';
-import { Box, Typography, IconButton, Button, TextField } from "@mui/material";
+import { Box, Typography, IconButton } from "@mui/material";
 import { CommentOutlined, DeleteOutline, KeyboardArrowDownOutlined } from "@mui/icons-material";
 import api from "../api/api";
 import TotalBar from "../pages/MiniHomePage/TotalBar.js";
 import Profile from "./MiniHomePage/Profile";
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import SmallUserProfile from "../component/SmallUserProfile";
 import BlogComment from "../component/blog/BlogComment";
-import strToHTML from "../function/strToHTML";
 
-const Editor = styled.div`
-    padding: 10px; 
-    border: 1px solid lightgray;
-    border-radius: 4px;
-    height: 150px;
-    overflow: auto;
-    margin-top: 10px;
-`;
+import CommentEditor from "../component/blog/CommentEditor";
 
 const TitleBox = styled.div`
     flex: 1;
-    /* align-items: center;
-    justify-content: center; */
     border-bottom: 1px solid;
     border-color: lightgray;
 `;
@@ -79,44 +69,13 @@ function Blog(){
     }
 
     function openCommentEditer(){
-        if(myInfo === null){
-            getMyInfo();
-            setIsOpenCommentEditor(!isOpenCommentEditer);
-        }
-        else{
-            setIsOpenCommentEditor(!isOpenCommentEditer);
-        }
+        if(myInfo === null) getMyInfo();
+        setIsOpenCommentEditor(!isOpenCommentEditer);
     }
 
-    function saveComment(){
-        const divE = document.getElementById('Editor');
-        if(divE === null){
-            openCommentEditer();
-            return;
-        }
-        let content = strToHTML(divE.innerHTML);
-        let commentString = '';
-        for(let i = 0; i < content.length; i++){
-            if(i === 0) {
-                commentString += content[i].textContent === '' ? '\n' : content[i].textContent+'\n';
-            }
-            else {
-                commentString += content[i].innerHTML === '<br>' ? '\n' : content[i].innerText+'\n';
-            }
-        }
-        if(commentString === '\n' || commentString === '' || commentString === ' ') {
-            alert("댓글을 입력해주세요.");
-        }
-        else {
-            api.registerPostComment(state.postId, commentString)
-            .then((res)=>{
-                setIsOpenCommentEditor(false);
-                setReRender(!reRender);
-            })
-            .catch(e=>{
-                alert("댓글 등록에 실패했습니다.");
-            });
-        }
+    function afterSaveComment(){
+        setIsOpenCommentEditor(false);
+        setReRender(!reRender);
     }
 
     return(
@@ -159,29 +118,15 @@ function Blog(){
                         <Box sx={{backgroundColor: '#f7f7f7', padding: 5}}>
                             {post.postCommentResponseDtos.map((item)=>{
                                 return (
-                                    <BlogComment postComment={item}/>
+                                    <BlogComment postComment={item} MyInfo={myInfo} key={item.id} afterSaveSubComment={()=>{afterSaveComment()}}/>
                                 )
                             })}
-
-                            {/* 댓글 작성  */}
-                            <Box sx={{flex: 1, display: 'flex', flexDirection: 'column', mt: 3}} >
-                                {(isOpenCommentEditer && myInfo !== null) && 
-                                <Box sx={{bgcolor: 'white', pt: 2, pr: 1, pl: 1}}>
-                                    <SmallUserProfile userInfo={myInfo}/>
-                                    <Editor id="Editor" contentEditable="true"/>
-                                    <Box sx={{flex: 1, display: 'flex', justifyContent: 'flex-end', mb: 2}}>
-                                        <Typography>0/3000</Typography>
-                                    </Box>
-                                </Box>}
-                                <Box sx={{flex: 1, display: 'flex'}}>
-                                    <Box sx={{flex: 15, height: 50, bgcolor: 'white', display: 'flex', alignItems: 'center', pl: 5, border: 1, borderColor: 'lightgray'}} onClick={()=>{openCommentEditer()}}>
-                                        {!isOpenCommentEditer && <Typography sx={{color: 'gray'}}>댓글을 입력해주세요.</Typography>}
-                                    </Box>
-                                    <Box sx={{flex: 1, height: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'orange' }} onClick={()=>{saveComment()}}>
-                                        <Typography sx={{color: 'white'}}>등록</Typography>
-                                    </Box>
-                                </Box>
-                            </Box>
+                            <CommentEditor myInfo={myInfo} 
+                            isOpenCommentEditer={isOpenCommentEditer} 
+                            openCommentEditer={()=>{openCommentEditer()}} 
+                            postId={state.postId} 
+                            afterSaveComment={()=>{afterSaveComment()}} 
+                            commentType={'COMMENT'}/>
                         </Box>}
 
                 </TotalBar>
