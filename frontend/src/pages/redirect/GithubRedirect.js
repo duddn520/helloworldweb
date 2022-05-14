@@ -16,7 +16,7 @@ export default function GithubRedirect(){
              console.log(res);
              window.sessionStorage.setItem("Auth", res.token);
 
-             if( res.data.data.isAlreadyRegister ){
+             if( res.isAlreadyRegister ){
                  // 미니홈피페이지로 이동
                  navigate("/", {replace: true});
              }
