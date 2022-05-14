@@ -49,7 +49,7 @@ public class Post extends BaseTimeEntity {
         this.id = id;
         this.user = user;
         this.postComments = postComments;
-        this.postImages = postImages;
+        this.postImages = postImages == null ? new ArrayList<>() : postImages;
         this.category = category;
         this.content = content;
         this.title = title;

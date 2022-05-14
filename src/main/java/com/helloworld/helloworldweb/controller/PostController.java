@@ -54,7 +54,6 @@ public class PostController {
                 .category(category)
                 .title(URLDecoder.decode(title, "UTF-8"))
                 .content(URLDecoder.decode(content, "UTF-8"))
-                .postImages(new ArrayList<>())
                 .tags(URLDecoder.decode(tags, "UTF-8"))
                 .build();
 
