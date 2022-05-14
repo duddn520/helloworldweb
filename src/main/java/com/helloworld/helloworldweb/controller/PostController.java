@@ -57,26 +57,20 @@ public class PostController {
                 .tags(URLDecoder.decode(tags, "UTF-8"))
                 .build();
 
+        PostResponseDto responseDto;
+
         if(files == null){
             Post savedPost = postService.addPost(post, findUser);
-
-            PostResponseDto responseDto = new PostResponseDto(savedPost);
-
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.POST_SUCCESS,
-                    HttpResponseMsg.POST_SUCCESS,
-                    responseDto), HttpStatus.OK);
+            responseDto = new PostResponseDto(savedPost);
         }
         else{
             Post savedPost = postService.addPostWithImage(post, findUser, files);
-
-            PostResponseDto responseDto = new PostResponseDto(savedPost);
-
-            return new ResponseEntity<>(ApiResponse.response(
-                    HttpStatusCode.POST_SUCCESS,
-                    HttpResponseMsg.POST_SUCCESS,
-                    responseDto), HttpStatus.OK);
+            responseDto = new PostResponseDto(savedPost);
         }
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.POST_SUCCESS,
+                HttpResponseMsg.POST_SUCCESS,
+                responseDto), HttpStatus.OK);
 
 
     }
