@@ -5,6 +5,7 @@ import com.helloworld.helloworldweb.domain.Post;
 import com.helloworld.helloworldweb.domain.PostImage;
 import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.dto.Post.PostRequestDto;
+import com.helloworld.helloworldweb.repository.PostImageRepository;
 import com.helloworld.helloworldweb.repository.PostRepository;
 import com.helloworld.helloworldweb.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import java.util.UUID;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final PostImageRepository postImageRepository;
     private final FileProcessService fileProcessService;
 
     @Transactional
@@ -51,7 +53,7 @@ public class PostService {
     //AWS S3에 파일을 업로드 하는 서비스
     //controller로 부터 Post 객체, User 객체, front에서 받은 file을 받음
     @Transactional
-    public void addPostWithImage(Post post, User user, List<MultipartFile> files) throws UnsupportedEncodingException {
+    public Post addPostWithImage(Post post, User user, List<MultipartFile> files) throws UnsupportedEncodingException {
 
         //Post와 User 연관관계 맺어줌
         post.updateUser(user);
@@ -70,9 +72,11 @@ public class PostService {
 
             //Post 와 PostImage의 연관관계 맺어줌
             postImage.updatePost(post);
+
+            postImageRepository.save(postImage);
         }
 
-        postRepository.save(post);
+        return postRepository.save(post);
 
     }
 
@@ -117,7 +121,7 @@ public class PostService {
     }
 
     @Transactional
-    //사용자 본인의 게시물만 전체조회
+    //한 User의 category별 전체 게시물 조회
     //userId를 매개변수로 받음.
     public List<Post> getAllUserPosts(Long userId, Category category) {
 

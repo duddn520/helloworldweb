@@ -41,7 +41,7 @@ public class PostController {
 
     @PostMapping("/api/post")
     @Transactional
-    public ResponseEntity<ApiResponse> registerPost(@RequestHeader(value = "Auth") String jwtToken,
+    public ResponseEntity<ApiResponse<PostResponseDto>> registerPost(@RequestHeader(value = "Auth") String jwtToken,
                                                      @RequestParam(value = "files", required = false) List<MultipartFile> files,
                                                      @RequestParam(value = "content") String content,
                                                      @RequestParam(value = "category") Category category,
@@ -54,20 +54,25 @@ public class PostController {
                 .category(category)
                 .title(URLDecoder.decode(title, "UTF-8"))
                 .content(URLDecoder.decode(content, "UTF-8"))
-                .postImages(new ArrayList<>())
                 .tags(URLDecoder.decode(tags, "UTF-8"))
                 .build();
 
+        PostResponseDto responseDto;
+
         if(files == null){
-            postService.addPost(post, findUser);
+            Post savedPost = postService.addPost(post, findUser);
+            responseDto = new PostResponseDto(savedPost);
         }
         else{
-            postService.addPostWithImage(post, findUser, files);
+            Post savedPost = postService.addPostWithImage(post, findUser, files);
+            responseDto = new PostResponseDto(savedPost);
         }
-
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.POST_SUCCESS,
-                HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
+                HttpResponseMsg.POST_SUCCESS,
+                responseDto), HttpStatus.OK);
+
+
     }
 
     @GetMapping("/api/post/blogs")

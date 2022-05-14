@@ -26,7 +26,7 @@ function WriteBlog(){
     const imageReader = async function(e) {
         const selectedImage = e.target.files[0];
         const options = { 
-            maxSizeMB: 2, 
+            maxSizeMB: 10, 
             maxWidthOrHeight: 400
         }
         const compressedFile = await imageCompression(selectedImage, options);
@@ -57,7 +57,7 @@ function WriteBlog(){
             selection?.removeAllRanges();
             selection?.addRange(newRange);
         }
-      }
+    }
     
     //OCR 기능
     function InvokeKakaoOcrApi(e){
