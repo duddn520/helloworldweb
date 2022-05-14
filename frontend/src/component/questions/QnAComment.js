@@ -10,7 +10,6 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 export default function QnAComment({postsubcomments, postCommentId}){
 
     const [subComments, setSubComments] = React.useState([])
-    const [subCommentsLength, setSubCommentsLength] = React.useState("")
     const [likes, setLikes] = React.useState("")
 
     useEffect(()=>{
@@ -20,9 +19,36 @@ export default function QnAComment({postsubcomments, postCommentId}){
 
     },[])
 
+    const renderContent = (content) => {
+        if( content != null  ){
+            let tmp = content?.split('```');
+            return(
+                tmp.map( (text,index) => {
+                    // 본문
+                    if( index % 2 == 0){
+                        return(
+                            <Typography sx={{ m: 2 }}>
+                                <pre key={index} style={{ fontFamily: 'inherit' }}>{text}</pre>
+                            </Typography>
+                        );
+                    }
+                    // 코드
+                    else {
+                        text = text.replace('\n','');
+                        return(
+                            <Typography key={index} sx={{ p: 2 ,backgroundColor: 'rgb(240,240,240)' }}>
+                                <pre style={{ fontFamily: 'inherit' }}>{text}</pre>
+                            </Typography>
+                        );
+                    }
+                })
+            );
+        }
+    }
+
     return(
     <Box>
-        <Divider variant="fullWidth" sx={{ flexGrow: 1 }}/>
+        <Divider variant="fullWidth" sx={{ flexGrow: 1}}/>
         <Grid container spacing={2}>
 
             <Grid item xs={1}>
@@ -45,12 +71,13 @@ export default function QnAComment({postsubcomments, postCommentId}){
                             <Box sx={{
                                 minBlockSize:"60px"
                             }}>
-                                {postsubcomment.content}
+                                {renderContent(postsubcomment.content)}
                             </Box>
                             <Box sx={{
                                 flexGrow:1 ,
                                 display: 'flex'
                             }}>
+                                <Typography variant="caption">{postsubcomment.createdTime}</Typography>
                                 <Typography variant="caption"
                                 sx={{
                                     marginLeft: 'auto'
@@ -74,6 +101,7 @@ export default function QnAComment({postsubcomments, postCommentId}){
                                 flexGrow:1 ,
                                 display: 'flex'
                             }}>
+                                <Typography variant="caption">{postsubcomment.createdTime}</Typography>
                                 <Typography variant="caption"
                                 sx={{
                                     marginLeft: 'auto'
