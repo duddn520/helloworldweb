@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Button, Typography, TextField } from "@mui/material";
 import api from "../../api/api";
 import { useNavigate, useLocation } from 'react-router';
-import styled from "styled-components";
+import styled from "@emotion/styled";
 import imageCompression from "browser-image-compression";
 import axios from "axios";
 import strToHTML from "../../function/strToHTML";

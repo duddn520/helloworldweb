@@ -40,7 +40,6 @@ public class FileProcessService {
     //유니크한 새로운 파일 이름을 생성하는 함수
     private String createFileName(String originalFileName) {
         String newName = UUID.randomUUID().toString().concat(originalFileName);
-        System.out.println("newName = " + newName);
         return newName;
     }
 
