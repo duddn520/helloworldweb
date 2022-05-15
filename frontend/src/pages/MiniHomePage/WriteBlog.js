@@ -7,6 +7,7 @@ import imageCompression from "browser-image-compression";
 import axios from "axios";
 import strToHTML from "../../function/strToHTML";
 import { convertBase64IntoFile, extractOnlyFilename } from "../../function/aboutFile";
+import { ThreeDots } from  'react-loader-spinner';
 
 const WriteSpace = styled.div`
     padding: 10px; 
@@ -22,6 +23,7 @@ function WriteBlog(){
     const navigate = useNavigate();
     const { state } = useLocation();
     const [targetEmail, setTargetEmail] = React.useState(state.targetEmail);
+    const [isLoading, setIsLoading] = React.useState(false);
 
     const imageReader = async function(e) {
         const selectedImage = e.target.files[0];
@@ -97,6 +99,8 @@ function WriteBlog(){
 
     //마지막으로 서버에 보낼 정보 만들기
     function savePost(){
+        setIsLoading(true);
+
         const divC = document.getElementById('Content');
         const TitleElement = document.getElementById('Title');
         const TagsElement = document.getElementById('Tags');
@@ -135,78 +139,84 @@ function WriteBlog(){
         .then(res => {
             console.log('블로그 게시 성공');
             navigate("/minihome", {replace: true, state: {tabIndex: 1, targetEmail: targetEmail}});
+            setIsLoading(false);
         })
         .catch(e => {
             console.log('블로그 게시 실패');
             alert("작성 실패");
+            setIsLoading(false);
         });
     }
 
     return(
-        <Box sx={{paddingTop: 3, paddingLeft: 2, paddingRight: 2, paddingBottom: 3, height: '90vh'}}>
-            <Typography sx={{fontWeight: 'bold', marginBottom: 2 }}>제목</Typography>
-            <Box sx={{flex: 1, display: 'flex', marginBottom: 3}}>
-                {/* <TitleInput id="Title" type="text" name="title"/> */}
-                <TextField 
-                    id="Title"
-                    sx={{ flex: 1, color: 'black' }}
-                    size='small'
-                />
-            </Box>
+        <div>
+            <Box sx={{paddingTop: 3, paddingLeft: 2, paddingRight: 2, paddingBottom: 3, height: '90vh'}}>
+                <Typography sx={{fontWeight: 'bold', marginBottom: 2 }}>제목</Typography>
+                <Box sx={{flex: 1, display: 'flex', marginBottom: 3}}>
+                    {/* <TitleInput id="Title" type="text" name="title"/> */}
+                    <TextField 
+                        id="Title"
+                        sx={{ flex: 1, color: 'black' }}
+                        size='small'
+                    />
+                </Box>
 
-            {/* <div class="editor-menu"> 
-                <button id="btn-bold"> 
-                    <b>B</b> 
-                </button> 
-                <button id="btn-italic"> 
-                    <i>I</i> 
-                </button> 
-                <button id="btn-underline"> 
-                    <u>U</u>
-                </button> 
-                <button id="btn-strike"> 
-                    <s>S</s> 
-                </button> 
-                <button id="btn-ordered-list"> OL </button> 
-                <button id="btn-unordered-list"> UL </button> 
-                <button id="btn-image"> IMG </button> 
-            </div> */}
-            <Typography sx={{fontWeight: 'bold', marginBottom: 2 }}>내용</Typography>
-            <WriteSpace id="Content" contentEditable="true"/>
-            
-            <Box sx={{marginBottom: 2}}>
-                <Button component="label" variant="outlined" sx={{height: 30, marginRight: 2}}> 이미지 업로드
-                <input 
-                    type="file"
-                    id="avatar" name="avatar"
-                    accept="image/png, image/jpeg, image/jpg"
-                    multiple={false}
-                    onChange={imageReader} hidden/>
-                </Button>
-
-                <Button variant="outlined" component="label" sx={{height: 30}}> OCR
-
+                {/* <div class="editor-menu"> 
+                    <button id="btn-bold"> 
+                        <b>B</b> 
+                    </button> 
+                    <button id="btn-italic"> 
+                        <i>I</i> 
+                    </button> 
+                    <button id="btn-underline"> 
+                        <u>U</u>
+                    </button> 
+                    <button id="btn-strike"> 
+                        <s>S</s> 
+                    </button> 
+                    <button id="btn-ordered-list"> OL </button> 
+                    <button id="btn-unordered-list"> UL </button> 
+                    <button id="btn-image"> IMG </button> 
+                </div> */}
+                <Typography sx={{fontWeight: 'bold', marginBottom: 2 }}>내용</Typography>
+                <WriteSpace id="Content" contentEditable="true"/>
+                
+                <Box sx={{marginBottom: 2}}>
+                    <Button component="label" variant="outlined" sx={{height: 30, marginRight: 2}}> 이미지 업로드
                     <input 
-                    type="file"
-                    accept="image/png, image/jpeg, image/jpg"
-                    multiple={false}
-                    onChange={InvokeKakaoOcrApi} hidden/>
-                </Button>
+                        type="file"
+                        id="avatar" name="avatar"
+                        accept="image/png, image/jpeg, image/jpg"
+                        multiple={false}
+                        onChange={imageReader} hidden/>
+                    </Button>
+
+                    <Button variant="outlined" component="label" sx={{height: 30}}> OCR
+
+                        <input 
+                        type="file"
+                        accept="image/png, image/jpeg, image/jpg"
+                        multiple={false}
+                        onChange={InvokeKakaoOcrApi} hidden/>
+                    </Button>
+                </Box>
+                <Typography sx={{fontWeight: 'bold', marginBottom: 2 }}>태그</Typography>
+                <Box sx={{flex: 1, display: 'flex', marginBottom: 2}}>
+                    <TextField 
+                        id="Tags"
+                        sx={{ flex: 1, color: 'black'}}
+                        size='small'
+                        placeholder='e.g. Java, Spring'
+                    />
+                </Box>
+                <Box sx={{flex: 1, justifyContent: 'flex-end', display: 'flex', marginBottom: 2}}>
+                    <Button onClick={()=>{savePost()}} variant={'contained'}>저장</Button>
+                </Box>
             </Box>
-            <Typography sx={{fontWeight: 'bold', marginBottom: 2 }}>태그</Typography>
-            <Box sx={{flex: 1, display: 'flex', marginBottom: 2}}>
-                <TextField 
-                    id="Tags"
-                    sx={{ flex: 1, color: 'black'}}
-                    size='small'
-                    placeholder='e.g. Java, Spring'
-                />
-            </Box>
-            <Box sx={{flex: 1, justifyContent: 'flex-end', display: 'flex', marginBottom: 2}}>
-                <Button onClick={()=>{savePost()}} variant={'contained'}>저장</Button>
-            </Box>
-            
-        </Box>
+            {isLoading && <Box sx={{ top: 0, height: '100vh', width: '100%', bgcolor: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} position={'absolute'}>
+                <ThreeDots color="#3874CB"/>
+            </Box>}
+        </div>
     )
 }
 
