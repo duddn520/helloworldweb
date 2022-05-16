@@ -12,7 +12,7 @@ export default function PostSubCommentTextBox({postCommentId}){
     function registerPostSubComment(){
         api.registerPostSubComment(postCommentId,reply)
         .then(res=>{
-            console.log(res)
+            window.location.reload()
         }).catch(e=>{
             console.log(e)
         })
