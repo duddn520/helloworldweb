@@ -1,6 +1,7 @@
 package com.helloworld.helloworldweb.dto.PostSubComment;
 
 import com.helloworld.helloworldweb.domain.PostSubComment;
+import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.dto.User.UserResponseDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,7 @@ public class PostSubCommentResponseDto {
     private String content;
     private String createdTime;
     private UserResponseDto userResponseDto;
+    private boolean IsOwner;
 
     public PostSubCommentResponseDto (PostSubComment postSubComment)
     {
@@ -24,5 +26,27 @@ public class PostSubCommentResponseDto {
         this.content = postSubComment.getContent();
         this.createdTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(postSubComment.getCreatedTime());
         this.userResponseDto = new UserResponseDto(postSubComment.getUser());
+    }
+
+    public PostSubCommentResponseDto (PostSubComment postSubComment, User caller)
+    {
+        this.id = postSubComment.getId();
+        this.content = postSubComment.getContent();
+        this.createdTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(postSubComment.getCreatedTime());
+        this.userResponseDto = new UserResponseDto(postSubComment.getUser());
+        this.IsOwner = checkIsOwner(postSubComment.getUser(),caller);
+    }
+
+    public PostSubCommentResponseDto (PostSubComment postSubComment, boolean isOwner)
+    {
+        this.id = postSubComment.getId();
+        this.content = postSubComment.getContent();
+        this.createdTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(postSubComment.getCreatedTime());
+        this.userResponseDto = new UserResponseDto(postSubComment.getUser());
+        this.IsOwner = isOwner;
+    }
+
+    private boolean checkIsOwner(User owner, User caller){
+        return owner.getId()==caller.getId();
     }
 }

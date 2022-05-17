@@ -55,6 +55,7 @@ public class PostController {
                 .title(URLDecoder.decode(title, "UTF-8"))
                 .content(URLDecoder.decode(content, "UTF-8"))
                 .tags(URLDecoder.decode(tags, "UTF-8"))
+                .solved(false)
                 .build();
 
         PostResponseDto responseDto;
@@ -159,8 +160,8 @@ public class PostController {
         User caller = userService.getUserByJwt(jwtToken);
         Post post = postService.getPost(id);
         postService.updatePost(post);
-        boolean isOwner = caller.getId() == post.getUser().getId();
-        PostResponseDtoWithPostComments responseDto = new PostResponseDtoWithPostComments(post, isOwner);
+        //postsubcomment 에서 isOwner를 반환할수 있도록, isOwner를 직접 넘기기보다 caller를 넘겨 post, postsubcomment 작성자와 각각 대조할수 있도록 변경.
+        PostResponseDtoWithPostComments responseDto = new PostResponseDtoWithPostComments(post, caller);
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.GET_SUCCESS,
