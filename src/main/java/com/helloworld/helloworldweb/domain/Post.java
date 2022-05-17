@@ -42,10 +42,12 @@ public class Post extends BaseTimeEntity {
     private Long searchCount = 0L;
     // 조회수
     private Long views = 0L;
+    // 채택여부
+    private boolean solved;
 
 
     @Builder
-    public Post(Long id, User user, List<PostComment> postComments, List<PostImage> postImages, Category category, String content, String title ,String tags) {
+    public Post(Long id, User user, List<PostComment> postComments, List<PostImage> postImages, Category category, String content, String title ,String tags, boolean solved) {
         this.id = id;
         this.user = user;
         this.postComments = postComments;
@@ -54,6 +56,7 @@ public class Post extends BaseTimeEntity {
         this.content = content;
         this.title = title;
         this.tags = tags;
+        this.solved = solved;
     }
 
     public void updateUser(User user) {
