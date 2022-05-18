@@ -36,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Transactional //테스트 반복을 위해 한 트랜잭션 후에 롤백함.
 @AutoConfigureMockMvc
+//Post Integration Test
 public class PostControllerTest {
 
     @Autowired
@@ -55,25 +56,25 @@ public class PostControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    String testEmail = "ys05143@naver.com/";
-//    String testEmail = "test@email.com";
+//    String testEmail = "ys05143@naver.com/";
+    String testEmail = "test@email.com";
 
     private String getToken() {
         return jwtTokenProvider.createToken(testEmail, Role.USER);
     }
 
-//    @BeforeEach
-//    void 회원가입() {
-//        User testUser = User.builder()
-//                    .email(testEmail)
-//                    .repo_url(" ")
-//                    .profileUrl(" ")
-//                    .nickName(testEmail)
-//                    .role(Role.USER)
-//                    .posts(new ArrayList<>())
-//                    .build();
-//        userRepository.save(testUser);
-//    }
+    @BeforeEach
+    void 회원가입() {
+        User testUser = User.builder()
+                    .email(testEmail)
+                    .repo_url(" ")
+                    .profileUrl(" ")
+                    .nickName(testEmail)
+                    .role(Role.USER)
+                    .posts(new ArrayList<>())
+                    .build();
+        userRepository.save(testUser);
+    }
 
     @Test
     void 게시물작성() throws Exception {
@@ -119,7 +120,7 @@ public class PostControllerTest {
         String testUserJwt = getToken();
         User user = userService.getUserByJwt(testUserJwt);
 
-        Post savedpost = postService.addPost(newPost, user);
+        Post savedpost = postService.addPost(newPost, user, null);
 
         MultiValueMap<String, String> requestParam = new LinkedMultiValueMap<>();
         requestParam.set("post_id", savedpost.getId().toString());
@@ -149,7 +150,7 @@ public class PostControllerTest {
 //                .postImages(new ArrayList<>())
                 .tags("TEST")
                 .build();
-        Post savedQna = postService.addPost(newQna, user);
+        Post savedQna = postService.addPost(newQna, user, null);
 
         Post newBlog = Post.builder()
                 .category(Category.BLOG)
@@ -158,7 +159,7 @@ public class PostControllerTest {
 //                .postImages(new ArrayList<>())
                 .tags("TEST")
                 .build();
-        Post savedBlog = postService.addPost(newBlog, user);
+        Post savedBlog = postService.addPost(newBlog, user, null);
 
         //when
         mockMvc.perform(
@@ -188,7 +189,7 @@ public class PostControllerTest {
 //                .postImages(new ArrayList<>())
                 .tags("TEST")
                 .build();
-        Post savedQna = postService.addPost(newQna, user);
+        Post savedQna = postService.addPost(newQna, user, null);
 
         Post newBlog = Post.builder()
                 .category(Category.BLOG)
@@ -197,7 +198,7 @@ public class PostControllerTest {
 //                .postImages(new ArrayList<>())
                 .tags("TEST")
                 .build();
-        Post savedBlog = postService.addPost(newBlog, user);
+        Post savedBlog = postService.addPost(newBlog, user, null);
 
         MultiValueMap<String, String> requestParam = new LinkedMultiValueMap<>();
         requestParam.set("email", testEmail);
@@ -272,7 +273,7 @@ public class PostControllerTest {
         String testUserJwt = getToken();
         User user = userService.getUserByJwt(testUserJwt);
 
-        Post savedpost = postService.addPost(newPost, user);
+        Post savedpost = postService.addPost(newPost, user, null);
 
         MultiValueMap<String, String> requestParam = new LinkedMultiValueMap<>();
         requestParam.set("post_id", savedpost.getId().toString());
@@ -298,6 +299,50 @@ public class PostControllerTest {
         assertThat(savedPost.getTitle()).isEqualTo("BLOG");
         assertThat(savedPost.getContent()).isEqualTo("hello my name is Jihun");
 
+    }
+
+    @Test
+    void 게시물수정() throws Exception {
+        //given
+        Post newPost = Post.builder()
+                .category(Category.BLOG)
+                .title("BLOG")
+                .content("hello my name is Jihun")
+//                .postImages(new ArrayList<>())
+                .tags("TEST")
+                .build();
+        String testUserJwt = getToken();
+        User user = userService.getUserByJwt(testUserJwt);
+        Post savedpost = postService.addPost(newPost, user, null);
+
+        MultiValueMap<String, String> requestParam = new LinkedMultiValueMap<>();
+        requestParam.set("post_id", savedpost.getId().toString());
+        requestParam.set("title", "newBLog title");
+        requestParam.set("tags", "newTest");
+        requestParam.set("content", "this is new Content");
+
+        //when
+        MvcResult result = mockMvc.perform(
+                        put("/api/post")
+                                .params(requestParam)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("UTF-8")
+                                .header("Auth", getToken())
+                )
+
+        //then
+
+                .andExpect(status().isOk())
+                .andReturn();
+        String content = result.getResponse().getContentAsString();
+        JSONParser p = new JSONParser();
+        JSONObject obj = (JSONObject)p.parse(content);
+        JSONObject data = (JSONObject) p.parse(obj.get("data").toString());
+        Post savedPost = postService.getPost(Long.valueOf(String.valueOf(data.get("id"))));
+
+        assertThat(savedPost.getTitle()).isEqualTo("newBLog title");
+        assertThat(savedPost.getContent()).isEqualTo("this is new Content");
+        assertThat(savedPost.getTags()).isEqualTo("newTest");
     }
 
 

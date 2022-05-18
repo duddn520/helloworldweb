@@ -173,11 +173,11 @@ function getSearchedPost({ sentence }){
 }
 
 // PUT - Post 조회수+1
-function updatePost(id){
+function updatePostViews(id){
     return new Promise((resolve,reject) => {
         request({
             method: 'PUT' ,
-            url: '/api/post',
+            url: '/api/post/views',
             params: {
                 post_id: id
             }
@@ -539,6 +539,61 @@ function connectUserToGithub(code){
             reject();
         })
     });
+}
+
+function updatePost(postId, formdata, title, totalContent, tags) {
+    if(formdata.get('files') === null){
+        return new Promise((resolve,reject) => {
+            request({
+                method: 'PUT',
+                url : '/api/post',
+                params: {
+                    post_id: postId,
+                    content: encodeURIComponent(totalContent),
+                    title: encodeURIComponent(title),
+                    tags: encodeURIComponent(tags),
+                }
+            })
+            .then( res => {
+                if ( res.data.statusCode === status.PUT_SUCCESS ){
+                    resolve(res.data);
+                }
+            })
+            .catch( e => {
+                console.log(e);
+                reject();
+            })
+        });
+    }
+    else{
+        const token = window.sessionStorage.getItem("Auth");
+        formdata.append('post_id', postId);
+        formdata.append('content', encodeURIComponent(totalContent));
+        formdata.append('title', encodeURIComponent(title));
+        formdata.append('tags', encodeURIComponent(tags));
+        return new Promise((resolve,reject) => {
+            if(token === null){
+                reject();
+            }
+            else{
+                axios.put('/api/post', formdata, {
+                    headers: {
+                        'content-type': 'multipart/form-data',
+                        Auth: token
+                    }
+                })
+                .then( res => {
+                    if ( res.data.statusCode === status.PUT_SUCCESS ){
+                        resolve(res.data);
+                    }
+                })
+                .catch( e => {
+                    console.log(e);
+                    reject();
+                })
+            }
+        });
+    }
 }
 
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 

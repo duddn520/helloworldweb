@@ -20,9 +20,9 @@ function Profile({ userInfo }){
                     <img src={userInfo.profileUrl} width={200} height={200} alt={'프로필 사진'}></img>
                 </Box>
             </Box>
-            <div style={{ padding: 7, display: 'flex', justifyContent: 'center' }} onClick={()=>{navigate("/makeusername")}}>
+            <div style={{ padding: 7, display: 'flex', justifyContent: 'center' }} onClick={()=>{ if(userInfo.isOwner) navigate("/makeusername")}}>
                 <Typography sx={{ fontWeight: 'bold' }}>{userInfo.userName}</Typography>
-                <EditOutlined sx={{ ml: 1 }}/>
+                {userInfo.isOwner && <EditOutlined sx={{ ml: 1 }}/>}
             </div>
             <Box sx={{ display: 'flex' , flexDirection: 'row' ,justifyContent: 'center', mt: 3 }}>
 
