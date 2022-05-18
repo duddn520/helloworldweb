@@ -1,9 +1,11 @@
 import axios from "axios";
+import api from "./api";
 
 
 const request = axios.create({
     timeout: 20000
 })
+
 
 
 // HTTP 요청 직전에 가로챔. ( 전역 )
@@ -22,5 +24,33 @@ request.interceptors.request.use(
     return Promise.reject(error);
     }
 );
+
+// 
+request.interceptors.response.use(
+    (response) => {
+        return response;
+    },
+    (error) => {
+        // 서버 에러가 난 경우
+        if( error.response.status === 500 && hasToken() ){
+            api.getNewToken( window.sessionStorage.getItem("Auth") , window.sessionStorage.getItem("Refresh") )
+            .then( res => {
+                if( res.Auth )
+                    window.sessionStorage.setItem("Auth",res.Auth);
+                alert("다시 시도해주세요.");
+            })
+            .catch( e => {
+                alert("다시 로그인 해주세요.")
+            })
+        }
+        return Promise.reject(error);
+    }
+);
+
+const hasToken = () => {
+    if( window.sessionStorage.getItem("Auth") && window.sessionStorage.getItem("Refresh") )
+        return true;
+    return false;
+}
 
 export default request;

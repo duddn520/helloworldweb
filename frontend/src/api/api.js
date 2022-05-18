@@ -596,8 +596,27 @@ function updatePost(postId, formdata, title, totalContent, tags) {
     }
 }
 
+function getNewToken(accessToken,refreshToken){
+    return new Promise((resolve,reject) => {
+        axios({
+            method: "GET" ,
+            url:"/api/user/getnewtoken",
+            headers: {
+                "Auth" : accessToken ,
+                "Refresh" : refreshToken 
+            }
+        })
+        .then( res => {
+            resolve(res.headers);
+        })
+        .catch( e => {
+            reject();
+        })
+    }); 
+}
+
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
     getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , 
     getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
     getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName 
-    ,getUserQnas ,getUserComments, getGithubRepositories, registerUserWithGithub, connectUserToGithub} ;
+    ,getUserQnas ,getUserComments, getGithubRepositories, registerUserWithGithub, connectUserToGithub , getNewToken} ;

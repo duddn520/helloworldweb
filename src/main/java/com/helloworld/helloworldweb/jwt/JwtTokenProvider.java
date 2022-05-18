@@ -25,7 +25,8 @@ public class JwtTokenProvider {
 
     private String secretKey = "HELLO_WORLD_WEB";
 
-    private static final long TOKEN_VALID_TIME = 1000L * 60 * 60 * 10; //10시간
+    private static final long ACCESS_TOKEN_VALID_TIME = 1000L * 60 * 60 * 10; //10시간
+    private static final long REFRESH_TOKEN_VALID_TIME = 1000L * 60 * 60 * 24 * 7;
 
     @PostConstruct
     protected void init(){
@@ -40,7 +41,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + TOKEN_VALID_TIME))
+                .setExpiration(new Date(now.getTime() + ACCESS_TOKEN_VALID_TIME))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
 
@@ -60,7 +61,9 @@ public class JwtTokenProvider {
     public boolean verifyToken(String jwtToken){
         try{
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
-            return !claims.getBody().getExpiration().before(new Date());
+            long valid_time = claims.getBody().getExpiration().getTime() - claims.getBody().getIssuedAt().getTime();
+            // refresh_token인지 확인
+            return valid_time > ACCESS_TOKEN_VALID_TIME ? false : !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
         }
