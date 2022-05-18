@@ -72,7 +72,9 @@ public class JwtTokenProvider {
     public boolean verifyToken(String jwtToken){
         try{
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
-            return !claims.getBody().getExpiration().before(new Date());
+            long valid_time = claims.getBody().getExpiration().getTime() - claims.getBody().getIssuedAt().getTime();
+            // refresh_token인지 확인
+            return valid_time > TOKEN_VALID_TIME ? false : !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
         }
