@@ -109,7 +109,8 @@ public class UserService {
 
         if(userOptional.isPresent())
         {
-            map.put("token", jwtTokenProvider.createToken(email,Role.USER));
+            map.put("accessToken", jwtTokenProvider.createToken(email,Role.USER));
+            map.put("refreshToken", jwtTokenProvider.createRefreshToken(email,Role.USER));
             map.put("isAlreadyRegister", true);
 
             return map;
@@ -125,7 +126,8 @@ public class UserService {
 
             userRepository.save(user);
 
-            map.put("token", jwtTokenProvider.createToken(email,Role.USER));
+            map.put("accessToken", jwtTokenProvider.createToken(email,Role.USER));
+            map.put("refreshToken",jwtTokenProvider.createRefreshToken(email,Role.USER));
             map.put("isAlreadyRegister", false);
 
             return map;
@@ -236,7 +238,8 @@ public class UserService {
         // 존재 유무 isPresent()로 확인
         if( findUser.isPresent() ){
 
-            map.put("token", jwtTokenProvider.createToken(findUser.get().getEmail(),findUser.get().getRole()));
+            map.put("accessToken", jwtTokenProvider.createToken(findUser.get().getEmail(),findUser.get().getRole()));
+            map.put("refreshToken",jwtTokenProvider.createRefreshToken(findUser.get().getEmail(),findUser.get().getRole()));
             map.put("isAlreadyRegister", true);
 
             return map;
@@ -250,7 +253,8 @@ public class UserService {
                     .build();
             User savedUser = userRepository.save(newUser);
 
-            map.put("token", jwtTokenProvider.createToken(savedUser.getEmail(), Role.USER));
+            map.put("accessToken", jwtTokenProvider.createToken(savedUser.getEmail(), Role.USER));
+            map.put("refreshToken",jwtTokenProvider.createRefreshToken(savedUser.getEmail(),Role.USER));
             map.put("isAlreadyRegister", false);
 
             return map;

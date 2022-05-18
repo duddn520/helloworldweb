@@ -55,11 +55,13 @@ public class UserController extends HttpServlet {
         // 카카오로 부터 받아온 정보로 유저로 등록
         Map<String, Object> stringObjectMap = userService.addKakaoUser(request.getHeader("token"));
 
-        String jwt = (String) stringObjectMap.get("token");
+        String jwt = (String) stringObjectMap.get("accessToken");
+        String refresh = (String) stringObjectMap.get("refreshToken");
         boolean isAlreadyRegister = (boolean) stringObjectMap.get("isAlreadyRegister");
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Auth", jwt);
+        headers.add("Refresh",refresh);
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.POST_SUCCESS,
@@ -77,10 +79,12 @@ public class UserController extends HttpServlet {
         //받아온 엑세스 토큰을 사용하여 네이버에서 유저 정보를 받아온 후 유저로 등록
         Map<String, Object> stringObjectMap = userService.addNaverUser(accessToken);
 
-        String jwt = (String) stringObjectMap.get("token");
+        String jwt = (String) stringObjectMap.get("accessToken");
+        String refresh = (String) stringObjectMap.get("refreshToken");
         boolean isAlreadyRegister = (boolean) stringObjectMap.get("isAlreadyRegister");
 
         response.addHeader("Auth", jwt);
+        response.addHeader("Refresh",refresh);
         response.addHeader("Access-Control-Allow-Origin","*");
         response.addHeader("Access-Control-Expose-Headers", "Auth");
 
@@ -102,10 +106,12 @@ public class UserController extends HttpServlet {
 
         Map<String, Object> stringObjectMap = userService.addGithubUser(userInfo);
 
-        String jwt = (String) stringObjectMap.get("token");
+        String jwt = (String) stringObjectMap.get("accessToken");
+        String refresh = (String) stringObjectMap.get("refreshToken");
         boolean isAlreadyRegister = (boolean) stringObjectMap.get("isAlreadyRegister");
 
         servletresponse.addHeader("Auth",jwt);
+        servletresponse.addHeader("Refresh",refresh);
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.POST_SUCCESS,

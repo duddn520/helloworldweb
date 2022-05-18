@@ -26,6 +26,7 @@ public class JwtTokenProvider {
     private String secretKey = "HELLO_WORLD_WEB";
 
     private static final long TOKEN_VALID_TIME = 1000L * 60 * 60 * 10; //10시간
+    private static final long REFRESH_TOKEN_VALID_TIME = 1000L * 60 * 60 * 24 * 14; //2주
 
     @PostConstruct
     protected void init(){
@@ -43,7 +44,18 @@ public class JwtTokenProvider {
                 .setExpiration(new Date(now.getTime() + TOKEN_VALID_TIME))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
+    }
 
+    public String createRefreshToken(String email, Role role){
+        Claims claims = Jwts.claims().setSubject(email);
+        claims.put("role", role);
+        Date now = new Date();
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + REFRESH_TOKEN_VALID_TIME))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
     }
 
     public Authentication getAuthentication(String token){
