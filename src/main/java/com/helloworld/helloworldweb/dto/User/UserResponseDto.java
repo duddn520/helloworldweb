@@ -22,6 +22,13 @@ public class UserResponseDto {
         this.profileUrl = user.getProfileUrl();
         this.IsOwner = isOwner;
     }
+    public UserResponseDto(User user, User caller) {
+        this.id = user.getId();
+        this.email = user.getEmail();
+        this.userName = user.getNickName();
+        this.profileUrl = user.getProfileUrl();
+        this.IsOwner = checkIsOwner(user,caller);
+    }
 
     public UserResponseDto(User user)
     {
@@ -29,5 +36,9 @@ public class UserResponseDto {
         this.email = user.getEmail();
         this.userName = user.getUsername().split("/")[0];
         this.profileUrl = user.getProfileUrl();
+    }
+
+    private boolean checkIsOwner(User owner, User caller){
+        return owner.getId()==caller.getId();
     }
 }
