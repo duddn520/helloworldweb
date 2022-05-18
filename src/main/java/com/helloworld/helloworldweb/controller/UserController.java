@@ -1,9 +1,6 @@
 package com.helloworld.helloworldweb.controller;
 
-import com.helloworld.helloworldweb.domain.Category;
-import com.helloworld.helloworldweb.domain.Post;
-import com.helloworld.helloworldweb.domain.PostSubComment;
-import com.helloworld.helloworldweb.domain.User;
+import com.helloworld.helloworldweb.domain.*;
 import com.helloworld.helloworldweb.dto.Post.PostResponseDto;
 import com.helloworld.helloworldweb.dto.PostSubComment.PostSubCommentResponseDto;
 import com.helloworld.helloworldweb.dto.User.UserResponseDto;
@@ -245,5 +242,46 @@ public class UserController extends HttpServlet {
                 HttpStatusCode.GET_SUCCESS,
                 HttpResponseMsg.GET_SUCCESS,
                 responseDtos), HttpStatus.OK);
+    }
+
+    //이 요청은 jwt 토큰이 만료 되어도 통과 할 수 있도록 설정
+    @GetMapping("/api/user/getnewtoken")
+    public ResponseEntity<ApiResponse> getNewToken(@RequestHeader(name= "Auth") String jwtToken,
+                                                   @RequestHeader(name = "Refresh") String refreshToken,
+                                                   HttpServletResponse response){
+
+        //이 호출은 프론트에서 이미 500을 받았을 때 다시 한번 더 요청
+        // 500을 받았을 때
+        // accessToken이 유효한 생태일 때 -> 우리 서버 내부 오류
+        if(jwtTokenProvider.verifyToken(jwtToken)){
+            return new ResponseEntity (ApiResponse.response(
+                    HttpStatusCode.SERVICE_UNAVAILABLE,
+                    HttpResponseMsg.SERVICE_UNAVAILABLE), HttpStatus.SERVICE_UNAVAILABLE);
+        }
+        else{
+            // accessToken은 만료된 상태인데,
+            // refresh은 유효한 상태 이다 -> accessToken을 재발급
+            if(jwtTokenProvider.verifyToken(refreshToken)){
+                //새로 에세스 토큰 생성
+                String email = jwtTokenProvider.getUserEmail(refreshToken);
+                Object role = jwtTokenProvider.getRole(refreshToken);
+                String newJwt = jwtTokenProvider.createToken(email, (Role) role);
+
+                response.addHeader("Auth", newJwt);
+                response.addHeader("Access-Control-Allow-Origin","*");
+                response.addHeader("Access-Control-Expose-Headers", "Auth");
+
+                return new ResponseEntity (ApiResponse.response(
+                        HttpStatusCode.REISSUE_SUCCESS,
+                        HttpResponseMsg.REISSUE_SUCCESS), HttpStatus.CREATED);
+            }
+            else{
+                //refreshToken도 만료 -> 다시 로그인
+                return new ResponseEntity (ApiResponse.response(
+                        HttpStatusCode.FORBIDDEN,
+                        HttpResponseMsg.FORBIDDEN), HttpStatus.FORBIDDEN);
+            }
+        }
+
     }
 }
