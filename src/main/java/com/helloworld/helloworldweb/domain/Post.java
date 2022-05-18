@@ -59,6 +59,7 @@ public class Post extends BaseTimeEntity {
         this.solved = solved;
     }
 
+    //연관관계 편의 메소드
     public void updateUser(User user) {
         this.user = user;
         user.getPosts().add(this);
@@ -66,7 +67,15 @@ public class Post extends BaseTimeEntity {
     public void updateSearchCount(){
         this.searchCount += 1;
     }
+
     public void updateViews(){
         this.views += 1;
+    }
+
+    public void updatePostTextContent(String title, String content, String tags){
+        this.title = title;
+        this.content = content;
+        this.tags = tags;
+        this.postImages = new ArrayList<>();
     }
 }

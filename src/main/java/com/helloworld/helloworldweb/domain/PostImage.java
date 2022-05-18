@@ -19,7 +19,6 @@ public class PostImage {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @NotNull
     private String originalFileName;
     @NotNull
     private String storedFileName;
@@ -28,14 +27,18 @@ public class PostImage {
 
     private Long fileSize;
 
+    @Lob
+    private String base64;
+
     @Builder
-    public PostImage(Long id, Post post, String originalFileName, String storedFileName, String storedUrl, Long fileSize) {
+    public PostImage(Long id, Post post, String originalFileName, String storedFileName, String storedUrl, Long fileSize, String base64) {
         this.id = id;
         this.post = post;
         this.originalFileName = originalFileName;
         this.storedFileName = storedFileName;
         this.storedUrl = storedUrl;
         this.fileSize = fileSize;
+        this.base64 = base64;
     }
 
     public void updatePost(Post post) {

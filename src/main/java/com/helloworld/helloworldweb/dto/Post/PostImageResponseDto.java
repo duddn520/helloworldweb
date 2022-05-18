@@ -9,8 +9,12 @@ import lombok.NoArgsConstructor;
 public class PostImageResponseDto {
 
     private String storedUrl;
+    private String base64;
+    private String originalFileName;
 
     public PostImageResponseDto(PostImage postImage){
         this.storedUrl = postImage.getStoredUrl();
+        this.base64 = postImage.getBase64();
+        this.originalFileName = postImage.getOriginalFileName();
     }
 }
