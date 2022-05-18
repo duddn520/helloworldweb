@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +40,7 @@ public class PostServiceTest {
     }
 
     @Test
-    void 게시물_모두검색(){
+    void 게시물_모두검색() throws IOException {
         // 유저 생성
         User testUser = userService.getUserByEmail(testEmail);
 
@@ -49,14 +51,14 @@ public class PostServiceTest {
                     .title("제목 react")
                     .content("")
                     .build();
-            Post addPost = postService.addPost(newPost, testUser);
+            Post addPost = postService.addPost(newPost, testUser, null);
         }
         for (int i = 0; i < 50; i++) {
             Post newPost = Post.builder()
                     .title("")
                     .content("내용 react")
                     .build();
-            Post addPost = postService.addPost(newPost, testUser);
+            Post addPost = postService.addPost(newPost, testUser, null);
         }
 
         // when - "react" 로 검색
@@ -66,7 +68,7 @@ public class PostServiceTest {
         Assertions.assertEquals(100,findPosts.size());
     }
     @Test
-    void 게시물_중복삽입방지(){
+    void 게시물_중복삽입방지() throws IOException {
         // 유저 생성
         User testUser = userService.getUserByEmail(testEmail);
 
@@ -77,7 +79,7 @@ public class PostServiceTest {
                     .title("react native")
                     .content("")
                     .build();
-            Post addPost = postService.addPost(newPost, testUser);
+            Post addPost = postService.addPost(newPost, testUser, null);
         }
 
         // when - "react native" 로 검색
@@ -89,7 +91,7 @@ public class PostServiceTest {
     }
 
     @Test
-    void 게시물_여러키워드로검색(){
+    void 게시물_여러키워드로검색() throws IOException {
         // 유저 생성
         User testUser = userService.getUserByEmail(testEmail);
 
@@ -100,14 +102,14 @@ public class PostServiceTest {
                     .title("제목 react")
                     .content("")
                     .build();
-            Post addPost = postService.addPost(newPost, testUser);
+            Post addPost = postService.addPost(newPost, testUser, null);
         }
         for (int i = 0; i < 50; i++) {
             Post newPost = Post.builder()
                     .title("")
                     .content("내용 native")
                     .build();
-            Post addPost = postService.addPost(newPost, testUser);
+            Post addPost = postService.addPost(newPost, testUser, null);
         }
 
         // when - "react native" 로 검색
@@ -118,7 +120,7 @@ public class PostServiceTest {
     }
 
     @Test
-    void 게시물_태그로검색(){
+    void 게시물_태그로검색() throws IOException {
         // 유저 생성
         User testUser = userService.getUserByEmail(testEmail);
 
@@ -130,7 +132,7 @@ public class PostServiceTest {
                     .content("")
                     .tags("react,")
                     .build();
-            Post addPost = postService.addPost(newPost, testUser);
+            Post addPost = postService.addPost(newPost, testUser, null);
         }
 
         // when - "[react]" 로 검색
@@ -141,7 +143,7 @@ public class PostServiceTest {
     }
 
     @Test
-    void 게시물_정확한문구로검색(){
+    void 게시물_정확한문구로검색() throws IOException {
         // 유저 생성
         User testUser = userService.getUserByEmail(testEmail);
 
@@ -152,14 +154,14 @@ public class PostServiceTest {
                     .title("react")
                     .content("")
                     .build();
-            Post addPost = postService.addPost(newPost, testUser);
+            Post addPost = postService.addPost(newPost, testUser, null);
         }
         for (int i = 0; i < 50; i++) {
             Post newPost = Post.builder()
                     .title("react and native")
                     .content("")
                     .build();
-            Post addPost = postService.addPost(newPost, testUser);
+            Post addPost = postService.addPost(newPost, testUser, null);
         }
 
         // when - " "react naitve" " 로 검색

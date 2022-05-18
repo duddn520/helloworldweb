@@ -16,7 +16,7 @@ const naverLogin_redirect_url = 'http://localhost:3000/login/redirect/naver';
 
 const kakao_url = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${rest_api_key}&redirect_uri=${redirect_url}`;
 const github_url = "https://github.com/login/oauth/authorize?client_id=105e0b50eefc27b4dc81&redirect_uri=http://localhost:3000/login/redirect/github";
-const naver_url = `https://nid.naver.com/oauth2.0/authorize?client_id=${naver_client_id}&response_type=code&redirect_uri=${naverLogin_redirect_url}&state=hLiDdL2uhPtsftcU`
+const naver_url = `https://nid.naver.com/oauth2.0/authorize?client_id=${naver_client_id}&response_type=code&redirect_uri=${naverLogin_redirect_url}&state=hello123`
 
 // 카카오 인가코드를 받아옴 ( REST_API_KEY , REDIRECT_URL 필요 )
 function kakao_getCode(){
@@ -29,7 +29,7 @@ function github_getCode(){
 }
 
 function naver_getCode(){
-    window.location.replace(naver_url);
+   window.location.replace(naver_url);
 }
 
 

@@ -46,7 +46,7 @@ public class PostController {
                                                      @RequestParam(value = "content") String content,
                                                      @RequestParam(value = "category") Category category,
                                                      @RequestParam(value = "title") String title,
-                                                     @RequestParam(value = "tags", required = false, defaultValue = "") String tags) throws UnsupportedEncodingException {
+                                                     @RequestParam(value = "tags", required = false, defaultValue = "") String tags) throws IOException {
 
         User findUser = userService.getUserByJwt(jwtToken);
         //post 객체 생성
@@ -55,18 +55,12 @@ public class PostController {
                 .title(URLDecoder.decode(title, "UTF-8"))
                 .content(URLDecoder.decode(content, "UTF-8"))
                 .tags(URLDecoder.decode(tags, "UTF-8"))
+                .solved(false)
                 .build();
 
-        PostResponseDto responseDto;
+        Post savedPost = postService.addPost(post, findUser, files);
+        PostResponseDto responseDto = new PostResponseDto(savedPost);
 
-        if(files == null){
-            Post savedPost = postService.addPost(post, findUser);
-            responseDto = new PostResponseDto(savedPost);
-        }
-        else{
-            Post savedPost = postService.addPostWithImage(post, findUser, files);
-            responseDto = new PostResponseDto(savedPost);
-        }
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.POST_SUCCESS,
                 HttpResponseMsg.POST_SUCCESS,
@@ -127,10 +121,10 @@ public class PostController {
     }
 
     // 조회수 + 1
-    @PutMapping("/api/post")
-    public ResponseEntity<ApiResponse> updatePost(@RequestParam(name="post_id")Long id){
+    @PutMapping("/api/post/views")
+    public ResponseEntity<ApiResponse> updatePostViews(@RequestParam(name="post_id")Long id){
 
-        postService.updatePost(postService.getPost(id));
+        postService.updatePostViews(postService.getPost(id));
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.PUT_SUCCESS,
@@ -159,8 +153,8 @@ public class PostController {
         User caller = userService.getUserByJwt(jwtToken);
         Post post = postService.getPost(id);
         postService.updatePost(post);
-        boolean isOwner = caller.getId() == post.getUser().getId();
-        PostResponseDtoWithPostComments responseDto = new PostResponseDtoWithPostComments(post, isOwner);
+        //postsubcomment 에서 isOwner를 반환할수 있도록, isOwner를 직접 넘기기보다 caller를 넘겨 post, postsubcomment 작성자와 각각 대조할수 있도록 변경.
+        PostResponseDtoWithPostComments responseDto = new PostResponseDtoWithPostComments(post, caller);
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.GET_SUCCESS,
@@ -168,4 +162,27 @@ public class PostController {
                 responseDto), HttpStatus.OK);
     }
 
+    @PutMapping("/api/post")
+    @Transactional
+    public ResponseEntity<ApiResponse<PostResponseDto>> updatePost(@RequestParam(value = "post_id") Long postId,
+                                                  @RequestParam(value = "files", required = false) List<MultipartFile> files,
+                                                  @RequestParam(value = "content") String content,
+                                                  @RequestParam(value = "title") String title,
+                                                  @RequestParam(value = "tags", required = false, defaultValue = "") String tags) throws IOException {
+
+        Post targetPost = postService.getPost(postId);
+        Post savedPost = postService.updatePost(targetPost,
+                                                URLDecoder.decode(title, "UTF-8"),
+                                                URLDecoder.decode(content, "UTF-8"),
+                                                URLDecoder.decode(tags, "UTF-8"),
+                                                files);
+
+        PostResponseDto responseDto = new PostResponseDto(savedPost);
+
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.PUT_SUCCESS,
+                HttpResponseMsg.PUT_SUCCESS,
+                responseDto), HttpStatus.OK);
+    }
 }
+

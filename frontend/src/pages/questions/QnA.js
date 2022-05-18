@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router';
 import QnACommentList from '../../component/questions/QnACommentList';
 import CommentTextArea from '../../component/questions/CommentTextArea';
 import MDEditor from '@uiw/react-md-editor';
+import SmallUserProfile from '../../component/SmallUserProfile';
 
 
 export default function QnA( props ){
@@ -15,6 +16,7 @@ export default function QnA( props ){
     const { state } = useLocation();
     const [value, setValue] = React.useState(1);
     const [qna,setQna] = React.useState({});
+    const [writer, setWriter] = React.useState({});
     // 답변
     const [reply,setReply] = React.useState("");
     const [postComment,setPostComment] = React.useState([]);
@@ -65,6 +67,7 @@ export default function QnA( props ){
             setTargetUserEmail(res.userResponseDto.email);
             setUserProfileUrl(res.userResponseDto.profileUrl);
             setUserName(res.userResponseDto.userName);
+            setWriter(res.userResponseDto)
         })
         .catch( e => { })
     
@@ -98,7 +101,10 @@ export default function QnA( props ){
                         <Typography sx={{ m : 1 ,ml: 2 ,fontSize: 25 ,fontWeight: '600'}}>{qna.title}</Typography>
                         <Box sx={{ display: 'flex' ,flexDirection: 'row' ,mb: 2 ,alignItems: 'center'}}>
                             <Typography sx={{ ml: 2 ,fontSize: 13}}>조회수 {qna.views}</Typography>
-                            <Typography sx={{ ml: 2 ,fontSize: 13}}>작성일 2022.04.28</Typography>
+                            <Typography sx={{ ml: 2 ,fontSize: 13}}>작성일 {qna.createdTime}</Typography>
+                            <Box onClick={() => navigate("/minihome", {state: {tabIndex: 0, targetEmail: targetUserEmail}})} sx={{marginLeft:'auto'}}>
+                                <SmallUserProfile  userInfo={writer}></SmallUserProfile>
+                            </Box>
                         </Box>
                     </Box>
                     <Divider variant="fullWidth" sx={{ flexGrow: 1 }}/>

@@ -7,6 +7,7 @@ import imageCompression from "browser-image-compression";
 import axios from "axios";
 import strToHTML from "../../function/strToHTML";
 import { convertBase64IntoFile, extractOnlyFilename } from "../../function/aboutFile";
+import LoadingSpinner from "../../component/LoadingSpinner";
 
 const WriteSpace = styled.div`
     padding: 10px; 
@@ -22,6 +23,48 @@ function WriteBlog(){
     const navigate = useNavigate();
     const { state } = useLocation();
     const [targetEmail, setTargetEmail] = React.useState(state.targetEmail);
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [post, setPost] = React.useState(state?.post);
+    const [title, setTitle] = React.useState(state.post?.title === null || state.post?.title === undefined ? null : state.post.title );
+    const [tags, setTags] = React.useState(state.post?.tags === null || state.post?.tags === undefined ? null : state.post.tags );
+
+    React.useEffect(()=>{
+        // document.getElementById('Title').append(post.title);
+        // document.getElementById('Tags').append(post.tags);
+
+        let divC = document.getElementById('Content');
+        let imageIndex = 0;
+        if(post !== null && post !== undefined){
+            const contentArray = post.content.split("\n");
+            for (let i = 0 ; i < contentArray.length ; i += 1) {
+                let currentLine = contentArray[i];
+
+                if(currentLine == '&&&&'){
+                    let currentImg = post.postImageResponseDtos[imageIndex];
+                    let imgNode = document.createElement('img');
+                    imgNode.setAttribute("src", currentImg.storedUrl);
+                    imgNode.setAttribute("name", currentImg.originalFileName);
+                    imgNode.setAttribute("base64", currentImg.base64); // base64 인코딩된 값
+                    imgNode.setAttribute("variant", "contained");
+                    imgNode.setAttribute("alt", currentImg.storedUrl);
+                    imgNode.style.maxWidth = '200px';
+                    imgNode.style.maxHeight = 'auto';
+                    divC.appendChild(imgNode);
+                    imageIndex += 1;
+                }
+                else {
+                    if(i === 0){
+                        divC.append(contentArray[i]);
+                    }
+                    else{
+                        let divNode = document.createElement('div');
+                        divNode.append(contentArray[i]);
+                        divC.appendChild(divNode);
+                    }        
+                }
+            }
+        }
+    }, []);
 
     const imageReader = async function(e) {
         const selectedImage = e.target.files[0];
@@ -43,11 +86,12 @@ function WriteBlog(){
             imgNode.setAttribute("src", url);
             imgNode.setAttribute("name", extractOnlyFilename(selectedImage.name)+"."+selectedImage.type.split("/")[1]);
             imgNode.setAttribute("base64", e.target.result); // base64 인코딩된 값
-            imgNode.setAttribute("maxWidth", 800);
-            imgNode.setAttribute("maxHeight", 400);
             imgNode.setAttribute("variant", "contained");
             imgNode.setAttribute("alt", selectedImage.name);
+            imgNode.style.maxWidth = '200px';
+            imgNode.style.maxHeight = 'auto';
 
+            // document.getElementById('Content').removeChild(document.getElementById('Content').lastElementChild);
             document.getElementById('Content').appendChild(imgNode);
 
             const selection = window.getSelection();
@@ -92,17 +136,13 @@ function WriteBlog(){
             console.log(e)
         })
         
-
     }
 
     //마지막으로 서버에 보낼 정보 만들기
     function savePost(){
+        setIsLoading(true);
         const divC = document.getElementById('Content');
-        const TitleElement = document.getElementById('Title');
-        const TagsElement = document.getElementById('Tags');
         let content = strToHTML(divC.innerHTML);
-        let title = TitleElement.value;
-        let tags = TagsElement.value;
 
         let formdata = new FormData();
         let totalContent = '';
@@ -114,99 +154,126 @@ function WriteBlog(){
                 let name = content[i].getAttribute('name');
                 let nameTempArray = name.split(".");
                 let NewName = name.replace('.'+name.split('.')[ nameTempArray.length - 1 ], i+'.'+name.split('.')[ nameTempArray.length - 1 ]);
-                console.log(convertBase64IntoFile(imgBase64, NewName));
                 formdata.append('files', convertBase64IntoFile(imgBase64, NewName));
 
                 totalContent += "&&&&\n";
-
+                if(imgUri.split('.') !== 'https://helloworldweb-fileserver' ){
                 // url 사용 후에 메모리에서 제거하기
                 window.URL.revokeObjectURL(imgUri);
+
+                console.log("&&&&\n");
+                }            
             }
             else{
                 if( i === 0) {
                     totalContent += content[i].textContent === '' ? '\n' : content[i].textContent+'\n';
                 }
                 else {
-                    totalContent += content[i].innerHTML === '<br>' ? '\n' : content[i].innerText+'\n';
+                    totalContent += content[i].innerHTML === '<br>' ? content[i+1].tagName === 'IMG' ? '' : '\n' : content[i].innerText+'\n' ;
                 }
             }
         }
-        api.registerPost(formdata, title, totalContent, tags)
-        .then(res => {
-            console.log('블로그 게시 성공');
-            navigate("/minihome", {replace: true, state: {tabIndex: 1, targetEmail: targetEmail}});
-        })
-        .catch(e => {
-            console.log('블로그 게시 실패');
-            alert("작성 실패");
-        });
+        // console.log(totalContent);
+        if(post === null || post === undefined){
+            api.registerPost(formdata, title, totalContent, tags)
+            .then(res => {
+                console.log('블로그 게시 성공');
+                navigate("/minihome", {replace: true, state: {tabIndex: 1, targetEmail: targetEmail}});
+                setIsLoading(false);
+            })
+            .catch(e => {
+                console.log('블로그 게시 실패');
+                alert("작성 실패");
+                setIsLoading(false);
+            });
+        }
+        else{
+            api.updatePost(post.id, formdata, title, totalContent, tags)
+            .then(res => {
+                console.log('블로그 수정 성공');
+                navigate("/minihome", {replace: true, state: {tabIndex: 1, targetEmail: targetEmail}});
+                setIsLoading(false);
+            })
+            .catch(e => {
+                console.log('블로그 수정 실패');
+                alert("수정 실패");
+                setIsLoading(false);
+            });
+        }
+       
     }
 
     return(
-        <Box sx={{paddingTop: 3, paddingLeft: 2, paddingRight: 2, paddingBottom: 3, height: '90vh'}}>
-            <Typography sx={{fontWeight: 'bold', marginBottom: 2 }}>제목</Typography>
-            <Box sx={{flex: 1, display: 'flex', marginBottom: 3}}>
-                {/* <TitleInput id="Title" type="text" name="title"/> */}
-                <TextField 
-                    id="Title"
-                    sx={{ flex: 1, color: 'black' }}
-                    size='small'
-                />
-            </Box>
+        <div>
+            <Box sx={{paddingTop: 3, paddingLeft: 2, paddingRight: 2, paddingBottom: 3, height: '90vh'}}>
+                <Typography sx={{fontWeight: 'bold', marginBottom: 2 }}>제목</Typography>
+                <Box sx={{flex: 1, display: 'flex', marginBottom: 3}}>
+                    {/* <TitleInput id="Title" type="text" name="title"/> */}
+                    <TextField 
+                        id="Title"
+                        sx={{ flex: 1, color: 'black' }}
+                        size='small'
+                        value={title}
+                        onChange={(value)=>{setTitle(value.target.value)}}
+                    />
+                </Box>
 
-            {/* <div class="editor-menu"> 
-                <button id="btn-bold"> 
-                    <b>B</b> 
-                </button> 
-                <button id="btn-italic"> 
-                    <i>I</i> 
-                </button> 
-                <button id="btn-underline"> 
-                    <u>U</u>
-                </button> 
-                <button id="btn-strike"> 
-                    <s>S</s> 
-                </button> 
-                <button id="btn-ordered-list"> OL </button> 
-                <button id="btn-unordered-list"> UL </button> 
-                <button id="btn-image"> IMG </button> 
-            </div> */}
-            <Typography sx={{fontWeight: 'bold', marginBottom: 2 }}>내용</Typography>
-            <WriteSpace id="Content" contentEditable="true"/>
-            
-            <Box sx={{marginBottom: 2}}>
-                <Button component="label" variant="outlined" sx={{height: 30, marginRight: 2}}> 이미지 업로드
-                <input 
-                    type="file"
-                    id="avatar" name="avatar"
-                    accept="image/png, image/jpeg, image/jpg"
-                    multiple={false}
-                    onChange={imageReader} hidden/>
-                </Button>
-
-                <Button variant="outlined" component="label" sx={{height: 30}}> OCR
-
+                {/* <div class="editor-menu"> 
+                    <button id="btn-bold"> 
+                        <b>B</b> 
+                    </button> 
+                    <button id="btn-italic"> 
+                        <i>I</i> 
+                    </button> 
+                    <button id="btn-underline"> 
+                        <u>U</u>
+                    </button> 
+                    <button id="btn-strike"> 
+                        <s>S</s> 
+                    </button> 
+                    <button id="btn-ordered-list"> OL </button> 
+                    <button id="btn-unordered-list"> UL </button> 
+                    <button id="btn-image"> IMG </button> 
+                </div> */}
+                <Typography sx={{fontWeight: 'bold', marginBottom: 2 }}>내용</Typography>
+                <WriteSpace id="Content" contentEditable="true"/>
+                
+                <Box sx={{marginBottom: 2}}>
+                    <Button component="label" variant="outlined" sx={{height: 30, marginRight: 2}}> 이미지 업로드
                     <input 
-                    type="file"
-                    accept="image/png, image/jpeg, image/jpg"
-                    multiple={false}
-                    onChange={InvokeKakaoOcrApi} hidden/>
-                </Button>
+                        type="file"
+                        id="avatar" name="avatar"
+                        accept="image/png, image/jpeg, image/jpg"
+                        multiple={false}
+                        onChange={imageReader} hidden/>
+                    </Button>
+
+                    <Button variant="outlined" component="label" sx={{height: 30}}> OCR
+
+                        <input 
+                        type="file"
+                        accept="image/png, image/jpeg, image/jpg"
+                        multiple={false}
+                        onChange={InvokeKakaoOcrApi} hidden/>
+                    </Button>
+                </Box>
+                <Typography sx={{fontWeight: 'bold', marginBottom: 2 }}>태그</Typography>
+                <Box sx={{flex: 1, display: 'flex', marginBottom: 2}}>
+                    <TextField 
+                        id="Tags"
+                        sx={{ flex: 1, color: 'black'}}
+                        size='small'
+                        placeholder='e.g. Java, Spring'
+                        value={tags}
+                        onChange={(value)=>{setTags(value.target.value)}}
+                    />
+                </Box>
+                <Box sx={{flex: 1, justifyContent: 'flex-end', display: 'flex', marginBottom: 2}}>
+                    <Button onClick={()=>{savePost()}} variant={'contained'}>저장</Button>
+                </Box>
             </Box>
-            <Typography sx={{fontWeight: 'bold', marginBottom: 2 }}>태그</Typography>
-            <Box sx={{flex: 1, display: 'flex', marginBottom: 2}}>
-                <TextField 
-                    id="Tags"
-                    sx={{ flex: 1, color: 'black'}}
-                    size='small'
-                    placeholder='e.g. Java, Spring'
-                />
-            </Box>
-            <Box sx={{flex: 1, justifyContent: 'flex-end', display: 'flex', marginBottom: 2}}>
-                <Button onClick={()=>{savePost()}} variant={'contained'}>저장</Button>
-            </Box>
-            
-        </Box>
+            {isLoading && <LoadingSpinner/>}
+        </div>
     )
 }
 
