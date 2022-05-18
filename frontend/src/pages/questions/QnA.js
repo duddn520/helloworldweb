@@ -7,12 +7,14 @@ import CustomAppBar from '../../component/appbar/CustomAppBar';
 import { useNavigate } from 'react-router';
 import QnAComment from '../../component/questions/QnAComment';
 import QnACommentList from '../../component/questions/QnACommentList';
+import SmallUserProfile from '../../component/SmallUserProfile';
 
 export default function( props ){
     const navigate = useNavigate();
     const { state } = useLocation();
     const [value, setValue] = React.useState(1);
     const [qna,setQna] = React.useState({});
+    const [writer, setWriter] = React.useState({});
     // 답변
     const [reply,setReply] = React.useState("");
     const [postComment,setPostComment] = React.useState([]);
@@ -161,7 +163,8 @@ export default function( props ){
         .then( res => {
             console.log(res)
             setPostComment(res.postCommentResponseDtos)
-            setTargetUserEmail(res.userResponseDto.email);
+            setTargetUserEmail(res.userResponseDto.email)
+            setWriter(res.userResponseDto)
         })
         .catch( e => { })
     
@@ -195,8 +198,10 @@ export default function( props ){
                         <Typography sx={{ m : 1 ,ml: 2 ,fontSize: 25 ,fontWeight: '600'}}>{qna.title}</Typography>
                         <Box sx={{ display: 'flex' ,flexDirection: 'row' ,mb: 2 ,alignItems: 'center'}}>
                             <Typography sx={{ ml: 2 ,fontSize: 13}}>조회수 {qna.views}</Typography>
-                            <Typography sx={{ ml: 2 ,fontSize: 13}}>작성일 2022.04.28</Typography>
-                            <Button onClick={() => navigate("/minihome", {state: {tabIndex: 0, targetEmail: targetUserEmail}}) }>이새끼 홈피로 이동해주세요.</Button>
+                            <Typography sx={{ ml: 2 ,fontSize: 13}}>작성일 {qna.createdTime}</Typography>
+                            <Box onClick={() => navigate("/minihome", {state: {tabIndex: 0, targetEmail: targetUserEmail}})} sx={{marginLeft:'auto'}}>
+                            <SmallUserProfile  userInfo={writer}></SmallUserProfile>
+                            </Box>
                         </Box>
                     </Box>
                     <Divider variant="fullWidth" sx={{ flexGrow: 1 }}/>
