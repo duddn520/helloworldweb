@@ -1,4 +1,3 @@
-import { Grid, Typography } from "@mui/material";
 import { Avatar, Button, Grid, Paper, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect } from "react";

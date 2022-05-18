@@ -152,7 +152,7 @@ public class PostController {
 
         User caller = userService.getUserByJwt(jwtToken);
         Post post = postService.getPost(id);
-        postService.updatePost(post);
+        postService.updatePostViews(post);
         //postsubcomment 에서 isOwner를 반환할수 있도록, isOwner를 직접 넘기기보다 caller를 넘겨 post, postsubcomment 작성자와 각각 대조할수 있도록 변경.
         PostResponseDtoWithPostComments responseDto = new PostResponseDtoWithPostComments(post, caller);
 
