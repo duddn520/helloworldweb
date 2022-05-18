@@ -261,11 +261,11 @@ public class UserController extends HttpServlet {
         else{
             // accessToken은 만료된 상태인데,
             // refresh은 유효한 상태 이다 -> accessToken을 재발급
-            if(jwtTokenProvider.verifyToken(refreshToken)){
+            if(jwtTokenProvider.verifyAllToken(refreshToken)){
                 //새로 에세스 토큰 생성
                 String email = jwtTokenProvider.getUserEmail(refreshToken);
                 Object role = jwtTokenProvider.getRole(refreshToken);
-                String newJwt = jwtTokenProvider.createToken(email, (Role) role);
+                String newJwt = jwtTokenProvider.createToken(email, Role.USER);
 
                 response.addHeader("Auth", newJwt);
                 response.addHeader("Access-Control-Allow-Origin","*");
