@@ -31,7 +31,8 @@ export default function Redirect(){
                 api.registerUserWithKakao( res.data.access_token )
                 .then(async (res) => {
                     // SessionStorage에 jwt 저장
-                    window.sessionStorage.setItem("Auth", res.token);
+                    window.sessionStorage.setItem("Auth", res.accessToken);
+                    window.sessionStorage.setItem("Refresh", res.refreshToken);
 
                     if( res.isAlreadyRegister ){
                         // 미니홈피페이지로 이동

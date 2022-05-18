@@ -26,4 +26,8 @@ public class HttpResponseMsg {
     public static final String SEND_FAILED = "전송 실패";
 
     public static final String UPDATE_SUCCESS = "업데이트 성공";
+
+    public static final String SERVICE_UNAVAILABLE = "서버 오류";
+    public static final String REISSUE_SUCCESS = "토큰 재발급 성공";
+    public static final String FORBIDDEN = "잘못된 접근";
 }

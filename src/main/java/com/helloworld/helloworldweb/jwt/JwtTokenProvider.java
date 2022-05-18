@@ -25,8 +25,8 @@ public class JwtTokenProvider {
 
     private String secretKey = "HELLO_WORLD_WEB";
 
-    private static final long ACCESS_TOKEN_VALID_TIME = 1000L * 60 * 60 * 10; //10시간
-    private static final long REFRESH_TOKEN_VALID_TIME = 1000L * 60 * 60 * 24 * 7;
+    private static final long TOKEN_VALID_TIME = 1000L * 60 * 60 * 10; //10시간
+    private static final long REFRESH_TOKEN_VALID_TIME = 1000L * 60 * 60 * 24 * 14; //2주
 
     @PostConstruct
     protected void init(){
@@ -41,10 +41,21 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + ACCESS_TOKEN_VALID_TIME))
+                .setExpiration(new Date(now.getTime() + TOKEN_VALID_TIME))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
+    }
 
+    public String createRefreshToken(String email, Role role){
+        Claims claims = Jwts.claims().setSubject(email);
+        claims.put("role", role);
+        Date now = new Date();
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + REFRESH_TOKEN_VALID_TIME))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
     }
 
     public Authentication getAuthentication(String token){
@@ -63,7 +74,7 @@ public class JwtTokenProvider {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
             long valid_time = claims.getBody().getExpiration().getTime() - claims.getBody().getIssuedAt().getTime();
             // refresh_token인지 확인
-            return valid_time > ACCESS_TOKEN_VALID_TIME ? false : !claims.getBody().getExpiration().before(new Date());
+            return valid_time > TOKEN_VALID_TIME ? false : !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
         }
