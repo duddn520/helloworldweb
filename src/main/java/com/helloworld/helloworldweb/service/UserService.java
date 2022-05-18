@@ -151,7 +151,7 @@ public class UserService {
 
     }
 
-    //네이버로 부터 사용자 정보 불러오는 부분
+    //카카오로 부터 사용자 정보 불러오는 부분
     private String getUserInfoFromKakao(String accessToken) {
 
         String token = accessToken; // 네이버 로그인 접근 토큰;
@@ -165,9 +165,7 @@ public class UserService {
         requestHeaders.put("Authorization", header);
         String responseBody = get(apiURL,requestHeaders);
 
-        System.out.println("responseBody = " + responseBody);
         return responseBody;
-
     }
 
     //InputStream을 읽는 함수

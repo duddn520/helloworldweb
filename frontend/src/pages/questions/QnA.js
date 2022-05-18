@@ -1,15 +1,17 @@
 import React from 'react';
-import { Tabs ,Box ,Tab ,Typography ,Divider ,Container ,styled ,Button ,Badge, Grid, Card} from '@mui/material';
+import { Tabs ,Box ,Tab ,Typography ,Divider ,Container ,Button , Grid, Card ,Avatar ,IconButton} from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { useLocation } from 'react-router';
 import api from '../../api/api';
 import CustomAppBar from '../../component/appbar/CustomAppBar';
 import { useNavigate } from 'react-router';
-import QnAComment from '../../component/questions/QnAComment';
 import QnACommentList from '../../component/questions/QnACommentList';
+import CommentTextArea from '../../component/questions/CommentTextArea';
+import MDEditor from '@uiw/react-md-editor';
 import SmallUserProfile from '../../component/SmallUserProfile';
 
-export default function( props ){
+
+export default function QnA( props ){
     const navigate = useNavigate();
     const { state } = useLocation();
     const [value, setValue] = React.useState(1);
@@ -22,7 +24,10 @@ export default function( props ){
     const [tags,setTags] = React.useState([]);
     // 유저 이메일
     const [targetUserEmail,setTargetUserEmail] = React.useState("");
-    //refresh
+    // 프로필 사진
+    const [userProfileUrl,setUserProfileUrl] = React.useState("");
+    // 유저이름
+    const [userName,setUserName] = React.useState("");
 
 
     const handleChange = (event, newValue) => {
@@ -38,114 +43,10 @@ export default function( props ){
             console.log(e)
         })
     }
-
-    const renderContent = () => {
-        if( qna?.content != null  ){
-            let tmp = qna?.content?.split('```');
-            return(
-                tmp.map( (text,index) => {
-                    // 본문
-                    if( index % 2 == 0){
-                        return(
-                            <Typography sx={{ m: 2 }}>
-                                <pre key={index} style={{ fontFamily: 'inherit' }}>{text}</pre>
-                            </Typography>
-                        );
-                    }
-                    // 코드
-                    else {
-                        text = text.replace('\n','');
-                        return(
-                            <Typography key={index} sx={{ p: 2 ,backgroundColor: 'rgb(240,240,240)' }}>
-                                <pre style={{ fontFamily: 'inherit' }}>{text}</pre>
-                            </Typography>
-                        );
-                    }
-                })
-            );
-        }
-    }
-
-    const renderReplyPreview = () => {
-        let tmp = reply.split("```");
-        return(
-            
-                tmp.map( (text,index) => {
-                    // 본문
-                    if( index % 2 == 0){
-                        return(
-                            <pre style={{ fontFamily: "inherit" ,verticalAlign: 'middle' }}>
-                                <Grid container spacing={2}>
-                                {renderLine(text)}
-                                </Grid>
-                            </pre>
-                        );
-                    }
-                    // 코드
-                    else {
-                        text = text.replace('\n','');
-                        return(
-                            <Typography key={index} sx={{ p: 2 ,backgroundColor: 'rgb(240,240,240)' }}>
-                                <pre style={{ fontFamily: 'inherit' }}>{renderLine(text)}</pre>
-                            </Typography>
-                        );
-                    }
-                })
-                
-        );
-
-    }
-
-    const renderLine = (text) => {
-        return(
-            text.split("\n").map( line => {
-                return(
-                    <Grid item xs={12} sx={{ flexDirection: 'row' ,display: 'flex' ,justfiyContent: 'center' ,alignItems: 'center' }}>
-                        {renderStrongText(line)}
-                    </Grid>
-                );
-            })
-        );
-    }
-
-    const renderStrongText = (value) => {
-        let text = value;
-        const regExp = /\*\*.{0,}\*\*/m;
-        let s = [];
-        
-        // **text** 모두 찾을때까지
-        while( text && text.length > 0 ){
-            if( regExp.test(text) ){
-                const startIndex = text.search(regExp);
-                // normal text
-                s.push({ "type" : "normal" , "text" : text.substring(0,startIndex) });
-                let restText = text.substring(startIndex+2,text.length);
-                const finIndex = restText.search(/\*\*/); 
-                // // strong text
-                s.push({ "type" : "strong", "text" : restText.substring(0,finIndex) })
-                text = restText.substring(finIndex+2,restText.length);
-            }
-            else {
-                s.push({ "type": "normal", "text" : text });
-                text = "";
-            }
-        }
-
-        // console.log(s);
-        return(
-                s.map( item => {
-                    if( item.type === "normal") 
-                        return <pre style={{ fontFamily: 'inherit' }}>{item.text}</pre>
-                    else if( item.type === "strong")
-                        return <b style={{ fontFamily: 'inherit' ,fontWeight: 'bold'}}>{item.text}</b>    
-            })
-        )
-
-    }
     
     React.useEffect(() => {
         // naivgate state가 없을 경우
-       if( state == null){
+       if( state === null){
             api.getPost( props.id )
             .then( res =>{
                 console.log(res);
@@ -163,7 +64,9 @@ export default function( props ){
         .then( res => {
             console.log(res)
             setPostComment(res.postCommentResponseDtos)
-            setTargetUserEmail(res.userResponseDto.email)
+            setTargetUserEmail(res.userResponseDto.email);
+            setUserProfileUrl(res.userResponseDto.profileUrl);
+            setUserName(res.userResponseDto.userName);
             setWriter(res.userResponseDto)
         })
         .catch( e => { })
@@ -200,35 +103,52 @@ export default function( props ){
                             <Typography sx={{ ml: 2 ,fontSize: 13}}>조회수 {qna.views}</Typography>
                             <Typography sx={{ ml: 2 ,fontSize: 13}}>작성일 {qna.createdTime}</Typography>
                             <Box onClick={() => navigate("/minihome", {state: {tabIndex: 0, targetEmail: targetUserEmail}})} sx={{marginLeft:'auto'}}>
-                            <SmallUserProfile  userInfo={writer}></SmallUserProfile>
+                                <SmallUserProfile  userInfo={writer}></SmallUserProfile>
                             </Box>
                         </Box>
                     </Box>
                     <Divider variant="fullWidth" sx={{ flexGrow: 1 }}/>
-                    <Box>
-                        {renderContent()}
+                    <Box sx={{ ml: 2 }}>
+                        <MDEditor.Markdown source={qna.content} style={{ marginTop: 5 }}/>
                     </Box>
                     {
-                        tags.map( tag => { if( tag.length ) return <Badge sx={{ backgroundColor: 'rgb(240,240,240)' ,ml: 2 ,p: 1,mt: 10,fontSize: 13}}>{tag}</Badge>})
+                        tags.map( tag => { if( tag.length ) return <Button sx={{ backgroundColor: 'lightblue' ,borderRadius: 1,ml: 2 ,p: 0.5,mt: 10,fontSize: 13 ,textTransform: 'none' }}>{tag}</Button>})
                     }
-                    <Divider variant="fullWidth" sx={{ flexGrow: 1 ,mt: 10}}/>
+                    <Box sx={{ display: 'flex'}}>
+                        <Box sx={{ flex: 9}}></Box>
+                        <Box sx={{ flex: 1 ,ml: 'auto' ,display: 'flex' ,flexDirection: 'row' ,alignItems: 'center' ,backgroundColor: 'lightblue' ,borderRadius: 1}}>
+                            <IconButton>
+                            <Avatar 
+                                onClick={() => navigate("/minihome", {state: {tabIndex: 0, targetEmail: targetUserEmail}}) } 
+                                src={userProfileUrl} 
+                                sx={{ borderRadius: 2 ,m: 0.5 }}    
+                            />
+                            </IconButton>
+                            <Box sx={{ alignItems: 'start' ,flexGrow: 1 }}>
+                                <Typography sx={{ fontSize: 10 ,ml: 0.5 }}>Asked By</Typography>
+                                <Button 
+                                    onClick={() => navigate("/minihome", {state: {tabIndex: 0, targetEmail: targetUserEmail}}) }
+                                    sx={{ ml: 0.5 ,p: 0,pr: 0.5 ,textAlign: 'start' ,justifyContent: 'start' ,textTransform: 'none'}}
+                                >
+                                    {userName}
+                                </Button>
+                            </Box>
+                        </Box>
+                    </Box>
+                    
+                    {/* <Divider variant="fullWidth" sx={{ flexGrow: 1 ,mt: 10}}/> */}
                     {
-                        postComment.length && <QnACommentList postComments={postComment} />
+                        postComment.length ?  <QnACommentList postComments={postComment} /> : <Box/>
                     }
+                    
                     <Typography sx={{ m : 2 ,fontSize: 25 ,fontWeight: '600' }}>{'당신의 답변'}</Typography>
                     <Grid container spacing={2}>
-                        <Grid item xs={8}>
+                        <Grid item xs={12}>
                             <Box>
-                                <TextArea
-                                    sx={{ width: '80%' ,m: 2 ,height: 350 , p : 2 ,borderColor: 'lightgray' ,borderRadius: 2 }}
-                                    value={reply}
-                                    onChange={value => setReply(value.target.value)}
-                                    size='small'
-                                    placeholder='e.g. 리액트 질문'
-                                />
+                                <CommentTextArea content={reply} setContent={setReply} />
                             </Box>
                         </Grid>
-                        <Grid item xs={4}>
+                        {/* <Grid item xs={4}>
                            <Card sx={{ m:2 ,flex: 1 }}>
                                 <Typography sx={{ fontWeight: 'bold', fontSize: 22 ,m: 2 ,justifyContent: 'center', display: 'flex' }}>Tips</Typography>
                             
@@ -249,13 +169,11 @@ export default function( props ){
                                         })
                                     }  
                             </Card>
-                        </Grid>
+                        </Grid> */}
                     </Grid>
                     
                     <Container>
-                        {
-                            renderReplyPreview()
-                        }
+                        <MDEditor.Markdown source={reply} style={{ marginTop: 1 }}/>
                     </Container>
                     <Box>
                         <Button 
@@ -272,10 +190,6 @@ export default function( props ){
         </Box>
     );
 }
-
-const TextArea = styled('textarea')({  
-
-});
 
 const tipContents = [
     {
