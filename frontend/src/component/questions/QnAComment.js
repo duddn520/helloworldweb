@@ -1,8 +1,9 @@
-import { Button, Grid, Paper, Typography } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import React, { useEffect, useState } from "react";
-import { Divider, styled } from "@mui/material";
+import React, { useEffect } from "react";
+import { Divider,} from "@mui/material";
 import PostSubCommentTextBox from "./PostSubCommentTextBox";
+import MDEditor from '@uiw/react-md-editor';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 
 
@@ -10,7 +11,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 export default function QnAComment({postsubcomments, postCommentId}){
 
     const [subComments, setSubComments] = React.useState([])
-    const [likes, setLikes] = React.useState("")
+    // const [likes, setLikes] = React.useState("")
 
     useEffect(()=>{
         if(postsubcomments){
@@ -19,32 +20,6 @@ export default function QnAComment({postsubcomments, postCommentId}){
 
     },[])
 
-    const renderContent = (content) => {
-        if( content != null  ){
-            let tmp = content?.split('```');
-            return(
-                tmp.map( (text,index) => {
-                    // 본문
-                    if( index % 2 == 0){
-                        return(
-                            <Typography sx={{ m: 2 }}>
-                                <pre key={index} style={{ fontFamily: 'inherit' }}>{text}</pre>
-                            </Typography>
-                        );
-                    }
-                    // 코드
-                    else {
-                        text = text.replace('\n','');
-                        return(
-                            <Typography key={index} sx={{ p: 2 ,backgroundColor: 'rgb(240,240,240)' }}>
-                                <pre style={{ fontFamily: 'inherit' }}>{text}</pre>
-                            </Typography>
-                        );
-                    }
-                })
-            );
-        }
-    }
 
     return(
     <Box>
@@ -55,8 +30,8 @@ export default function QnAComment({postsubcomments, postCommentId}){
                 <Box sx={{
                     m:4,
                     display:"flex",
-                    flexDirection:"column"
-
+                    flexDirection:"column" ,
+                    alignItems: 'center'
                 }}>
                 <Typography variant="h6">300</Typography>
                 <ThumbUpIcon fontSize="large" />
@@ -68,46 +43,62 @@ export default function QnAComment({postsubcomments, postCommentId}){
                     if(idx===0){
                         return (
                             <div key={postsubcomment.id}>
-                            <Box sx={{
-                                minBlockSize:"60px"
-                            }}>
-                                {renderContent(postsubcomment.content)}
-                            </Box>
-                            <Box sx={{
-                                flexGrow:1 ,
-                                display: 'flex'
-                            }}>
-                                <Typography variant="caption">{postsubcomment.createdTime}</Typography>
-                                <Typography variant="caption"
-                                sx={{
-                                    marginLeft: 'auto'
-                                }}>{postsubcomment.userResponseDto.email}</Typography>
-                            </Box>
+                                <Box sx={{
+                                    minBlockSize:"60px"
+                                }}>
+                                    <MDEditor.Markdown source={postsubcomment.content} style={{ marginTop: 5 }}/>
+                                </Box>
+                                <Box sx={{
+                                    flexGrow:1 ,
+                                    display: 'flex'
+                                }}>
+                                    <Typography variant="caption"
+                                        sx={{ color: 'gray'}}
+                                    >
+                                        {postsubcomment.createdTime}
+                                    </Typography>
+                                    <Typography variant="caption"
+                                        sx={{
+                                            marginLeft: 'auto' ,
+                                            color: 'gray'
+                                        }}
+                                    >
+                                        {postsubcomment.userResponseDto.email}
+                                    </Typography>
+                                </Box>
+                                <Divider variant="fullWidth" sx={{ flexGrow: 1 ,mt: 1}}/>
                             </div>
                         )
                     }
                     else{       //대댓글인 경우
                         return(
-                            <div>
-                            <Divider variant="fullWidth" sx={{ flexGrow: 1 }}/>
-                            <Box sx={{
-                                minBlockSize:"20px"
-                            }}>
-                                <Typography variant="body2">
-                                    {postsubcomment.content}
-                                </Typography>
+                            <Box sx={{ ml: 2 }}>
+                                <Box sx={{
+                                    minBlockSize:"20px" ,
+                                    mt: 1
+                                }}>
+                                    <Typography variant="body2">
+                                        {postsubcomment.content}
+                                    </Typography>
+                                </Box>
+                                <Box sx={{
+                                    flexGrow:1 ,
+                                    display: 'flex' ,
+                                    mt: 2
+                                }}>
+                                    <Typography variant="caption"
+                                        sx={{ color: 'gray' }}
+                                    >
+                                        {postsubcomment.createdTime}
+                                    </Typography>
+                                    <Typography variant="caption"
+                                    sx={{
+                                        marginLeft: 'auto' ,
+                                        color: 'gray'
+                                    }}>{postsubcomment.userResponseDto.email}</Typography>
+                                </Box>
+                                <Divider variant="fullWidth" sx={{ flexGrow: 1 ,mt: 1}}/>
                             </Box>
-                            <Box sx={{
-                                flexGrow:1 ,
-                                display: 'flex'
-                            }}>
-                                <Typography variant="caption">{postsubcomment.createdTime}</Typography>
-                                <Typography variant="caption"
-                                sx={{
-                                    marginLeft: 'auto'
-                                }}>{postsubcomment.userResponseDto.email}</Typography>
-                            </Box>
-                            </div>
                         
                             )
                     }

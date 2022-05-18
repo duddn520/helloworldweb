@@ -12,7 +12,7 @@ export default function QnACommentList({postComments}){
 
     return (
         <div>
-            <Typography variant="h6" >{comments.length} Answers </Typography>
+            <Typography variant="h6" sx={{ mt: 2 ,mb: 2}}>{comments.length} Answers </Typography>
         {
         comments.map((postComment)=>{
             return(
