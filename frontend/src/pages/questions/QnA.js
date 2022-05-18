@@ -53,12 +53,6 @@ export default function QnA( props ){
             })
        } else {
             setQna(state);
-        
-            // 조회수+1
-            api.updatePost(state.id);
-
-        // 조회수+1
-        api.updatePost(state.id);
 
         api.getPost(state.id)
         .then( res => {
@@ -102,9 +96,9 @@ export default function QnA( props ){
                         <Box sx={{ display: 'flex' ,flexDirection: 'row' ,mb: 2 ,alignItems: 'center'}}>
                             <Typography sx={{ ml: 2 ,fontSize: 13}}>조회수 {qna.views}</Typography>
                             <Typography sx={{ ml: 2 ,fontSize: 13}}>작성일 {qna.createdTime}</Typography>
-                            <Box onClick={() => navigate("/minihome", {state: {tabIndex: 0, targetEmail: targetUserEmail}})} sx={{marginLeft:'auto'}}>
+                            {/* <Box onClick={() => navigate("/minihome", {state: {tabIndex: 0, targetEmail: targetUserEmail}})} sx={{marginLeft:'auto'}}>
                                 <SmallUserProfile  userInfo={writer}></SmallUserProfile>
-                            </Box>
+                            </Box> */}
                         </Box>
                     </Box>
                     <Divider variant="fullWidth" sx={{ flexGrow: 1 }}/>
