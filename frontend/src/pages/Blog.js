@@ -117,7 +117,7 @@ function Blog(){
                         <SmallUserProfile userInfo={post.userResponseDto}/>
                         <Box sx={{justifyContent: 'space-between', display: 'flex', width: '100%', marginBottom: 1}}>
                             <Typography sx={{fontWeight :'bold', fontSize: 20, color: 'gray'}}>{'태그: '+post.tags}</Typography>
-                            <Typography sx={{fontWeight :'bold', fontSize: 20}}>{post.createdTime}</Typography>
+                            <Typography sx={{fontWeight :'bold', fontSize: 15}}>{post.modifiledTime === null ? post.createdTime : post.modifiedTime+' (수정됨)'}</Typography>
                         </Box>
                     </TitleBox>
 
@@ -148,7 +148,8 @@ function Blog(){
                             openCommentEditer={()=>{openCommentEditer()}} 
                             postId={state.postId} 
                             afterSaveComment={()=>{afterSaveComment()}} 
-                            commentType={'COMMENT'}/>
+                            commentType={'COMMENT'}
+                            modify={false}/>
                         </Box>}
                     <Box sx={{flex: 1, justifyContent: 'flex-end', display: 'flex', mt: 2}}>
                         {isOwner && <Button onClick={movetoUpdatePost} variant="outlined" sx={{width: 100}}>수정</Button>}

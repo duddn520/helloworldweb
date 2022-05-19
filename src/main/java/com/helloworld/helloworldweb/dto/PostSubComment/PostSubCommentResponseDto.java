@@ -17,6 +17,7 @@ public class PostSubCommentResponseDto {
     private Long id;
     private String content;
     private String createdTime;
+    private String modifiedTime;
     private UserResponseDto userResponseDto;
     private boolean IsOwner;
 
@@ -25,6 +26,7 @@ public class PostSubCommentResponseDto {
         this.id = postSubComment.getId();
         this.content = postSubComment.getContent();
         this.createdTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(postSubComment.getCreatedTime());
+        this.modifiedTime = postSubComment.getModifiedTime() != null ? DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(postSubComment.getModifiedTime()) : null;
         this.userResponseDto = new UserResponseDto(postSubComment.getUser());
     }
 
@@ -33,6 +35,7 @@ public class PostSubCommentResponseDto {
         this.id = postSubComment.getId();
         this.content = postSubComment.getContent();
         this.createdTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(postSubComment.getCreatedTime());
+        this.modifiedTime = postSubComment.getModifiedTime() != null ? DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(postSubComment.getModifiedTime()) : null;
         this.userResponseDto = new UserResponseDto(postSubComment.getUser());
         this.IsOwner = checkIsOwner(postSubComment.getUser(),caller);
     }
@@ -42,6 +45,7 @@ public class PostSubCommentResponseDto {
         this.id = postSubComment.getId();
         this.content = postSubComment.getContent();
         this.createdTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(postSubComment.getCreatedTime());
+        this.modifiedTime = postSubComment.getModifiedTime() != null ? DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(postSubComment.getModifiedTime()) : null;
         this.userResponseDto = new UserResponseDto(postSubComment.getUser());
         this.IsOwner = isOwner;
     }

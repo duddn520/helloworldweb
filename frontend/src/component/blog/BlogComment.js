@@ -47,6 +47,7 @@ const CommentBundle = styled('div')(
 
 const BlogComment = ({postComment, MyInfo, afterSaveSubComment}) => {
     const [isOpenSubCommentEditor, setIsOpenSubCommentEditor] = React.useState(false);
+    const [modifyTargetIndex, setModifyTargetIndex] = React.useState(null);
     const [myInfo, setMyInfo] = React.useState(MyInfo);
 
     function getMyInfo(){
@@ -64,38 +65,58 @@ const BlogComment = ({postComment, MyInfo, afterSaveSubComment}) => {
         setIsOpenSubCommentEditor(!isOpenSubCommentEditor);
     }
 
+    function openCommentModifyEditor(index){
+        if(myInfo === null) getMyInfo();
+        setIsOpenSubCommentEditor(false);
+        if(modifyTargetIndex === index) setModifyTargetIndex(null);
+        else setModifyTargetIndex(index); 
+    }
+
     return (
         <div>
             {postComment.postSubCommentResponseDtos.map((subComment, index)=>{
                 if(index === 0){
                     return(
-                        <CommentBundle key={subComment.id}>
-                            <SmallUserProfile userInfo={subComment.userResponseDto}/>
-                            <Typography>{subComment.content}</Typography>
-                            <Typography sx={{fontSize: 14, color: 'lightgray'}}>{subComment.createdTime}</Typography>
-                            <SubCommentBtn onClick={()=>{openCommentEditer()}}>
-                                <Typography sx={{fontSize: 12, fontWeight: 'bold'}}>답글</Typography>
-                            </SubCommentBtn>
-                        </CommentBundle>
+                        <div key={subComment.id}>
+                            <CommentBundle>
+                                <Box sx={{justifyContent: 'space-between', display: 'flex', width: '100%', alignItems: 'center', marginBottom: 1}}>
+                                    <SmallUserProfile userInfo={subComment.userResponseDto}/>
+                                    {subComment.isOwner && <Typography sx={{fontSize: 13, color: 'gray'}} onClick={()=>{openCommentModifyEditor(index)}}>수정</Typography>}
+                                </Box>
+                                <Typography>{subComment.content}</Typography>
+                                <Typography sx={{fontSize: 14, color: 'lightgray'}}>{subComment.modifiedTime === null ? subComment.createdTime : subComment.modifiedTime}</Typography>
+                                <SubCommentBtn onClick={()=>{openCommentEditer()}}>
+                                    <Typography sx={{fontSize: 12, fontWeight: 'bold'}}>답글</Typography>
+                                </SubCommentBtn>
+                            </CommentBundle>
+                            {index === modifyTargetIndex && <CommentEditor myInfo={myInfo} isOpenCommentEditer={true} openCommentEditer={()=>{}} commentType={"SUBCOMMENT"} afterSaveComment={()=>{afterSaveSubComment(); setIsOpenSubCommentEditor(false);}} postCommentId={postComment.id} modify={true}/>}
+                        </div>
                     )
                 }
                 else{
                     return(
-                        <SubCommentBundle key={subComment.id}>
-                            <Box sx={{height: 30, display: 'flex', alignItems: 'center'}}>
-                                <ArrowForwardIos sx={{color: 'gray', fontSize: 18}}/>
-                            </Box>
-                            <Box sx={{marginLeft: 1}}>
-                                <SmallUserProfile userInfo={subComment.userResponseDto}/>
-                                <Typography>{subComment.content}</Typography>
-                                <Typography sx={{fontSize: 14, color: 'lightgray'}}>{subComment.createdTime}</Typography>
-                            </Box>
-                        </SubCommentBundle>
+                        <div key={subComment.id}>
+                            <SubCommentBundle>
+                                <Box sx={{height: 30, display: 'flex', alignItems: 'center'}}>
+                                    <ArrowForwardIos sx={{color: 'gray', fontSize: 18}}/>
+                                </Box>
+                                <Box sx={{marginLeft: 1, flex: 1}}>
+                                    <Box sx={{justifyContent: 'space-between', display: 'flex', width: '100%', alignItems: 'center', marginBottom: 1}}>
+                                        <SmallUserProfile userInfo={subComment.userResponseDto}/>
+                                        {subComment.isOwner && <Typography sx={{fontSize: 13, color: 'gray'}} onClick={()=>{openCommentModifyEditor(index)}}>수정</Typography>}
+                                    </Box>
+                                    <Typography>{subComment.content}</Typography>
+                                    <Typography sx={{fontSize: 14, color: 'lightgray'}}>{subComment.modifiedTime === null ? subComment.createdTime : subComment.modifiedTime}</Typography>
+                                </Box>
+                            </SubCommentBundle>
+                            {index === modifyTargetIndex && <CommentEditor myInfo={myInfo} isOpenCommentEditer={true} openCommentEditer={()=>{}} commentType={"SUBCOMMENT"} afterSaveComment={()=>{afterSaveSubComment(); setIsOpenSubCommentEditor(false);}} postCommentId={postComment.id} modify={true}/>}
+                        </div>
                     )
                 }
                 
             })}
-            {isOpenSubCommentEditor && <CommentEditor myInfo={myInfo} isOpenCommentEditer={true} openCommentEditer={()=>{}} commentType={"SUBCOMMENT"} afterSaveComment={()=>{afterSaveSubComment(); setIsOpenSubCommentEditor(false)}} postCommentId={postComment.id}/>}
+            {isOpenSubCommentEditor && <CommentEditor myInfo={myInfo} isOpenCommentEditer={true} openCommentEditer={()=>{}} commentType={"SUBCOMMENT"} afterSaveComment={()=>{afterSaveSubComment(); setIsOpenSubCommentEditor(false);}} postCommentId={postComment.id} modify={false}/>}
+            
         </div>
     )
 }

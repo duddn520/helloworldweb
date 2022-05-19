@@ -15,7 +15,7 @@ const Editor = styled.div`
     margin-top: 10px;
 `;
 
-function CommentEditor({myInfo, isOpenCommentEditer, openCommentEditer, postId, afterSaveComment, commentType, postCommentId}){
+function CommentEditor({myInfo, isOpenCommentEditer, openCommentEditer, postId, afterSaveComment, commentType, postCommentId, modify}){
 
     function saveComment(){
         const divE = document.getElementById('Editor');
@@ -37,25 +37,29 @@ function CommentEditor({myInfo, isOpenCommentEditer, openCommentEditer, postId, 
             alert("댓글을 입력해주세요.");
         }
         else {
-            if(commentType === 'COMMENT'){
-                api.registerPostComment(postId, commentString)
-                .then((res)=>{
-                    afterSaveComment();
-                })
-                .catch(e=>{
-                    alert("댓글 등록에 실패했습니다.");
-                });
+            if(modify){
+                alert("개발중");
             }
             else{
-                api.registerPostSubComment(postCommentId, commentString)
-                .then((res)=>{
-                    afterSaveComment();
-                })
-                .catch(e=>{
-                    alert("답글 등록에 실패했습니다.");
-                });
+                if(commentType === 'COMMENT'){
+                    api.registerPostComment(postId, commentString)
+                    .then((res)=>{
+                        afterSaveComment();
+                    })
+                    .catch(e=>{
+                        alert("댓글 등록에 실패했습니다.");
+                    });
+                }
+                else{
+                    api.registerPostSubComment(postCommentId, commentString)
+                    .then((res)=>{
+                        afterSaveComment();
+                    })
+                    .catch(e=>{
+                        alert("답글 등록에 실패했습니다.");
+                    });
+                }
             }
-            
         }
     }
 
