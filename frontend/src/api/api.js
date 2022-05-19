@@ -615,8 +615,47 @@ function getNewToken(accessToken,refreshToken){
     }); 
 }
 
+function updatePostSubComment(id,content){
+    return new Promise((resolve,reject) => {
+        axios({
+            method: "PUT" ,
+            url:"/api/postsubcomment",
+            data: {
+                "id" : id ,
+                "content" : content
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            reject();
+        })
+    });  
+}
+
+function deletePostSubComment(id) {
+    return new Promise((resolve,reject) => {
+        axios({
+            method: "DELETE" ,
+            url:"/api/postsubcomment",
+            params: {
+                "id" : id ,
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            reject();
+        })
+    });  
+}
+
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
     getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , 
     getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
     getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName 
-    ,getUserQnas ,getUserComments, getGithubRepositories, registerUserWithGithub, connectUserToGithub , getNewToken} ;
+    ,getUserQnas ,getUserComments, getGithubRepositories, registerUserWithGithub, connectUserToGithub , getNewToken
+    ,updatePostSubComment ,deletePostSubComment
+} ;

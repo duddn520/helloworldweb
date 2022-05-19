@@ -56,9 +56,7 @@ public class PostSubCommentController {
     @PutMapping("/api/postsubcomment")
     public ResponseEntity<ApiResponse<PostSubCommentResponseDto>> updatePostSubComment(@RequestBody PostSubCommentRequestDto requestDto)
     {
-        PostSubComment postSubComment = postSubCommentService.getPostSubCommentById(requestDto.getId());
-
-        PostSubCommentResponseDto responseDto = new PostSubCommentResponseDto(postSubComment.updatePostSubComment(requestDto.toEntity()));
+        PostSubCommentResponseDto responseDto = new PostSubCommentResponseDto(postSubCommentService.updatePostSubComment(requestDto.getId(), requestDto.getContent()));
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.OK,
@@ -79,7 +77,7 @@ public class PostSubCommentController {
     @DeleteMapping("/api/postsubcomment")
     public ResponseEntity<ApiResponse> deletePostSubComment(@RequestParam(name = "id")Long id)
     {
-        postSubCommentService.deletePostSubComment(postSubCommentService.getPostSubCommentById(id));
+        postSubCommentService.deletePostSubComment(id);
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.OK,
