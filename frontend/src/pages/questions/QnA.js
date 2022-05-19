@@ -166,9 +166,9 @@ export default function QnA( props ){
                         </Grid> */}
                     </Grid>
                     
-                    <Container>
+                    {/* <Container>
                         <MDEditor.Markdown source={reply} style={{ marginTop: 1 }}/>
-                    </Container>
+                    </Container> */}
                     <Box>
                         <Button 
                             variant='contained' 

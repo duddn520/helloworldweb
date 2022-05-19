@@ -1,16 +1,18 @@
-import { Avatar, Button, Grid, Paper, Typography } from "@mui/material";
+import { Button, Grid, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect } from "react";
 import { Divider,} from "@mui/material";
 import PostSubCommentTextBox from "./PostSubCommentTextBox";
 import MDEditor from '@uiw/react-md-editor';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import api from "../../api/api";
 import { useNavigate } from 'react-router';
+import AlertDialog from "../dialog/AlertDialog";
+
+
 
 export default function QnAComment({postsubcomments, postCommentId}){
-
-    const navigate = useNavigate();
-    const [subComments, setSubComments] = React.useState([])
+    const [subComments, setSubComments] = React.useState([]);
     // const [likes, setLikes] = React.useState("")
 
 
@@ -40,79 +42,19 @@ export default function QnAComment({postsubcomments, postCommentId}){
             </Grid>
             <Grid item xs={11}>
                 {subComments.map((postsubcomment,idx)=>{
-
                     if(idx===0){
                         return (
-                            <div key={postsubcomment.id}>
-                            <Box sx={{
-                                minBlockSize:"60px"
-                            }}>
-                                <MDEditor.Markdown source={postsubcomment.content} style={{ marginTop: 5 }}/>
-                            </Box>
-                            <Box sx={{
-                                flexGrow:1 ,
-                                display: 'flex'
-                            }}>
-                                <Typography 
-                                    variant="caption"
-                                    sx={{ color: 'gray'}}
-                                >
-                                        {postsubcomment.createdTime}
-                                </Typography>
-                                <Box sx={{
-                                    marginLeft:'auto' ,
-                                    color: 'gray'
-                                }}>
-                                    <Box onClick={() => navigate("/minihome", {state: {tabIndex: 0, targetEmail: postsubcomment.userResponseDto.email}}) } sx={{display: 'flex', alignItems: 'center', mb: 1}}>
-                                      <Box sx={{width: 30, height: 30, borderRadius: 15, overflow: 'hidden', marginRight: 1, display: 'flex', alignItems: 'center'}}>
-                                        <img src={postsubcomment.userResponseDto.profileUrl} width={30} height={30} alt={'프로필 사진'}></img>
-                                    </Box>
-                                        <Typography variant="caption">{postsubcomment.userResponseDto.userName}</Typography>
-                                    </Box>
+                                <QnACommentComponent postsubcomment={postsubcomment} boxsize="60px" />
+                            );
+                        }
+                        else{       // 대댓글인 경우
+                            return(
+                                <Box sx={{ ml: 2 }}>
+                                    <QnACommentComponent postsubcomment={postsubcomment} boxsize="20px" />
                                 </Box>
-                            </Box>
-                            <Divider variant="fullWidth" sx={{ flexGrow: 1 ,mt: 1}}/>
-                            </div>
-                        )
-                    }
-                    else{       //대댓글인 경우
-                        return(
-                            <Box sx={{ ml: 2 }}>
-                                <Box sx={{
-                                    minBlockSize:"20px" ,
-                                    mt: 1
-                                }}>
-                                    <MDEditor.Markdown source={postsubcomment.content} style={{ marginTop: 5 }}/>
-                                </Box>
-                                <Box sx={{
-                                    flexGrow:1 ,
-                                    display: 'flex' ,
-                                    mt: 2
-                                }}>
-                                    <Typography 
-                                        variant="caption"
-                                        sx={{ color: 'gray' }}
-                                    >
-                                        {postsubcomment.createdTime}
-                                    </Typography>
-                                    <Box sx={{
-                                        marginLeft:'auto'
-                                    }}>
-                                        <Box onClick={() => navigate("/minihome", {state: {tabIndex: 0, targetEmail: postsubcomment.userResponseDto.email}}) } sx={{display: 'flex', alignItems: 'center', mb: 1}}>
-                                        <Box sx={{width: 30, height: 30, borderRadius: 15, overflow: 'hidden', marginRight: 1, display: 'flex', alignItems: 'center'}}>
-                                            <img src={postsubcomment.userResponseDto.profileUrl} width={30} height={30} alt={'프로필 사진'}></img>
-                                        </Box>
-                                            <Typography variant="caption">{postsubcomment.userResponseDto.userName}</Typography>
-                                        </Box>
-                                    </Box>
-
-                                </Box>
-                                <Divider variant="fullWidth" sx={{ flexGrow: 1 ,mt: 1}}/>
-                            </Box>
                             )
                     }
                     } 
-
                 )
                 }
                     <PostSubCommentTextBox postCommentId={postCommentId}/>
@@ -122,7 +64,92 @@ export default function QnAComment({postsubcomments, postCommentId}){
     </Box> 
   )
 
-     
-
 }
+
+function QnACommentComponent({postsubcomment,boxsize}){
+    const [editEnabled,setEditEnabled] = React.useState(false);
+    const [newComment,setNewComment] = React.useState(postsubcomment.content);
+    // 다이얼로그 드로어
+    const [open,setOpen] = React.useState(false);
+    const handleOpen = () => {
+        setOpen(true);
+    };
+
+    const handleDelete = () => {
+        // 삭제함수
+        api.deletePostSubComment(postsubcomment.id)
+        .then( res => {
+            window.location.reload();
+        })
+        .catch( e => { })
+    };
+
+    const navigate = useNavigate();
+
+    const handleSubmit = () => {
+        api.updatePostSubComment(postsubcomment.id,newComment)
+        .then( res => {
+            window.location.reload();
+        })
+        .catch( e => { });
+    };
+    
+
+    return(
+        <div key={postsubcomment.id}>
+            <Box sx={{ display: 'flex' ,flexDireciton: 'row' ,mt: 0.5 }}>
+                <AlertDialog open={open} setOpen={setOpen} onAgree={handleDelete}/>
+                <Box sx={{
+                    minBlockSize: boxsize ,
+                    flex: 4
+                }}>
+                    {
+                        editEnabled ? 
+                        <Box>
+                            <MDEditor style={{ flex: 1 }} value={newComment} onChange={setNewComment} /> 
+                            <Button variant="contained" sx={{ mt: 1 }} onClick={handleSubmit}>수정하기</Button>
+                        </Box>
+                        : <MDEditor.Markdown source={postsubcomment.content} style={{ marginTop: 5 }}/>
+                    }
+                </Box>
+                {
+                    postsubcomment.isOwner &&
+                    <Box sx={{ ml: 'auto' ,display: 'flex' ,height: 30 , flex: 1 }}>
+                        <Button  size="small" sx={{ ml: 'auto' , color: editEnabled ? 'gray' : 'default' }} onClick={() => setEditEnabled(!editEnabled)}>{ !editEnabled ? "수정" : "수정취소" }</Button>
+                        <Button  size="small" sx={{ color: 'red' }} onClick={handleOpen}>삭제</Button>
+                    </Box>
+                }
+            </Box>
+
+            <Box sx={{
+                flexGrow:1 ,
+                display: 'flex' ,
+                flexDireciton: 'row' ,
+                alignItems: 'end' ,
+                mt: 3
+            }}>
+                <Typography 
+                    variant="caption"
+                    sx={{ color: 'gray'}}
+                >
+                        {postsubcomment.createdTime}
+                </Typography>
+                <Box sx={{
+                    marginLeft:'auto' ,
+                    color: 'gray'
+                }}>
+                    <Button onClick={() => navigate("/minihome", {state: {tabIndex: 0, targetEmail: postsubcomment.userResponseDto.email}}) } sx={{display: 'flex', alignItems: 'center' ,textTransform: 'none'}}>
+                        <Box sx={{width: 25, height: 25, borderRadius: 15, overflow: 'hidden', marginRight: 1, display: 'flex', alignItems: 'center'}}>
+                            <img src={postsubcomment.userResponseDto.profileUrl} width={25} height={25} alt={'프로필 사진'}></img>
+                        </Box>
+                        <Typography variant="caption">{postsubcomment.userResponseDto.userName}</Typography>
+                    </Button>
+                </Box>
+            </Box>
+            <Divider variant="fullWidth" sx={{ flexGrow: 1 ,mt: 1}}/>
+        </div>
+    );
+}
+
+
 
