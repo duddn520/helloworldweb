@@ -3,6 +3,7 @@ package com.helloworld.helloworldweb.service;
 import com.helloworld.helloworldweb.domain.PostComment;
 import com.helloworld.helloworldweb.domain.PostSubComment;
 import com.helloworld.helloworldweb.domain.User;
+import com.helloworld.helloworldweb.repository.PostCommentRepository;
 import com.helloworld.helloworldweb.repository.PostSubCommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,12 +11,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class PostSubCommentService {
 
     private final PostSubCommentRepository postSubCommentRepository;
+    private final PostCommentRepository postCommentRepository;
 
     public PostSubComment getPostSubCommentById(Long id)
     {
@@ -35,9 +38,27 @@ public class PostSubCommentService {
         return postSubCommentRepository.findAllById(userId).orElse(new ArrayList<PostSubComment>());
     }
 
+    // 답변 수정
+    public PostSubComment updatePostSubComment(Long id,String content){
+        PostSubComment findPostSubComment = postSubCommentRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        return postSubCommentRepository.save( findPostSubComment.updateContent(content) ) ;
+    }
+
     @Transactional
-    public void deletePostSubComment(PostSubComment postSubComment)
+    public void deletePostSubComment(Long id)
     {
-        postSubCommentRepository.delete(postSubComment);
+        PostSubComment postSubComment = getPostSubCommentById(id);
+        // 남아있는 모든 댓글들
+        PostComment postComment = postSubComment.getPostComment();
+
+        postCommentRepository.save( postComment.removePostSubComment(postSubComment) ) ;
+
+        // 댓글 삭제
+//        if( allPostSubComments.size() == 1 ){
+//            postCommentRepository.delete( postSubComment.getPostComment() );
+//        } else {
+//            postSubCommentRepository.delete( postSubComment );
+//        }
+
     }
 }

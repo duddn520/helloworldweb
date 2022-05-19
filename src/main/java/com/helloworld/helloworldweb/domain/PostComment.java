@@ -37,4 +37,17 @@ public class PostComment extends BaseTimeEntity{
         post.getPostComments().add(this);
         this.post = post;
     }
+
+    public PostComment removePostSubComment(PostSubComment postSubComment){
+        // 마지막 댓글인 경우
+        if( this.postSubComments.size() == 1 ){
+            this.post.getPostComments().remove(this);
+            this.post = null;
+        } else { // 일반적인 경우
+            this.postSubComments.remove(postSubComment);
+            postSubComment.removePostComment();
+        }
+        return this;
+    }
+
 }

@@ -48,8 +48,16 @@ public class PostSubComment extends BaseTimeEntity {
     public PostSubComment updatePostSubComment(PostSubComment postSubComment)
     {
         this.content = postSubComment.getContent();
-
         return this;
+    }
+
+    public PostSubComment updateContent(String content){
+        this.content = content;
+        return this;
+    }
+
+    public void removePostComment(){
+        this.postComment = null;
     }
 
 

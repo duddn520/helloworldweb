@@ -9,7 +9,7 @@ export default function CommentTextArea({content,setContent}){
                 <MDEditor
                     value={content}
                     onChange={setContent}
-                    height = {500}
+                    height = {300}
                     style={{ margin: 10 }}
                 />
                 {/* <MDEditor.Markdown source={value} /> */}
