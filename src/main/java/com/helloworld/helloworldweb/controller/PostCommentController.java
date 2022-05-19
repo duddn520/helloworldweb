@@ -39,6 +39,7 @@ public class PostCommentController {
 
         Post post = postService.getPost(postCommentRequestDto.getPostId());
         PostComment postComment = PostComment.builder()
+                .selected(false)
                 .build();
         PostSubComment postSubComment = PostSubComment.builder()
                 .content(postCommentRequestDto.getContent())
@@ -66,8 +67,6 @@ public class PostCommentController {
 
     }
 
-    //update는 필요 없을듯.
-
     @DeleteMapping("/api/postcomment")
     public ResponseEntity<ApiResponse> deletePostComment(@RequestParam(name = "id") Long id)
     {
@@ -78,6 +77,16 @@ public class PostCommentController {
                 HttpStatusCode.OK,
                 HttpResponseMsg.DELETE_SUCCESS), HttpStatus.OK);
 
+    }
+
+    @PutMapping
+    public ResponseEntity<ApiResponse> selectPostComment(@RequestParam(name="id") Long id)
+    {
+        postCommentService.selectPostComment(id);
+
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.PUT_SUCCESS,
+                HttpResponseMsg.PUT_SUCCESS), HttpStatus.OK);
     }
 
 
