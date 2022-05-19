@@ -21,6 +21,7 @@ public class PostResponseDtoWithPostComments {
     private String content;
     private String tags;
     private String createdTime;
+    private String modifiedTime;
     private List<PostCommentResponseDto> postCommentResponseDtos = new ArrayList<>();
     private List<PostImageResponseDto> postImageResponseDtos = new ArrayList<>();
     private boolean IsOwner;
@@ -34,7 +35,8 @@ public class PostResponseDtoWithPostComments {
         this.title = post.getTitle();
         this.content = post.getContent();
         this.tags = post.getTags();
-        this.createdTime = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(post.getCreatedTime());
+        this.createdTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(post.getCreatedTime());
+        this.modifiedTime = post.getModifiedTime() != null ? DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(post.getModifiedTime()) : null;
         this.postCommentResponseDtos = postCommentsToResponseDtos(post.getPostComments(),caller);
         this.postImageResponseDtos = postImageResponseDtos(post.getPostImages());
         this.IsOwner = checkIsOwner(post.getUser(),caller);

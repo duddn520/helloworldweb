@@ -92,41 +92,6 @@ public class PostServiceUnitTest {
         //then
         assertThat(savedPost).isEqualTo(null);
     }
-
-    @Test
-    @DisplayName("getPost 성공한 케이스")
-    void getPost_success(){
-        //given
-        Post post = Post.builder()
-                .title("hello")
-                .content("my name is Jihun")
-                .category(Category.BLOG)
-                .tags("test")
-                .build();
-        Long undefinedId = 100L;
-        when(postRepository.findById(any(Long.class))).thenReturn(Optional.of(post));
-
-        //when
-        Post getPost = postService.getPost(undefinedId);
-
-        //then
-        assertThat(getPost).isEqualTo(post);
-
-    }
-    @Test
-    @DisplayName("getPost 실패한 케이스")
-    void getPost_fail(){
-        //given
-        Long undefinedId = 100L;
-        when(postRepository.findById(any(Long.class))).thenReturn(Optional.empty());
-
-        //when, then
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> {
-            postService.getPost(undefinedId);
-        });
-        assertEquals("해당 게시물이 존재하지 않습니다.", exception.getMessage());
-    }
-
     @Test
     @DisplayName("addPost_WithImage 성공한 케이스")
     void addPost_WithImage_success() throws IOException {
@@ -167,7 +132,6 @@ public class PostServiceUnitTest {
         //then
         assertThat("www.naver.com123TestImage.png").isEqualTo(savedPost.getPostImages().get(0).getStoredUrl());
         assertThat(base64ForFront).isEqualTo(savedPost.getPostImages().get(0).getBase64());
-        System.out.println("savedPost.getPostImages().get(0).getBase64() = " + savedPost.getPostImages().get(0).getBase64());
     }
     @Test
     @DisplayName("addPost_WithImage 실패한 케이스")
@@ -201,6 +165,40 @@ public class PostServiceUnitTest {
             postService.addPost(post, user, fileList);
         });
         assertEquals("파일 변환 중 에러가 발생했습니다 (TestImage.png)", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("getPost 성공한 케이스")
+    void getPost_success(){
+        //given
+        Post post = Post.builder()
+                .title("hello")
+                .content("my name is Jihun")
+                .category(Category.BLOG)
+                .tags("test")
+                .build();
+        Long undefinedId = 100L;
+        when(postRepository.findById(any(Long.class))).thenReturn(Optional.of(post));
+
+        //when
+        Post getPost = postService.getPost(undefinedId);
+
+        //then
+        assertThat(getPost).isEqualTo(post);
+
+    }
+    @Test
+    @DisplayName("getPost 실패한 케이스")
+    void getPost_fail(){
+        //given
+        Long undefinedId = 100L;
+        when(postRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+
+        //when, then
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> {
+            postService.getPost(undefinedId);
+        });
+        assertEquals("해당 게시물이 존재하지 않습니다.", exception.getMessage());
     }
 
     @Test
@@ -312,5 +310,59 @@ public class PostServiceUnitTest {
         assertThat(savedPost.getTags()).isEqualTo(newTags);
         assertThat(savedPost.getPostImages().get(0).getStoredUrl()).isEqualTo("www.naver.com123newTestImage.png");
 
+    }
+
+    @Test
+    @DisplayName("게시물 제목, 내용으로 검색")
+    void searchPost_withTitleAndContent() {
+        //given
+        List<Post> postList = new ArrayList<>();
+        for(int i = 0; i < 50; i++){
+            Post post = Post.builder()
+                    .title("제목 react")
+                    .content("my name is Jihun")
+                    .category(Category.BLOG)
+                    .tags("test")
+                    .build();
+            postList.add(post);
+        }
+        for(int i = 0; i < 50; i++){
+            Post post = Post.builder()
+                    .title("title")
+                    .content("내용 native")
+                    .category(Category.BLOG)
+                    .tags("test")
+                    .build();
+            postList.add(post);
+        }
+
+        //when
+        when(postRepository.findAllByTitleContainingOrContentContaining(anyString(), anyString())).thenReturn(Optional.of(postList));
+        List<Post> findPosts = postService.getSearchedPost("react native");
+
+        //then
+        assertThat(findPosts.size()).isEqualTo(100);
+    }
+    @Test
+    @DisplayName("태그 모두 검색")
+    void searchPost_withTags() {
+        //given
+        List<Post> postList_tag = new ArrayList<>();
+        for(int i = 0; i < 50; i++){
+            Post post = Post.builder()
+                    .title("title")
+                    .content("content")
+                    .category(Category.BLOG)
+                    .tags("react, java")
+                    .build();
+            postList_tag.add(post);
+        }
+
+        //when
+        when(postRepository.findAllByTagsContaining(anyString())).thenReturn(Optional.of(postList_tag));
+        List<Post> findPosts = postService.getSearchedPost("%react%");
+
+        //then
+        assertThat(findPosts.size()).isEqualTo(50);
     }
 }
