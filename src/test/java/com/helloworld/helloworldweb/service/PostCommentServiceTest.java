@@ -1,89 +1,129 @@
 package com.helloworld.helloworldweb.service;
 
 import com.helloworld.helloworldweb.domain.*;
-import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
-import com.helloworld.helloworldweb.repository.PostRepository;
-import com.helloworld.helloworldweb.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
+import com.helloworld.helloworldweb.repository.PostCommentRepository;
+import com.helloworld.helloworldweb.repository.PostSubCommentRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.PersistenceContext;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-@SpringBootTest
-@Transactional //테스트 반복을 위해 한 트랜잭션 후에 롤백함.
-@PersistenceContext
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
 public class PostCommentServiceTest {
 
-    @Autowired
-    JwtTokenProvider jwtTokenProvider;
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    PostRepository postRepository;
-    @Autowired
-    UserService userService;
-    @Autowired
-    PostService postService;
-    @Autowired PostCommentService postCommentService;
+    @Mock
+    PostCommentRepository postCommentRepository;
 
-    String testEmail = "ys05143@naver.com/";
-//    String testEmail = "test@email.com";
+    @Mock
+    PostSubCommentRepository postSubCommentRepository;
 
-    private String getToken() {
-        return jwtTokenProvider.createToken(testEmail, Role.USER);
-    }
+    @InjectMocks
+    PostCommentService postCommentService;
 
-    @BeforeEach
-    void 회원가입_게시물작성() throws IOException {
-
-//        User testUser = User.builder()
-//                .email(testEmail)
-//                .repo_url(" ")
-//                .profileUrl(" ")
-//                .nickName(testEmail)
-//                .role(Role.USER)
-//                .build();
-//        userService.addUser(testUser);
-
-        Post newPost = Post.builder()
-                .category(Category.BLOG)
-                .title("BLOG")
-                .content("hello my name is Jihun")
-                .tags("TEST")
+    @Test
+    @DisplayName("댓글 등록 성공")
+    void registerPostComment_success() throws IOException{
+        //given
+        User user = User.builder()
+                .posts(new ArrayList<>())
+                .subComments(new ArrayList<>())
+                .email("test@email.com")
+                .role(Role.USER)
+                .nickName("hihihi")
                 .build();
 
-        String testUserJwt = getToken();
-        User user = userService.getUserByJwt(testUserJwt);
+        Post post = Post.builder()
+                .postComments(new ArrayList<>())
+                .title("hello")
+                .content("i dont know!!!")
+                .tags("java")
+                .category(Category.QNA)
+                .build();
 
-        postService.addPost(newPost, user, null);
+        PostComment postComment = PostComment.builder()
+                .selected(false)
+                .build();
+
+        PostSubComment subComment = PostSubComment.builder()
+                .content("1234")
+                .build();
+
+        when(postCommentRepository.save(any(PostComment.class))).thenReturn(postComment);
+        when(postSubCommentRepository.save(any(PostSubComment.class))).thenReturn(subComment);
+
+        //when
+        PostComment result = postCommentService.registerPostComment(postComment,post,subComment,user);
+
+        //then (연관관계 잘 맺어졌는지 확인.)
+        assertThat(result.getPostSubComments().get(0).getContent()).isEqualTo("1234");
+        assertThat(result.getPost().getContent()).isEqualTo("i dont know!!!");
+        assertThat(result.getPostSubComments().get(0).getUser()).isEqualTo(user);
 
     }
 
-//    @Test
-//    void 게시물_댓글_작성() {
-//        //given
-//        User findUser = userService.getUserByEmail(testEmail);
-//        List<Post> blogs = postService.getAllUserPosts(findUser.getId(), Category.BLOG);
-//        Post targetPost = blogs.get(blogs.size() - 1 );
-//        System.out.println("targetPost = " + targetPost.getContent());
-//
-//        PostComment newPostComment = PostComment.builder()
-//                .build();
-//        PostSubComment newPostSubComment = PostSubComment.builder()
-//                .content("hi this is comment")
-//                .build();
-//
-//        //when
-//        PostComment savedPostComment = postCommentService.registerPostComment(newPostComment, targetPost, newPostSubComment, findUser);
-//
-//        //then
-//        System.out.println("savedPostComment = " + savedPostComment);
-//    }
+    @Test
+    @DisplayName("댓글 채택 성공")
+    void selectPostComment_success() throws IOException{
+        //given
+        User user = User.builder()
+                .posts(new ArrayList<>())
+                .subComments(new ArrayList<>())
+                .email("test@email.com")
+                .role(Role.USER)
+                .nickName("hihihi")
+                .build();
+
+        Post post = Post.builder()
+                .postComments(new ArrayList<>())
+                .title("hello")
+                .content("i dont know!!!")
+                .tags("java")
+                .category(Category.QNA)
+                .build();
+
+        post.updateUser(user);
+
+        PostComment postComment = PostComment.builder()
+                        .selected(false)
+                        .build();
+
+        postComment.updatePost(post);
+
+        List<PostSubComment> subCommentList = new ArrayList<>();
+        for(int i=0;i<3;i++)
+        {
+            PostSubComment subComment = PostSubComment.builder()
+                    .content("1234"+i)
+                    .build();
+
+            subComment.updateUser(user);
+            subComment.updatePostComment(postComment);
+            subCommentList.add(subComment);
+        }
+
+        when(postCommentRepository.save(any(PostComment.class))).thenReturn(postComment);
+        when(postCommentService.getPostCommentById(any(Long.class))).thenReturn(postComment);
+
+        //when
+        PostComment result = postCommentService.selectPostComment(postComment.getId());
+
+        //then
+        assertThat(result.isSelected()).isEqualTo(true);
+        assertThat(post.getPostComments().get(0).isSelected()).isEqualTo((true));
+
+    }
+
 }
