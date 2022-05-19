@@ -19,6 +19,7 @@ public class PostCommentResponseDto {
     private Long id;
     private Long postId;
     private List<PostSubCommentResponseDto> postSubCommentResponseDtos = new ArrayList<>();
+    private boolean selected;
     private String createdTime;
 
     public PostCommentResponseDto(PostComment postComment)
@@ -26,6 +27,7 @@ public class PostCommentResponseDto {
         this.id = postComment.getId();
         this.postId = postComment.getPost().getId();
         this.postSubCommentResponseDtos = postSubCommentsToResponseDtos(postComment.getPostSubComments());
+        this.selected = postComment.isSelected();
         this.createdTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(postComment.getCreatedTime());
     }
 
@@ -34,6 +36,7 @@ public class PostCommentResponseDto {
         this.id = postComment.getId();
         this.postId = postComment.getPost().getId();
         this.postSubCommentResponseDtos = postSubCommentsToResponseDtos(postComment.getPostSubComments(), caller);
+        this.selected = postComment.isSelected();
         this.createdTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(postComment.getCreatedTime());
     }
 

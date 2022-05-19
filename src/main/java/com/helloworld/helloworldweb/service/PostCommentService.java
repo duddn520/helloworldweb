@@ -41,4 +41,12 @@ public class PostCommentService {
     {
         postCommentRepository.delete(postComment);
     }
+
+    public PostComment selectPostComment(Long id)
+    {
+        PostComment postComment = getPostCommentById(id);
+
+        postComment.selectPostComment();
+        return postCommentRepository.save(postComment);
+    }
 }
