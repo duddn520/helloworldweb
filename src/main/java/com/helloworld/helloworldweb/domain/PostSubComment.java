@@ -56,8 +56,11 @@ public class PostSubComment extends BaseTimeEntity {
         return this;
     }
 
-    public void removePostComment(){
+    public void delete(){
+        // 연관관계 모두 삭제
+        this.postComment.getPostSubComments().clear();
         this.postComment = null;
+        this.user = null;
     }
 
 

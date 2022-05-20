@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface PostSubCommentRepository extends JpaRepository<PostSubComment,Long> {
     Optional<PostSubComment> findById(Long id);
     Optional<List<PostSubComment>> findAllById(Long id);
+    Optional<List<PostSubComment>> findAllByUserId(Long userId);
 }

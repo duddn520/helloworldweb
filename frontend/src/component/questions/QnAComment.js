@@ -94,6 +94,7 @@ function QnACommentComponent({postsubcomment,boxsize}){
         .catch( e => { });
     };
     
+    console.log(postsubcomment);
 
     return(
         <div key={postsubcomment.id}>
@@ -132,7 +133,11 @@ function QnACommentComponent({postsubcomment,boxsize}){
                     variant="caption"
                     sx={{ color: 'gray'}}
                 >
-                        {postsubcomment.createdTime}
+                    {
+                        postsubcomment.createdTime === postsubcomment.modifiedTime ?
+                        postsubcomment.createdTime :
+                        postsubcomment.modifiedTime + "(수정됨)"
+                    }
                 </Typography>
                 <Box sx={{
                     marginLeft:'auto' ,

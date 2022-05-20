@@ -494,7 +494,7 @@ function getGithubRepositories(email){
             }
         })
         .then( res => {
-            resolve(res.data.data);
+            resolve(res);
         })
         .catch( e => {
             console.log(e);

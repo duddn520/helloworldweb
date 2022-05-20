@@ -39,8 +39,8 @@ request.interceptors.response.use(
             })
             .catch( e => {
                 // alert("다시 로그인 해주세요.")
-                window.sessionStorage.clear();
-                window.location.replace("/login");
+                // window.sessionStorage.clear();
+                // window.location.replace("/login");
             })
         }
         return Promise.reject(error);

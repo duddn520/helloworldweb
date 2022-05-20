@@ -3,11 +3,12 @@ import { Box ,Avatar ,Container ,Typography ,Button ,Badge } from '@mui/material
 import { useParams ,useNavigate} from 'react-router';
 import api from '../../api/api';
 import QnAItem from '../questions/QnAItem';
+import CommentItem from '../questions/CommentItem';
 import CustomAppBar from '../appbar/CustomAppBar';
 export default function({id , qnas ,comments }){
     return(
         <Box>
-            <Container border={1} sx={{ display: 'flex' ,flexDirection: 'row' }}>
+            <Container border={1} sx={{ display: 'flex' ,flexDirection: 'column' }}>
                 <Box sx={{ flex: 1 ,m: 2}}>
                     <Typography sx={{ fontSize: 25 }}>작성한 질문</Typography>
                     <Box sx={{ flex: 1 ,mt: 2 }}>
@@ -32,8 +33,8 @@ export default function({id , qnas ,comments }){
                     {
                         comments.length ?
                         comments.map( comment => {
-                            return(
-                                <QnAItem item={comment} />
+                            return(            
+                                <CommentItem item={comment.postResponseDto} reply={comment.content}/>
                             );
                         })
                         :

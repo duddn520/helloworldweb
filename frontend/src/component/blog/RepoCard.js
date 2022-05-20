@@ -41,7 +41,7 @@ export default function RepoCard({title,content,fullName,createdAt,htmlUrl}) {
             </Typography>
         </CardContent>
         <CardActions>
-            <Button size="small" onClick={()=>window.open(htmlUrl,'_blank')}>Github에서 보기</Button>
+            <Button sx={{ textTransform: 'none' ,}}size="small" onClick={()=>window.open(htmlUrl,'_blank')}>Github에서 보기</Button>
         </CardActions>
     </Card>)
 

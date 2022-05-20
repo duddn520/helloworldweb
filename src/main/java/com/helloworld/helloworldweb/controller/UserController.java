@@ -14,6 +14,7 @@ import com.helloworld.helloworldweb.service.UserService;
 import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jose.shaded.json.parser.ParseException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.util.Pair;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
@@ -231,11 +232,11 @@ public class UserController extends HttpServlet {
     // 특정 유저가 작성한 답변들만 조회
     @GetMapping("/api/user/comments")
     public ResponseEntity<ApiResponse<List<PostSubCommentResponseDto>>> getUserComments(@RequestParam(name= "id") Long id){
-        List<PostSubComment> findAllUserComments = postSubCommentService.getAllUserComments(id);
+        List<Pair<Post, PostSubComment>> findAllUserComments = postSubCommentService.getAllUserComments(id);
 
         // List -> ResponseDto
         List<PostSubCommentResponseDto> responseDtos = findAllUserComments.stream()
-                .map(PostSubCommentResponseDto::new)
+                .map(PostSubCommentResponseDto::allUserCommentsDtos)
                 .collect(Collectors.toList());
 
         return new ResponseEntity (ApiResponse.response(
