@@ -1,5 +1,6 @@
 import React from "react";
 import { Box ,Container ,Typography ,Button} from "@mui/material";
+import { GitHub as GitHubIcon ,AccessTime as AccessTimeIcon } from "@mui/icons-material";
 import User from "../../component/blog/User";
 import api from "../../api/api";
 import RepoCardFlatList from "../../component/blog/RepoCardFlatList";
@@ -47,16 +48,19 @@ function MyInfoTab({ userInfo }){
 
             <Container sx={{ m: 2 ,display: 'flex' ,flexDirection: 'row' }}>
                 <Button 
+                    
                     onClick={() => setTabIndex(1)}
                     variant="contained" 
                     sx={{ backgroundColor: tabIndex == 1 ? 'orange' : 'lightgray' ,boxShadow: 0 ,":hover":{ boxShadow:0, backgroundColor: tabIndex == 1 ? "orange" : "lightgray" } ,textTransform: 'none' }}>
-                        Activity
+                        <AccessTimeIcon sx={{ mr: 1 }}/>
+                        활동
                 </Button>
                 <Button 
                     onClick={() => setTabIndex(2)}
                     variant="contained" 
                     sx={{ backgroundColor: tabIndex == 2 ? 'orange' : 'lightgray' ,boxShadow: 0 ,ml: 2 ,":hover":{ boxShadow:0, backgroundColor: tabIndex == 2 ? "orange" : "lightgray"} ,textTransform: 'none' }}>
-                        Github Repositories
+                        <GitHubIcon sx={{ mr: 1 }}/>
+                        깃허브
                 </Button>
             </Container>
             {

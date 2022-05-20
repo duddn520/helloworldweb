@@ -143,9 +143,12 @@ export default function(){
                                 sx={{ alignItems: 'center' }}
                                 onClick={MoveToMyBlog}
                             >
-                                <Avatar src={profileUrl}>
-                                    유저
-                                </Avatar>
+                                {
+                                    profileUrl &&
+                                    <Avatar src={profileUrl}>
+                                        
+                                    </Avatar>
+                                }
                             </ListItemButton>
                             
                             <Popover

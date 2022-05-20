@@ -1,10 +1,13 @@
 package com.helloworld.helloworldweb.dto.PostSubComment;
 
+import com.helloworld.helloworldweb.domain.Post;
 import com.helloworld.helloworldweb.domain.PostSubComment;
 import com.helloworld.helloworldweb.domain.User;
+import com.helloworld.helloworldweb.dto.Post.PostResponseDto;
 import com.helloworld.helloworldweb.dto.User.UserResponseDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.util.Pair;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,6 +22,8 @@ public class PostSubCommentResponseDto {
     private String createdTime;
     private String modifiedTime;
     private UserResponseDto userResponseDto;
+    // 댓글과 연관된 Post
+    private PostResponseDto postResponseDto;
     private boolean IsOwner;
 
     public PostSubCommentResponseDto (PostSubComment postSubComment)
@@ -48,6 +53,12 @@ public class PostSubCommentResponseDto {
         this.modifiedTime = postSubComment.getModifiedTime() != null ? DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(postSubComment.getModifiedTime()) : null;
         this.userResponseDto = new UserResponseDto(postSubComment.getUser());
         this.IsOwner = isOwner;
+    }
+
+    public static PostSubCommentResponseDto allUserCommentsDtos(Pair<Post,PostSubComment> pair){
+        PostSubCommentResponseDto postSubCommentResponseDto = new PostSubCommentResponseDto(pair.getSecond());
+        postSubCommentResponseDto.postResponseDto = new PostResponseDto(pair.getFirst());
+        return postSubCommentResponseDto;
     }
 
     private boolean checkIsOwner(User owner, User caller){

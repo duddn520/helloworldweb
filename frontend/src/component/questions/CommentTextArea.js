@@ -12,7 +12,6 @@ export default function CommentTextArea({content,setContent}){
                     height = {300}
                     style={{ margin: 10 }}
                 />
-                {/* <MDEditor.Markdown source={value} /> */}
             </Box>
     );
 }

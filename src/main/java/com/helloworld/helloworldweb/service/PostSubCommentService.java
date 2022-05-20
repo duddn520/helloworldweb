@@ -1,17 +1,14 @@
 package com.helloworld.helloworldweb.service;
 
-import com.helloworld.helloworldweb.domain.PostComment;
-import com.helloworld.helloworldweb.domain.PostSubComment;
-import com.helloworld.helloworldweb.domain.User;
+import com.helloworld.helloworldweb.domain.*;
 import com.helloworld.helloworldweb.repository.PostCommentRepository;
 import com.helloworld.helloworldweb.repository.PostSubCommentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +31,21 @@ public class PostSubCommentService {
     }
 
     // 유저가 작성한 모든 답변들 조회
-    public List<PostSubComment> getAllUserComments(Long userId){
-        return postSubCommentRepository.findAllById(userId).orElse(new ArrayList<PostSubComment>());
+    public List<Pair<Post,PostSubComment>> getAllUserComments(Long userId){
+        List<Pair<Post,PostSubComment>> resultList = new ArrayList<>();
+
+        List<PostSubComment> findPostSubComments = postSubCommentRepository.findAllByUserId(userId).orElseGet(ArrayList::new);
+        for ( PostSubComment subcomment : findPostSubComments){
+            // 연관관계가 끊어진 경우 에러 유발방지
+            // ex) PostSubComment 는 존재하나 PostCommentId == null
+            if ( subcomment.getPostComment() == null || subcomment.getPostComment().getPost() == null ) continue;
+            Post post = subcomment.getPostComment().getPost();
+            // 블로그 댓글은 제외
+            if( post.getCategory() == Category.BLOG ) continue;
+            // (Post, SubComment ) 묶음
+            resultList.add(Pair.of(post,subcomment));
+        }
+        return resultList;
     }
 
     // 답변 수정
@@ -49,16 +59,15 @@ public class PostSubCommentService {
     {
         PostSubComment postSubComment = getPostSubCommentById(id);
         // 남아있는 모든 댓글들
-        PostComment postComment = postSubComment.getPostComment();
-
-        postCommentRepository.save( postComment.removePostSubComment(postSubComment) ) ;
+        List<PostSubComment> allPostSubComments = postSubComment.getPostComment().getPostSubComments();
 
         // 댓글 삭제
-//        if( allPostSubComments.size() == 1 ){
-//            postCommentRepository.delete( postSubComment.getPostComment() );
-//        } else {
-//            postSubCommentRepository.delete( postSubComment );
-//        }
+        if( allPostSubComments.size() == 1 ){
+            postCommentRepository.delete( postSubComment.getPostComment() );
+        } else {
+            postSubComment.delete(); // 연관관계 편의 메서드
+            postSubCommentRepository.delete( postSubComment );
+        }
 
     }
 }

@@ -8,8 +8,8 @@ import api from "../../api/api";
 
 export default function RepoCardFlatList({email, isOwner})
 {
-    const [jsonList,setJsonList] = React.useState([])
-    const [flag,setFlag] = React.useState([])
+    const [jsonList,setJsonList] = React.useState([]);
+    const [flag,setFlag] = React.useState([false]);
     const [userEmail,setUserEmail] = React.useState(email);
 
     const github_url = "https://github.com/login/oauth/authorize?client_id=105e0b50eefc27b4dc81&redirect_uri=http://localhost:3000/login/redirect/github/connect";
@@ -21,17 +21,16 @@ export default function RepoCardFlatList({email, isOwner})
     useEffect(()=>{
         api.getGithubRepositories(userEmail)
             .then( res =>{
-                console.log(res)
 
-                if(res.status===200)   //github 연동 되어있는 경우
+                if(res?.status===200)   //github 연동 되어있는 경우
                 {
-                    setJsonList(res)
-                    setFlag([true])
+                    setJsonList(res.data.data);
+                    setFlag([true]);
                 }
-                else if(res.status===204) //github 연동 안되어있는 경우
+                else if(res?.status===204) //github 연동 안되어있는 경우
                 {
-                    setFlag([false])
-                    console.log(res)
+                    setFlag([false]);
+                    console.log(res.data.data);
                 }
             })
             .catch( e=>{
@@ -88,7 +87,7 @@ export default function RepoCardFlatList({email, isOwner})
                     <Button
                         onClick={getGitCode} 
                         startIcon={<Avatar sx={{position : "absolute", left:5, alignSelf:"center", bottom:4.2}} src={require(`../../images/github_icon.png`)} alt='LoginButtonImage' width='50' height='50' />}
-                        sx={{ color: 'gray', width : 300, height: 50, fontSize:14 ,backgroundColor : "white" ,boxShadow:0 , borderColor:"gray", borderWidth:0.9 ,":hover":{ boxShadow:0, backgroundColor:"whitesmoke", borderColor:"gray"}}}
+                        sx={{ textTransform: 'none' ,color: 'gray', width : 300, height: 50, fontSize:14 ,backgroundColor : "white" ,boxShadow:0 , borderColor:"gray", borderWidth:0.9 ,":hover":{ boxShadow:0, backgroundColor:"whitesmoke", borderColor:"gray"}}}
                         variant={"outlined"}
                     >
                         Github 연동하기
