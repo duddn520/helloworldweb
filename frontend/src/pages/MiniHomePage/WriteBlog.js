@@ -39,7 +39,7 @@ function WriteBlog(){
             for (let i = 0 ; i < contentArray.length ; i += 1) {
                 let currentLine = contentArray[i];
 
-                if(currentLine == '&&&&'){
+                if(currentLine === '&&&&'){
                     let currentImg = post.postImageResponseDtos[imageIndex];
                     let imgNode = document.createElement('img');
                     imgNode.setAttribute("src", currentImg.storedUrl);
