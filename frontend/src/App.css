@@ -27,6 +27,10 @@
 .App-link {
   color: #61dafb;
 }
+pre.ql-syntax {
+  background-color: #DFE1E4;
+  overflow: visible;
+}
 
 @keyframes App-logo-spin {
   from {

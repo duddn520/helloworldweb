@@ -241,12 +241,12 @@ function registerPost(formdata, title, totalContent, tags){
             request({
                 method: 'POST',
                 url : '/api/post',
-                params: {
-                    content: encodeURIComponent(totalContent),
+                params: encodeURI({
+                    content: totalContent,
                     category: "BLOG",
-                    title: encodeURIComponent(title),
-                    tags: encodeURIComponent(tags),
-                }
+                    title: title,
+                    tags: tags,
+                })
             })
             .then( res => {
                 if ( res.data.statusCode === status.POST_SUCCESS ){
@@ -652,10 +652,40 @@ function deletePostSubComment(id) {
     });  
 }
 
+function registerBlog(formdata, title, totalContent, tags){
+    const token = window.sessionStorage.getItem("Auth");
+    formdata.append('content', encodeURIComponent(totalContent));
+    formdata.append('category', "BLOG");
+    formdata.append('title', encodeURIComponent(title));
+    formdata.append('tags', encodeURIComponent(tags));
+    return new Promise((resolve,reject) => {
+        if(token === null){
+            reject();
+        }
+        else{
+            axios.post('/api/post', formdata, {
+                headers: {
+                    'content-type': 'multipart/form-data',
+                    Auth: token
+                }
+            })
+            .then( res => {
+                if ( res.data.statusCode === status.POST_SUCCESS ){
+                    resolve(res.data);
+                }
+            })
+            .catch( e => {
+                console.log(e);
+                reject();
+            })
+        }
+    });
+}
+
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
     getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , 
     getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
     getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName 
     ,getUserQnas ,getUserComments, getGithubRepositories, registerUserWithGithub, connectUserToGithub , getNewToken
-    ,updatePostSubComment ,deletePostSubComment
+    ,updatePostSubComment ,deletePostSubComment, registerBlog
 } ;

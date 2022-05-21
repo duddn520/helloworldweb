@@ -8,6 +8,10 @@ import axios from "axios";
 import strToHTML from "../../function/strToHTML";
 import { convertBase64IntoFile, extractOnlyFilename } from "../../function/aboutFile";
 import LoadingSpinner from "../../component/LoadingSpinner";
+import ReactQuill, { Quill } from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import ImageResize from 'quill-image-resize';
+Quill.register('modules/ImageResize', ImageResize);
 
 const WriteSpace = styled.div`
     padding: 10px; 
@@ -27,10 +31,45 @@ function WriteBlog(){
     const [post, setPost] = React.useState(state?.post);
     const [title, setTitle] = React.useState(state.post?.title === null || state.post?.title === undefined ? null : state.post.title );
     const [tags, setTags] = React.useState(state.post?.tags === null || state.post?.tags === undefined ? null : state.post.tags );
+    const [value, setValue] = React.useState(" ");
+    const quillRef = React.useRef<ReactQuill>(null);
+
+    // useMemo를 사용하지 않고 handler를 등록할 경우 타이핑 할때마다 focus가 벗어남
+    const modules = React.useMemo(() => ({
+        toolbar: {
+            // container에 등록되는 순서대로 tool 배치
+            container: [
+                [{ 'font': [] }], // font 설정
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }], // header 설정
+                ['bold', 'italic', 'underline','strike', 'blockquote', 'code-block', 'formula'], // 굵기, 기울기, 밑줄 등 부가 tool 설정
+                [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}], // 리스트, 인덴트 설정
+                ['link', 'image'], // 링크, 이미지 업로드 설정
+                [{ 'align': [] }, { 'color': ['#000000', '#ff0000', '#0000ff'] }, { 'background': [] }], // 정렬, 글씨 색깔, 글씨 배경색 설정
+                ['clean'], // toolbar 설정 초기화 설정
+            ],
+
+            // // custom 핸들러 설정
+            // handlers: {
+            //     image: imageHandler, // 이미지 tool 사용에 대한 핸들러 설정
+            // }
+        },
+        syntax: true,
+        ImageResize: {
+            parchment: Quill.import('parchment')
+        }
+
+    }), []);
+    // toolbar에 사용되는 tool format
+    const formats = [
+        'font',
+        'header',
+        'bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block', 'formula',
+        'list', 'bullet', 'indent',
+        'link', 'image',
+        'align', 'color', 'background',        
+    ]
 
     React.useEffect(()=>{
-        // document.getElementById('Title').append(post.title);
-        // document.getElementById('Tags').append(post.tags);
 
         let divC = document.getElementById('Content');
         let imageIndex = 0;
@@ -203,11 +242,26 @@ function WriteBlog(){
        
     }
 
+    function tempSave(){
+        let formdata = new FormData();
+        api.registerBlog(formdata, title, value, tags)
+        .then(res => {
+                console.log('블로그 게시 성공');
+                navigate("/minihome", {replace: true, state: {tabIndex: 1, targetEmail: targetEmail}});
+                setIsLoading(false);
+            })
+        .catch(e => {
+            console.log('블로그 게시 실패');
+            alert("작성 실패");
+            setIsLoading(false);
+        });
+    }
+
     return(
         <div>
             <Box sx={{paddingTop: 3, paddingLeft: 2, paddingRight: 2, paddingBottom: 3, height: '90vh'}}>
-                <Typography sx={{fontWeight: 'bold', marginBottom: 2 }}>제목</Typography>
-                <Box sx={{flex: 1, display: 'flex', marginBottom: 3}}>
+                <Typography sx={{fontWeight: 'bold', marginBottom: 1 }}>제목</Typography>
+                <Box sx={{flex: 1, display: 'flex', marginBottom: 2}}>
                     {/* <TitleInput id="Title" type="text" name="title"/> */}
                     <TextField 
                         id="Title"
@@ -215,30 +269,21 @@ function WriteBlog(){
                         size='small'
                         value={title}
                         onChange={(value)=>{setTitle(value.target.value)}}
+                        placeholder='제목을 입력하세요.'
                     />
                 </Box>
-
-                {/* <div class="editor-menu"> 
-                    <button id="btn-bold"> 
-                        <b>B</b> 
-                    </button> 
-                    <button id="btn-italic"> 
-                        <i>I</i> 
-                    </button> 
-                    <button id="btn-underline"> 
-                        <u>U</u>
-                    </button> 
-                    <button id="btn-strike"> 
-                        <s>S</s> 
-                    </button> 
-                    <button id="btn-ordered-list"> OL </button> 
-                    <button id="btn-unordered-list"> UL </button> 
-                    <button id="btn-image"> IMG </button> 
-                </div> */}
-                <Typography sx={{fontWeight: 'bold', marginBottom: 2 }}>내용</Typography>
-                <WriteSpace id="Content" contentEditable="true"/>
+                <Typography sx={{fontWeight: 'bold', marginBottom: 1}}>내용</Typography>
+                {/* <WriteSpace id="Content" contentEditable="true"/> */}
+                <ReactQuill 
+                theme="snow" 
+                value={value} 
+                onChange={setValue}
+                modules={modules} 
+                formats={formats} 
+                placeholder='내용을 입력하세요.'
+                style={{height: '55vh'}}/>
                 
-                <Box sx={{marginBottom: 2}}>
+                <Box sx={{marginBottom: 2, marginTop: 8}}>
                     <Button component="label" variant="outlined" sx={{height: 30, marginRight: 2}}> 이미지 업로드
                     <input 
                         type="file"
@@ -257,7 +302,7 @@ function WriteBlog(){
                         onChange={InvokeKakaoOcrApi} hidden/>
                     </Button>
                 </Box>
-                <Typography sx={{fontWeight: 'bold', marginBottom: 2 }}>태그</Typography>
+                <Typography sx={{fontWeight: 'bold', marginBottom: 1 }}>태그</Typography>
                 <Box sx={{flex: 1, display: 'flex', marginBottom: 2}}>
                     <TextField 
                         id="Tags"
@@ -268,8 +313,8 @@ function WriteBlog(){
                         onChange={(value)=>{setTags(value.target.value)}}
                     />
                 </Box>
-                <Box sx={{flex: 1, justifyContent: 'flex-end', display: 'flex', marginBottom: 2}}>
-                    <Button onClick={()=>{savePost()}} variant={'contained'}>저장</Button>
+                <Box sx={{flex: 1, justifyContent: 'flex-end', display: 'flex'}}>
+                    <Button onClick={()=>{tempSave()}} variant={'contained'}>저장</Button>
                 </Box>
             </Box>
             {isLoading && <LoadingSpinner/>}
