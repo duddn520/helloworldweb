@@ -11,14 +11,16 @@ import AlertDialog from "../dialog/AlertDialog";
 
 
 
-export default function QnAComment({postsubcomments, postCommentId}){
+export default function QnAComment({postsubcomments, postComment, Solved, Owner}){
     const [subComments, setSubComments] = React.useState([]);
-    // const [likes, setLikes] = React.useState("")
+    const [isSelected, setIsSelected] = React.useState("");
 
 
     useEffect(()=>{
         if(postsubcomments){
-            setSubComments(postsubcomments)
+            console.log(postComment)
+            setSubComments(postsubcomments);
+            setIsSelected(postComment.selected);
         }        
 
     },[])
@@ -36,8 +38,7 @@ export default function QnAComment({postsubcomments, postCommentId}){
                     flexDirection:"column" ,
                     alignItems: 'center'
                 }}>
-                <Typography variant="h6">300</Typography>
-                <ThumbUpIcon fontSize="large" />
+                { Solved ? isSelected ? <Typography> 초록체크버튼 </Typography>: <Box /> : Owner &&<Typography>회색체크버튼</Typography>}
                 </Box>
             </Grid>
             <Grid item xs={11}>
@@ -57,7 +58,7 @@ export default function QnAComment({postsubcomments, postCommentId}){
                     } 
                 )
                 }
-                    <PostSubCommentTextBox postCommentId={postCommentId}/>
+                    <PostSubCommentTextBox postCommentId={postComment.id}/>
             </Grid>
         </Grid>
         <Divider variant="fullWidth" sx={{ flexGrow: 1 }}/>
@@ -94,8 +95,6 @@ function QnACommentComponent({postsubcomment,boxsize}){
         .catch( e => { });
     };
     
-    console.log(postsubcomment);
-
     return(
         <div key={postsubcomment.id}>
             <Box sx={{ display: 'flex' ,flexDireciton: 'row' ,mt: 0.5 }}>
