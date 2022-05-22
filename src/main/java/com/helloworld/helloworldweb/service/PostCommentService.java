@@ -5,6 +5,7 @@ import com.helloworld.helloworldweb.domain.PostComment;
 import com.helloworld.helloworldweb.domain.PostSubComment;
 import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.repository.PostCommentRepository;
+import com.helloworld.helloworldweb.repository.PostRepository;
 import com.helloworld.helloworldweb.repository.PostSubCommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class PostCommentService {
 
     private final PostCommentRepository postCommentRepository;
     private final PostSubCommentRepository postSubCommentRepository;
+    private final PostRepository postRepository;
 
     @Transactional
     public PostComment registerPostComment(PostComment postComment, Post post, PostSubComment postSubComment, User user)
@@ -42,11 +44,12 @@ public class PostCommentService {
         postCommentRepository.delete(postComment);
     }
 
-    public PostComment selectPostComment(Long id)
+    @Transactional
+    public PostComment selectPostComment(PostComment postComment)
     {
-        PostComment postComment = getPostCommentById(id);
-
         postComment.selectPostComment();
+        Post post = postComment.getPost();
+        postRepository.save(post.updateSolved());
         return postCommentRepository.save(postComment);
     }
 }

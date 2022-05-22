@@ -2,6 +2,7 @@ package com.helloworld.helloworldweb.service;
 
 import com.helloworld.helloworldweb.domain.*;
 import com.helloworld.helloworldweb.repository.PostCommentRepository;
+import com.helloworld.helloworldweb.repository.PostRepository;
 import com.helloworld.helloworldweb.repository.PostSubCommentRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,17 +10,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class PostCommentServiceTest {
@@ -29,6 +32,9 @@ public class PostCommentServiceTest {
 
     @Mock
     PostSubCommentRepository postSubCommentRepository;
+
+    @Mock
+    PostRepository postRepository;
 
     @InjectMocks
     PostCommentService postCommentService;
@@ -92,6 +98,7 @@ public class PostCommentServiceTest {
                 .content("i dont know!!!")
                 .tags("java")
                 .category(Category.QNA)
+                .solved(false)
                 .build();
 
         post.updateUser(user);
@@ -102,7 +109,6 @@ public class PostCommentServiceTest {
 
         postComment.updatePost(post);
 
-        List<PostSubComment> subCommentList = new ArrayList<>();
         for(int i=0;i<3;i++)
         {
             PostSubComment subComment = PostSubComment.builder()
@@ -111,18 +117,18 @@ public class PostCommentServiceTest {
 
             subComment.updateUser(user);
             subComment.updatePostComment(postComment);
-            subCommentList.add(subComment);
         }
 
         when(postCommentRepository.save(any(PostComment.class))).thenReturn(postComment);
-        when(postCommentService.getPostCommentById(any(Long.class))).thenReturn(postComment);
+        when(postRepository.save(any(Post.class))).thenReturn(post);
 
         //when
-        PostComment result = postCommentService.selectPostComment(postComment.getId());
+        PostComment result = postCommentService.selectPostComment(postComment);
 
         //then
         assertThat(result.isSelected()).isEqualTo(true);
         assertThat(post.getPostComments().get(0).isSelected()).isEqualTo((true));
+        assertThat(result.getPost().isSolved()).isEqualTo(true);
 
     }
 

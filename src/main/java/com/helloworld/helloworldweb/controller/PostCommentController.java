@@ -1,6 +1,7 @@
 package com.helloworld.helloworldweb.controller;
 
 import com.helloworld.helloworldweb.domain.*;
+import com.helloworld.helloworldweb.dto.Post.PostResponseDtoWithPostComments;
 import com.helloworld.helloworldweb.dto.PostComment.PostCommentRequestDto;
 import com.helloworld.helloworldweb.dto.PostComment.PostCommentResponseDto;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
@@ -79,14 +80,19 @@ public class PostCommentController {
 
     }
 
-    @PutMapping
-    public ResponseEntity<ApiResponse> selectPostComment(@RequestParam(name="id") Long id)
+    @PutMapping("/api/postcomment/select")
+    public ResponseEntity<ApiResponse> selectPostComment(@RequestParam(name="id") Long id, HttpServletRequest request)
     {
-        postCommentService.selectPostComment(id);
+        String token = jwtTokenProvider.getTokenByHeader(request);
+        User user = userService.getUserByEmail(jwtTokenProvider.getUserEmail(token));
+
+        PostComment postComment = postCommentService.getPostCommentById(id);
+        postCommentService.selectPostComment(postComment);
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.PUT_SUCCESS,
-                HttpResponseMsg.PUT_SUCCESS), HttpStatus.OK);
+                HttpResponseMsg.PUT_SUCCESS,
+                new PostResponseDtoWithPostComments(postComment.getPost(),user)), HttpStatus.OK);
     }
 
 
