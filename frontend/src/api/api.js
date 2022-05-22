@@ -241,12 +241,12 @@ function registerPost(formdata, title, totalContent, tags){
             request({
                 method: 'POST',
                 url : '/api/post',
-                params: encodeURI({
-                    content: totalContent,
+                params: {
+                    content: encodeURIComponent(totalContent),
                     category: "BLOG",
-                    title: title,
-                    tags: tags,
-                })
+                    title: encodeURIComponent(title),
+                    tags: encodeURIComponent(tags),
+                }
             })
             .then( res => {
                 if ( res.data.statusCode === status.POST_SUCCESS ){
@@ -652,18 +652,63 @@ function deletePostSubComment(id) {
     });  
 }
 
-function registerBlog(formdata, title, totalContent, tags){
+function registerBlog(title, totalContent, tags, imageUrlArray){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'POST',
+            url : '/api/post',
+            params: {
+                content: encodeURIComponent(totalContent),
+                category: "BLOG",
+                title: encodeURIComponent(title),
+                tags: encodeURIComponent(tags),
+                imageUrlArray: encodeURIComponent(imageUrlArray)
+            }
+        })
+        .then( res => {
+            if ( res.data.statusCode === status.POST_SUCCESS ){
+                resolve(res.data);
+            }
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
+function updateBlog(postId, title, totalContent, tags, imageUrlArray){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'PUT',
+            url : '/api/post',
+            params: {
+                post_id: postId,
+                content: encodeURIComponent(totalContent),
+                title: encodeURIComponent(title),
+                tags: encodeURIComponent(tags),
+                imageUrlArray: encodeURIComponent(imageUrlArray)
+            }
+        })
+        .then( res => {
+            if ( res.data.statusCode === status.PUT_SUCCESS ){
+                resolve(res.data);
+            }
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
+
+function getImgUrl(formdata){
     const token = window.sessionStorage.getItem("Auth");
-    formdata.append('content', encodeURIComponent(totalContent));
-    formdata.append('category', "BLOG");
-    formdata.append('title', encodeURIComponent(title));
-    formdata.append('tags', encodeURIComponent(tags));
     return new Promise((resolve,reject) => {
         if(token === null){
             reject();
         }
         else{
-            axios.post('/api/post', formdata, {
+            axios.post('/api/image', formdata, {
                 headers: {
                     'content-type': 'multipart/form-data',
                     Auth: token
@@ -671,7 +716,7 @@ function registerBlog(formdata, title, totalContent, tags){
             })
             .then( res => {
                 if ( res.data.statusCode === status.POST_SUCCESS ){
-                    resolve(res.data);
+                    resolve(res.data.data);
                 }
             })
             .catch( e => {
@@ -682,10 +727,29 @@ function registerBlog(formdata, title, totalContent, tags){
     });
 }
 
+function deleteImgUrl(urls){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'DELETE',
+            url : "/api/image",
+            params: {
+                urls: encodeURIComponent(urls)
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
+
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
     getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , 
     getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
     getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName 
     ,getUserQnas ,getUserComments, getGithubRepositories, registerUserWithGithub, connectUserToGithub , getNewToken
-    ,updatePostSubComment ,deletePostSubComment, registerBlog
+    ,updatePostSubComment ,deletePostSubComment, registerBlog, getImgUrl, updateBlog, deleteImgUrl
 } ;

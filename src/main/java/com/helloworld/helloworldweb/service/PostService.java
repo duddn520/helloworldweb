@@ -40,10 +40,26 @@ public class PostService {
     //AWS S3에 파일을 업로드 하는 서비스
     //controller로 부터 Post 객체, User 객체, front에서 받은 file을 받음
     @Transactional
-    public Post addPost(Post post, User user, List<MultipartFile> files) throws IOException {
+    public Post addPost(Post post, User user, List<MultipartFile> files, List<String> storedUrls) throws IOException {
 
         //Post와 User 연관관계 맺어줌
         post.updateUser(user);
+
+        if(storedUrls != null){
+            for(String url : storedUrls){
+                String storedUrl = URLDecoder.decode(url, "UTF-8");
+                PostImage postImage = PostImage.builder()
+                        .originalFileName("temp_test")
+                        .storedFileName(fileProcessService.getFileName(storedUrl))
+                        .storedUrl(storedUrl)
+                        .build();
+
+                //Post 와 PostImage의 연관관계 맺어줌
+                postImage.updatePost(post);
+
+                postImageRepository.save(postImage);
+            }
+        }
 
         if(files != null){
             for(MultipartFile file : files){
