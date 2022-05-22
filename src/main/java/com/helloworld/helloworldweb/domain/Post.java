@@ -78,4 +78,9 @@ public class Post extends BaseTimeEntity {
         this.tags = tags;
         this.postImages = new ArrayList<>();
     }
+
+    public Post updateSolved(){
+        this.solved = true;
+        return this;
+    }
 }
