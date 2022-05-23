@@ -184,7 +184,7 @@ function WriteBlog(){
                 });
             }
             else{
-                api.updatePost(post.id, title, blogContent, tags, imageArray)
+                api.updateBlog(post.id, title, blogContent, tags, imageArray)
                 .then(res => {
                     console.log('블로그 수정 성공');
                     navigate("/minihome", {replace: true, state: {tabIndex: 1, targetEmail: targetEmail}});
@@ -199,7 +199,7 @@ function WriteBlog(){
     
         }
         catch (e) {
-            alert("삭제 실패");
+            alert("실패");
         }
         
 

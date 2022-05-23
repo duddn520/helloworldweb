@@ -261,46 +261,83 @@ public class PostServiceUnitTest {
                 .tags("test")
                 .build();
         PostImage oldPostImage = PostImage.builder()
-                .originalFileName("oldTestImage.png")
                 .storedFileName("123oldTestImage.png")
                 .storedUrl("www.naver.com123oldTestImage.png")
-                .fileSize(10L)
                 .build();
         oldPostImage.updatePost(post);
 
         String newTitle = "new!!";
         String newContent = "this is new content!";
         String newTags = "NEW";
-        MockMultipartFile newfile = new MockMultipartFile("files",
-                "newTestImage.png",
-                "image/png",
-                //이미지경로는 각 로컬에서 수정해야함.
-                new FileInputStream("/Users/heojihun/Project/helloworldweb/src/test/java/com/helloworld/helloworldweb/controller/TestImage.png"));
 
-        List<MultipartFile> newFileList = new ArrayList<>();
-        newFileList.add(newfile);
+        List<String> urls = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            urls.add("www.naver.com123newTestImage.png");
+        }
+
         PostImage newPostImage = PostImage.builder()
-                .originalFileName("newTestImage.png")
+                .originalFileName("IMAGE"+post.getId())
                 .storedFileName("123newTestImage.png")
                 .storedUrl("www.naver.com123newTestImage.png")
-                .fileSize(10L)
                 .build();
 
-        doNothing().when(fileProcessService).deleteImage(anyString());
-        when(fileProcessService.uploadImage(any(MultipartFile.class))).thenReturn("www.naver.com123newTestImage.png");
+        //when
         when(fileProcessService.getFileName(any(String.class))).thenReturn("123newTestImage.png");
         when(postImageRepository.save(any(PostImage.class))).thenReturn(newPostImage);
         when(postRepository.save(any(Post.class))).thenReturn(post);
 
-        //when
-        Post savedPost = postService.updatePost(post, newTitle, newContent, newTags, newFileList);
+        Post savedPost = postService.updatePost(post, newTitle, newContent, newTags, urls.toArray(new String[0]));
 
         //then
         assertThat(savedPost.getTitle()).isEqualTo(newTitle);
         assertThat(savedPost.getContent()).isEqualTo(newContent);
         assertThat(savedPost.getTags()).isEqualTo(newTags);
+        assertThat(savedPost.getPostImages().size()).isEqualTo(2);
         assertThat(savedPost.getPostImages().get(0).getStoredUrl()).isEqualTo("www.naver.com123newTestImage.png");
 
+    }
+    @Test
+    @DisplayName("Post 완전히 새로 수정 했을 때 post 저장 실패")
+    void updatePost_fail() throws IOException {
+        //given
+        Post post = Post.builder()
+                .title("hello")
+                .content("my name is Jihun")
+                .category(Category.BLOG)
+                .tags("test")
+                .build();
+        PostImage oldPostImage = PostImage.builder()
+                .storedFileName("123oldTestImage.png")
+                .storedUrl("www.naver.com123oldTestImage.png")
+                .build();
+        oldPostImage.updatePost(post);
+
+        String newTitle = "new!!";
+        String newContent = "this is new content!";
+        String newTags = "NEW";
+
+        List<String> urls = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            urls.add("www.naver.com123newTestImage.png");
+        }
+
+        PostImage newPostImage = PostImage.builder()
+                .originalFileName("IMAGE"+post.getId())
+                .storedFileName("123newTestImage.png")
+                .storedUrl("www.naver.com123newTestImage.png")
+                .build();
+
+        //when
+        when(fileProcessService.getFileName(any(String.class))).thenReturn("123newTestImage.png");
+        when(postImageRepository.save(any(PostImage.class))).thenReturn(newPostImage);
+        when(postRepository.save(any(Post.class))).thenReturn(null);
+
+        Throwable exception = assertThrows(NullPointerException.class, () -> {
+            postService.updatePost(post, newTitle, newContent, newTags, urls.toArray(new String[0]));
+        });
+
+        //then
+        assertEquals("Post 수정에 실패했습니다.", exception.getMessage());
     }
 
     @Test

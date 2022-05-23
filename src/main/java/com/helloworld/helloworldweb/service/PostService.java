@@ -49,7 +49,7 @@ public class PostService {
             for(String url : storedUrls){
                 String storedUrl = URLDecoder.decode(url, "UTF-8");
                 PostImage postImage = PostImage.builder()
-                        .originalFileName("temp_test")
+                        .originalFileName("IMAGE"+post.getId())
                         .storedFileName(fileProcessService.getFileName(storedUrl))
                         .storedUrl(storedUrl)
                         .build();
@@ -193,36 +193,26 @@ public class PostService {
     }
 
     @Transactional
-    public Post updatePost(Post post, String title, String content, String tags, List<MultipartFile> files) throws IOException {
+    public Post updatePost(Post post, String title, String content, String tags, String[] storedUrls) throws IOException {
 
         List<PostImage> postImages = post.getPostImages();
 
-        //post의 이전 postImage들을 미리 Aws S3에서 삭제
+        //post의 이전 postImage들을 미리 삭제
         for(PostImage postImage : postImages){
-            String targetName = postImage.getStoredFileName();
-            fileProcessService.deleteImage(targetName);
             postImageRepository.delete(postImage);
         }
 
         post.updatePostTextContent(title, content, tags);
 
-        if(files != null){
-            for(MultipartFile file : files){
-
-                //Aws S3 file server에 file을 업로드
-                String uploadImageUrl = fileProcessService.uploadImage(file);
-
-                Base64.Encoder encoder = Base64.getEncoder();
-                byte[] photoEncode = encoder.encode(file.getBytes());
-                String fileBase64 = new String(photoEncode, "UTF8");
-                String base64ForFront = "data:"+file.getContentType()+";base64,"+fileBase64;
-
+        System.out.println("storedUrls = " + storedUrls);
+        // 삭제 후 새로 객체 생성 후 연관관계 맺어줌
+        if(storedUrls != null){
+            for(String url : storedUrls){
+                String storedUrl = URLDecoder.decode(url, "UTF-8");
                 PostImage postImage = PostImage.builder()
-                        .originalFileName(file.getOriginalFilename())
-                        .storedFileName(fileProcessService.getFileName(URLDecoder.decode(uploadImageUrl, "UTF-8")))
-                        .storedUrl(uploadImageUrl)
-                        .fileSize(file.getSize())
-                        .base64(base64ForFront)
+                        .originalFileName("IMAGE"+post.getId())
+                        .storedFileName(fileProcessService.getFileName(storedUrl))
+                        .storedUrl(storedUrl)
                         .build();
 
                 //Post 와 PostImage의 연관관계 맺어줌
@@ -231,7 +221,15 @@ public class PostService {
                 postImageRepository.save(postImage);
             }
         }
-        return postRepository.save(post);
+
+        Post savedPost = postRepository.save(post);
+
+        if(savedPost == null) {
+            throw new NullPointerException("Post 수정에 실패했습니다.");
+        }
+        else {
+            return savedPost;
+        }
     }
 
     @Transactional

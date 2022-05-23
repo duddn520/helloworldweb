@@ -205,17 +205,27 @@ public class PostController {
     @PutMapping("/api/post")
     @Transactional
     public ResponseEntity<ApiResponse<PostResponseDto>> updatePost(@RequestParam(value = "post_id") Long postId,
-                                                  @RequestParam(value = "files", required = false) List<MultipartFile> files,
-                                                  @RequestParam(value = "content") String content,
-                                                  @RequestParam(value = "title") String title,
-                                                  @RequestParam(value = "tags", required = false, defaultValue = "") String tags) throws IOException {
+                                                                   @RequestParam(value = "content") String content,
+                                                                   @RequestParam(value = "title") String title,
+                                                                   @RequestParam(value = "tags", required = false, defaultValue = "") String tags,
+                                                                   @RequestParam(value = "imageUrlArray", required = false) String urls) throws IOException {
 
         Post targetPost = postService.getPost(postId);
+
+        String[] storedUrls;
+        if(urls != "" && urls != null) {
+            String decodeResult = URLDecoder.decode(urls, "UTF-8");
+            storedUrls = decodeResult.split(",");
+        }
+        else{
+            storedUrls = null;
+        }
+
         Post savedPost = postService.updatePost(targetPost,
-                                                URLDecoder.decode(title, "UTF-8"),
-                                                URLDecoder.decode(content, "UTF-8"),
-                                                URLDecoder.decode(tags, "UTF-8"),
-                                                files);
+                URLDecoder.decode(title, "UTF-8"),
+                URLDecoder.decode(content, "UTF-8"),
+                URLDecoder.decode(tags, "UTF-8"),
+                storedUrls);
 
         PostResponseDto responseDto = new PostResponseDto(savedPost);
 
