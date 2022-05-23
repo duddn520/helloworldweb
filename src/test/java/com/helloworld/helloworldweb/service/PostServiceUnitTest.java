@@ -28,8 +28,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
@@ -67,7 +66,39 @@ public class PostServiceUnitTest {
         Post savedPost = postService.addPost(post, user, null);
 
         //then
+        assertThat(savedPost).isEqualTo(post);
         assertThat(savedPost.getUser()).isEqualTo(user);
+    }
+    @Test
+    @DisplayName("addPost url 포함 성공한 케이스")
+    void addPost_withImg_success() throws IOException {
+        //given
+        Post post = Post.builder()
+                .title("hello")
+                .content("my name is Jihun")
+                .category(Category.BLOG)
+                .tags("test")
+                .build();
+        User user = User.builder()
+                .email("test@email.com")
+                .profileUrl(" ")
+                .posts(new ArrayList<>())
+                .build();
+        List<String> urls = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            urls.add("http://test-server/123TestImage.png");
+        }
+
+        //when
+        when(fileProcessService.getFileName(any(String.class))).thenReturn("123TestImage.png");
+        when(postImageRepository.save(any(PostImage.class))).thenReturn(null);
+        when(postRepository.save(any(Post.class))).thenReturn(post);
+        Post savedPost = postService.addPost(post, user, urls.toArray(new String[0]));
+
+        //then
+        assertThat(5).isEqualTo(savedPost.getPostImages().size());
+        assertThat("http://test-server/123TestImage.png").isEqualTo(savedPost.getPostImages().get(0).getStoredUrl());
+        assertThat(user).isEqualTo(savedPost.getUser());
     }
     @Test
     @DisplayName("addPost 실패한 케이스")
@@ -87,14 +118,16 @@ public class PostServiceUnitTest {
         when(postRepository.save(any(Post.class))).thenReturn(null);
 
         //when
-        Post savedPost = postService.addPost(post, user, null);
+        Throwable exception = assertThrows(NullPointerException.class, () -> {
+            postService.addPost(post, user, null);
+        });
 
         //then
-        assertThat(savedPost).isEqualTo(null);
+        assertEquals("Post 저장에 실패했습니다.", exception.getMessage());
     }
     @Test
-    @DisplayName("addPost_WithImage 성공한 케이스")
-    void addPost_WithImage_success() throws IOException {
+    @DisplayName("addPost url 포함 실패한 케이스")
+    void addPost_withImg_fail() throws IOException {
         //given
         Post post = Post.builder()
                 .title("hello")
@@ -107,64 +140,22 @@ public class PostServiceUnitTest {
                 .profileUrl(" ")
                 .posts(new ArrayList<>())
                 .build();
-        MockMultipartFile file = new MockMultipartFile("files",
-                "TestImage.png",
-                "image/png",
-                //이미지경로는 각 로컬에서 수정해야함.
-                new FileInputStream("/Users/heojihun/Project/helloworldweb/src/test/java/com/helloworld/helloworldweb/controller/TestImage.png"));
-
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] photoEncode = encoder.encode(file.getBytes());
-        String fileBase64 = new String(photoEncode, "UTF8");
-        String base64ForFront = "data:"+file.getContentType()+";base64,"+fileBase64;
-
-        List<MultipartFile> fileList = new ArrayList<>();
-        fileList.add(file);
-
-        when(fileProcessService.uploadImage(any(MultipartFile.class))).thenReturn("www.naver.com123TestImage.png");
-        when(fileProcessService.getFileName(any(String.class))).thenReturn("123TestImage.png");
-        when(postImageRepository.save(any(PostImage.class))).thenReturn(null);
-        when(postRepository.save(any(Post.class))).thenReturn(post);
+        List<String> urls = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            urls.add("http://test-server/123TestImage.png");
+        }
 
         //when
-        Post savedPost = postService.addPost(post, user, fileList);
+        when(fileProcessService.getFileName(any(String.class))).thenReturn("123TestImage.png");
+        when(postImageRepository.save(any(PostImage.class))).thenReturn(null);
+        when(postRepository.save(any(Post.class))).thenReturn(null);
+
+        Throwable exception = assertThrows(NullPointerException.class, () -> {
+            postService.addPost(post, user, urls.toArray(new String[0]));
+        });
 
         //then
-        assertThat("www.naver.com123TestImage.png").isEqualTo(savedPost.getPostImages().get(0).getStoredUrl());
-        assertThat(base64ForFront).isEqualTo(savedPost.getPostImages().get(0).getBase64());
-    }
-    @Test
-    @DisplayName("addPost_WithImage 실패한 케이스")
-    void addPost_WithImage_fail() throws IOException {
-        //given
-        Post post = Post.builder()
-                .title("hello")
-                .content("my name is Jihun")
-                .category(Category.BLOG)
-                .tags("test")
-                .build();
-        User user = User.builder()
-                .email("test@email.com")
-                .profileUrl(" ")
-                .posts(new ArrayList<>())
-                .build();
-        MockMultipartFile file = new MockMultipartFile("files",
-                "TestImage.png",
-                "image/png",
-                //이미지경로는 각 로컬에서 수정해야함.
-                new FileInputStream("/Users/heojihun/Project/helloworldweb/src/test/java/com/helloworld/helloworldweb/controller/TestImage.png"));
-
-        List<MultipartFile> fileList = new ArrayList<>();
-        fileList.add(file);
-
-        when(fileProcessService.uploadImage(any(MultipartFile.class))).thenThrow(
-                new IllegalArgumentException(String.format("파일 변환 중 에러가 발생했습니다 (%s)", file.getOriginalFilename())));;
-
-        //when, then
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> {
-            postService.addPost(post, user, fileList);
-        });
-        assertEquals("파일 변환 중 에러가 발생했습니다 (TestImage.png)", exception.getMessage());
+        assertEquals("Post 저장에 실패했습니다.", exception.getMessage());
     }
 
     @Test
@@ -365,4 +356,6 @@ public class PostServiceUnitTest {
         //then
         assertThat(findPosts.size()).isEqualTo(50);
     }
+
+
 }

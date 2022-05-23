@@ -5,6 +5,7 @@ import { Close, DeleteOutline } from "@mui/icons-material";
 import styled from "styled-components";
 import { useNavigate } from 'react-router';
 import api from "../../api/api";
+import strToHTML from "../../function/strToHTML";
 
 const TitleBox = styled.div`
     white-space: nowrap;
@@ -30,9 +31,21 @@ const OnePost = muiStyled(Box)({
 function PostThumbnail({post, isOwner}){
     const navigate = useNavigate();
 
-    function makeThumbnailContent(text){
-        return text.split('&&&&')[0]
+    function makeThumbnailContent(content){
+        // return content.replace(/<[^>]+>/g, ' ');
+        let temp = content.replace(/<[^>]+>/g, '%').split('%');
+        let result = "";
+        let i;
+        for (i = 0; i < temp.length; i++) {
+            if(temp[i] !== ""){
+                result = temp[i];
+                break;
+            }
+        }
+        return result;
+        
     }
+
     function deletePost(postId){
         api.deletePost(postId)
         .then(res=>{

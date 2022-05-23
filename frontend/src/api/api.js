@@ -652,13 +652,13 @@ function deletePostSubComment(id) {
     });  
 }
 
-function registerBlog(title, totalContent, tags, imageUrlArray){
+function registerBlog(title, content, tags, imageUrlArray){
     return new Promise((resolve,reject) => {
         request({
             method: 'POST',
             url : '/api/post',
             params: {
-                content: encodeURIComponent(totalContent),
+                content: encodeURIComponent(content),
                 category: "BLOG",
                 title: encodeURIComponent(title),
                 tags: encodeURIComponent(tags),
@@ -676,14 +676,14 @@ function registerBlog(title, totalContent, tags, imageUrlArray){
         })
     });
 }
-function updateBlog(postId, title, totalContent, tags, imageUrlArray){
+function updateBlog(postId, title, content, tags, imageUrlArray){
     return new Promise((resolve,reject) => {
         request({
             method: 'PUT',
             url : '/api/post',
             params: {
                 post_id: postId,
-                content: encodeURIComponent(totalContent),
+                content: encodeURIComponent(content),
                 title: encodeURIComponent(title),
                 tags: encodeURIComponent(tags),
                 imageUrlArray: encodeURIComponent(imageUrlArray)

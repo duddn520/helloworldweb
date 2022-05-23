@@ -20,15 +20,26 @@ function WriteBlog(){
     const [post, setPost] = React.useState(state?.post);
     const [title, setTitle] = React.useState(state.post?.title === null || state.post?.title === undefined ? null : state.post.title );
     const [tags, setTags] = React.useState(state.post?.tags === null || state.post?.tags === undefined ? null : state.post.tags );
-    const [blogContent, setBlogContent] = React.useState(" ");
+    const [blogContent, setBlogContent] = React.useState(state.post?.content === null || state.post?.content === undefined ? null : state.post.content);
     const [urls, setUrls] = React.useState([]);
     const [recentUrl, setRecentUrl]= React.useState("");
     const quillRef = React.useRef(null);
 
     React.useEffect(()=>{
+        if(state.post?.postImageResponseDtos !== null && state.post?.postImageResponseDtos !== undefined){
+            let imgArray = state.post.postImageResponseDtos;
+            let newImgArray = [];
+            imgArray.map((item) => {
+                newImgArray.push(item.storedUrl);
+            })
+            console.log(newImgArray);
+            setUrls(newImgArray);
+        }
+    },[])
+
+    React.useEffect(()=>{
         if(recentUrl !== ""){
             let newArray = [...urls];
-            console.log(recentUrl);
             newArray.push(recentUrl);
             setUrls(newArray);
         }
@@ -137,8 +148,8 @@ function WriteBlog(){
     }
 
     async function savePost(){
+        setIsLoading(true);
         let content = strToHTML(blogContent);
-
         //NodeList를 Array로 변환
         const contents = Array.from(content);
         //이미지 배열 만들기
@@ -157,34 +168,34 @@ function WriteBlog(){
         console.log(difference);
 
         try{
-            await api.deleteImgUrl(difference);
+            if(difference.length !== 0) await api.deleteImgUrl(difference);
 
-            // if(post === null || post === undefined){
-            //     api.registerBlog(title, blogContent, tags, imageArray)
-            //     .then(res => {
-            //             console.log('블로그 게시 성공');
-            //             navigate("/minihome", {replace: true, state: {tabIndex: 1, targetEmail: targetEmail}});
-            //             setIsLoading(false);
-            //         })
-            //     .catch(e => {
-            //         console.log('블로그 게시 실패');
-            //         alert("작성 실패");
-            //         setIsLoading(false);
-            //     });
-            // }
-            // else{
-            //     api.updatePost(post.id, title, blogContent, tags, imageArray)
-            //     .then(res => {
-            //         console.log('블로그 수정 성공');
-            //         navigate("/minihome", {replace: true, state: {tabIndex: 1, targetEmail: targetEmail}});
-            //         setIsLoading(false);
-            //     })
-            //     .catch(e => {
-            //         console.log('블로그 수정 실패');
-            //         alert("수정 실패");
-            //         setIsLoading(false);
-            //     });
-            // }
+            if(post === null || post === undefined){
+                api.registerBlog(title, blogContent, tags, imageArray)
+                .then(res => {
+                        console.log('블로그 게시 성공');
+                        navigate("/minihome", {replace: true, state: {tabIndex: 1, targetEmail: targetEmail}});
+                        setIsLoading(false);
+                    })
+                .catch(e => {
+                    console.log('블로그 게시 실패');
+                    alert("작성 실패");
+                    setIsLoading(false);
+                });
+            }
+            else{
+                api.updatePost(post.id, title, blogContent, tags, imageArray)
+                .then(res => {
+                    console.log('블로그 수정 성공');
+                    navigate("/minihome", {replace: true, state: {tabIndex: 1, targetEmail: targetEmail}});
+                    setIsLoading(false);
+                })
+                .catch(e => {
+                    console.log('블로그 수정 실패');
+                    alert("수정 실패");
+                    setIsLoading(false);
+                });
+            }
     
         }
         catch (e) {
@@ -219,7 +230,7 @@ function WriteBlog(){
                 modules={modules} 
                 formats={formats} 
                 placeholder='내용을 입력하세요.'
-                style={{height: '55vh'}}
+                style={{height: '47vh'}}
                 ref={quillRef}/>
                 
                 <Box sx={{marginBottom: 2, marginTop: 8}}>

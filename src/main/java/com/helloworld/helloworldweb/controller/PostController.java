@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,12 +46,11 @@ public class PostController {
     @PostMapping("/api/post")
     @Transactional
     public ResponseEntity<ApiResponse<PostResponseDto>> registerPost(@RequestHeader(value = "Auth") String jwtToken,
-                                                     @RequestParam(value = "files", required = false) List<MultipartFile> files,
                                                      @RequestParam(value = "content") String content,
                                                      @RequestParam(value = "category") Category category,
                                                      @RequestParam(value = "title") String title,
                                                      @RequestParam(value = "tags", required = false, defaultValue = "") String tags,
-                                                     @RequestParam(value = "imageUrlArray", required = false) List<String> storedUrls) throws IOException {
+                                                     @RequestParam(value = "imageUrlArray", required = false) String urls) throws IOException {
 
         User findUser = userService.getUserByJwt(jwtToken);
         //post 객체 생성
@@ -62,7 +62,16 @@ public class PostController {
                 .solved(false)
                 .build();
 
-        Post savedPost = postService.addPost(post, findUser, files, storedUrls);
+        String[] storedUrls;
+        if(urls != "" && urls != null) {
+            String decodeResult = URLDecoder.decode(urls, "UTF-8");
+            storedUrls = decodeResult.split(",");
+        }
+        else{
+            storedUrls = null;
+        }
+
+        Post savedPost = postService.addPost(post, findUser, storedUrls);
         PostResponseDto responseDto = new PostResponseDto(savedPost);
 
         return new ResponseEntity<>(ApiResponse.response(
@@ -83,13 +92,18 @@ public class PostController {
     }
 
     @DeleteMapping ("/api/image")
-    public ResponseEntity<ApiResponse> deleteImageUrl(@RequestParam(value = "urls") List<String> urls) throws UnsupportedEncodingException {
+    public ResponseEntity<ApiResponse> deleteImageUrl(@RequestParam(value = "urls") String urls) throws UnsupportedEncodingException {
 
-        for(String url : urls){
-            String storedUrl = URLDecoder.decode(url, "UTF-8");
-            fileProcessService.deleteImage(fileProcessService.getFileName(storedUrl));
+        if(urls != ""){
+            String decodeResult = URLDecoder.decode(urls, "UTF-8");
+            String[] finalUrls = decodeResult.split(",");
+            System.out.println(Arrays.toString(finalUrls).length());
+
+            for(String url: finalUrls){
+                String storedUrl = URLDecoder.decode(url, "UTF-8");
+                fileProcessService.deleteImage(fileProcessService.getFileName(storedUrl));
+            }
         }
-
         return new ResponseEntity (ApiResponse.response(
                 HttpStatusCode.DELETE_SUCCESS,
                 HttpResponseMsg.DELETE_SUCCESS), HttpStatus.OK);

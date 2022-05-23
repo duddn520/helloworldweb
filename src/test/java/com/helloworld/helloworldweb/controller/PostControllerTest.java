@@ -27,6 +27,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import java.io.FileInputStream;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -383,21 +384,19 @@ public class PostControllerTest {
     @Test
     void 블로그_작성시_지운_이미지들_삭제() throws Exception {
         //given
-        MultiValueMap<String, String> requestParam = new LinkedMultiValueMap<>();
         List<String> urls = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 0; i++) {
             MockMultipartFile file = new MockMultipartFile("file",
-                    "TestImage"+i+".png",
+                    "테스트이미지"+i+".png",
                     "image/png",
                     //이미지경로는 각 로컬에서 수정해야함.
                     new FileInputStream("/Users/heojihun/Project/helloworldweb/src/test/java/com/helloworld/helloworldweb/controller/TestImage.png"));
             urls.add(fileProcessService.uploadImage(file));
         }
-        requestParam.set("urls", urls.toString());
         //when
         MvcResult result = mockMvc.perform(
                         delete("/api/image")
-                                .params(requestParam)
+                                .param("urls", String.valueOf(urls))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .characterEncoding("UTF-8")
                                 .header("Auth", getToken())

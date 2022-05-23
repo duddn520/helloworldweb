@@ -40,7 +40,7 @@ public class PostService {
     //AWS S3에 파일을 업로드 하는 서비스
     //controller로 부터 Post 객체, User 객체, front에서 받은 file을 받음
     @Transactional
-    public Post addPost(Post post, User user, List<MultipartFile> files, List<String> storedUrls) throws IOException {
+    public Post addPost(Post post, User user, String[] storedUrls) throws IOException {
 
         //Post와 User 연관관계 맺어줌
         post.updateUser(user);
@@ -61,33 +61,13 @@ public class PostService {
             }
         }
 
-        if(files != null){
-            for(MultipartFile file : files){
-
-                //Aws S3 file server에 file을 업로드
-                String uploadImageUrl = fileProcessService.uploadImage(file);
-
-                Base64.Encoder encoder = Base64.getEncoder();
-                byte[] photoEncode = encoder.encode(file.getBytes());
-                String fileBase64 = new String(photoEncode, "UTF8");
-                String base64ForFront = "data:"+file.getContentType()+";base64,"+fileBase64;
-
-                PostImage postImage = PostImage.builder()
-                        .originalFileName(file.getOriginalFilename())
-                        .storedFileName(fileProcessService.getFileName(URLDecoder.decode(uploadImageUrl, "UTF-8")))
-                        .storedUrl(uploadImageUrl)
-                        .fileSize(file.getSize())
-                        .base64(base64ForFront)
-                        .build();
-
-                //Post 와 PostImage의 연관관계 맺어줌
-                postImage.updatePost(post);
-
-                postImageRepository.save(postImage);
-            }
+        Post savedPost = postRepository.save(post);
+        if(savedPost == null) {
+            throw new NullPointerException("Post 저장에 실패했습니다.");
         }
-
-        return postRepository.save(post);
+        else {
+            return savedPost;
+        }
 
     }
 
