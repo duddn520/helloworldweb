@@ -97,7 +97,6 @@ public class PostService {
                     .originalFileName(file.getOriginalFilename())
                     .storedFileName(newFileName)
                     .storedUrl(newFileName) //로컬에 저장할 떄는 일단 url 없음
-                    .fileSize(file.getSize())
                     .build();
 
             postImage.updatePost(post);
