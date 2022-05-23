@@ -652,10 +652,30 @@ function deletePostSubComment(id) {
     });  
 }
 
+function selectPostComment(id) {
+    return new Promise((resolve,reject) => {
+        request({
+            method: "POST" ,
+            url:"/api/postcomment/select",
+            params: {
+                "id" : id ,
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            reject();
+        })
+    });  
+}
+
+
+
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
     getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , 
     getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
     getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName 
     ,getUserQnas ,getUserComments, getGithubRepositories, registerUserWithGithub, connectUserToGithub , getNewToken
-    ,updatePostSubComment ,deletePostSubComment
+    ,updatePostSubComment ,deletePostSubComment, selectPostComment
 } ;

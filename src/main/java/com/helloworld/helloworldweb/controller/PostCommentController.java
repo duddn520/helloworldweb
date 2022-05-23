@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @RequiredArgsConstructor
@@ -80,17 +81,19 @@ public class PostCommentController {
 
     }
 
-    @PutMapping("/api/postcomment/select")
-    public ResponseEntity<ApiResponse> selectPostComment(@RequestParam(name="id") Long id, HttpServletRequest request)
+    @Transactional
+    @PostMapping("/api/postcomment/select")
+    public ResponseEntity<ApiResponse> selectPostComment(@RequestParam(name="id") Long id, HttpServletRequest request, HttpServletResponse response)
     {
         String token = jwtTokenProvider.getTokenByHeader(request);
         User user = userService.getUserByEmail(jwtTokenProvider.getUserEmail(token));
 
+        response.addHeader("Access-Control-Allow-Origin", "*");
         PostComment postComment = postCommentService.getPostCommentById(id);
         postCommentService.selectPostComment(postComment);
 
         return new ResponseEntity<>(ApiResponse.response(
-                HttpStatusCode.PUT_SUCCESS,
+                HttpStatusCode.OK,
                 HttpResponseMsg.PUT_SUCCESS,
                 new PostResponseDtoWithPostComments(postComment.getPost(),user)), HttpStatus.OK);
     }

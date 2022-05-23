@@ -5,9 +5,11 @@ import { Divider,} from "@mui/material";
 import PostSubCommentTextBox from "./PostSubCommentTextBox";
 import MDEditor from '@uiw/react-md-editor';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import CheckIcon from '@mui/icons-material/Check'
 import api from "../../api/api";
 import { useNavigate } from 'react-router';
 import AlertDialog from "../dialog/AlertDialog";
+import { green } from "@mui/material/colors";
 
 
 
@@ -25,6 +27,19 @@ export default function QnAComment({postsubcomments, postComment, Solved, Owner}
 
     },[])
 
+    function selectPostComment(postCommentId){
+        if(window.confirm("이 댓글을 채택하시겠습니까?"))
+        {
+            api.selectPostComment(postCommentId)
+            .then(res=>{
+                window.location.reload();
+            }).catch(e=>{
+                console.log(e)
+            })
+        }
+
+    }
+
 
     return(
     <Box>
@@ -38,7 +53,7 @@ export default function QnAComment({postsubcomments, postComment, Solved, Owner}
                     flexDirection:"column" ,
                     alignItems: 'center'
                 }}>
-                { Solved ? isSelected ? <Typography> 초록체크버튼 </Typography>: <Box /> : Owner &&<Typography>회색체크버튼</Typography>}
+                { Solved ? isSelected ? <CheckIcon color="success" fontSize="large"/>: <Box /> : Owner &&<CheckIcon color="disabled" fontSize="large" sx={{ "&:hover":{color:"green"}}} onClick={()=>{selectPostComment(postComment.id)}}/>}
                 </Box>
             </Grid>
             <Grid item xs={11}>
