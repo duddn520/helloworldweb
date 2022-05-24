@@ -23,7 +23,8 @@ public class PostResponseDto { // post결과로 전달할 데이터
     private String content;
     private String tags;
     private Long views;
-    private String createdTime;
+    private LocalDateTime createdTime;
+    private LocalDateTime modifiedTime;
 
     public PostResponseDto(Post post) {
         this.id = post.getId();
@@ -33,6 +34,7 @@ public class PostResponseDto { // post결과로 전달할 데이터
         this.content = post.getContent();
         this.tags = post.getTags();
         this.views = post.getViews();
-        this.createdTime = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(post.getCreatedTime());
+        this.createdTime = post.getCreatedTime();
+        this.modifiedTime = post.getModifiedTime();
     }
 }

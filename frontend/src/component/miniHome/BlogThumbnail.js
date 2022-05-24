@@ -5,7 +5,6 @@ import { Close, DeleteOutline } from "@mui/icons-material";
 import styled from "styled-components";
 import { useNavigate } from 'react-router';
 import api from "../../api/api";
-import strToHTML from "../../function/strToHTML";
 
 const TitleBox = styled.div`
     white-space: nowrap;
@@ -58,13 +57,6 @@ function PostThumbnail({post, isOwner}){
 
     function MoveToOnePost(id){
         navigate("/blog", {state: {postId: id}});
-        // api.getPost(id)
-        // .then(res=>{
-        //     console.log(res);
-        // })
-        // .catch(e=>{
-        //     console.log(e);
-        // })
     }
 
     return(
@@ -76,7 +68,7 @@ function PostThumbnail({post, isOwner}){
                 </IconButton>}
             </Box>
             <ContentBox>{makeThumbnailContent(post.content)}</ContentBox>
-            <ContentBox>{post.createdTime}</ContentBox>
+            <ContentBox>{(post.modifiedTime === null || post.modifiedTime === post.createdTime) ? post.createdTime.split('T')[0] : post.modifiedTime.split('T')[0]}</ContentBox>
             <ContentBox>{'views: '+post.views}</ContentBox>
         </OnePost>
     )

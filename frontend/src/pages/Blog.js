@@ -88,7 +88,7 @@ function Blog(){
                         <SmallUserProfile userInfo={post.userResponseDto}/>
                         <Box sx={{justifyContent: 'space-between', display: 'flex', width: '100%', marginBottom: 1}}>
                             <Typography sx={{fontWeight :'bold', fontSize: 20, color: 'gray'}}>{'태그: '+post.tags}</Typography>
-                            <Typography sx={{fontWeight :'bold', fontSize: 15}}>{(post.modifiledTime === null || post.modifiedTime === post.createdTime) ? post.createdTime : post.modifiedTime+' (수정됨)'}</Typography>
+                            <Typography sx={{fontWeight :'bold', fontSize: 15}}>{(post.modifiedTime === null || post.modifiedTime === post.createdTime) ? post.createdTime : post.modifiedTime+' (수정됨)'}</Typography>
                         </Box>
                     </TitleBox>
 

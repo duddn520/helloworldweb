@@ -10,8 +10,6 @@ import 'react-quill/dist/quill.snow.css';
 import ImageResize from 'quill-image-resize';
 Quill.register('modules/ImageResize', ImageResize);
 
-
-
 function WriteBlog(){
     const navigate = useNavigate();
     const { state } = useLocation();
@@ -222,7 +220,6 @@ function WriteBlog(){
                     />
                 </Box>
                 <Typography sx={{fontWeight: 'bold', marginBottom: 1}}>내용</Typography>
-                {/* <WriteSpace id="Content" contentEditable="true"/> */}
                 <ReactQuill 
                 theme="snow" 
                 value={blogContent} 
@@ -230,12 +227,11 @@ function WriteBlog(){
                 modules={modules} 
                 formats={formats} 
                 placeholder='내용을 입력하세요.'
-                style={{height: '47vh'}}
+                style={{minHeight: '47vh'}}
                 ref={quillRef}/>
                 
-                <Box sx={{marginBottom: 2, marginTop: 8}}>
+                <Box sx={{marginBottom: 2, marginTop: 2}}>
                     <Button variant="outlined" component="label" sx={{height: 30}}> OCR
-
                         <input 
                         type="file"
                         accept="image/png, image/jpeg, image/jpg"
