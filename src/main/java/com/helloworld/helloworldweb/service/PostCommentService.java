@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -51,5 +52,16 @@ public class PostCommentService {
         Post post = postComment.getPost();
         postRepository.save(post.updateSolved());
         return postCommentRepository.save(postComment);
+    }
+
+    @Transactional
+    public List<PostComment> getPostCommentsInOrder(Post post)
+    {
+        List<PostComment> postComments = new ArrayList<>();
+        PostComment selectedPostComment = postCommentRepository.findByPostAndSelectedTrue(post).orElseThrow(()-> new IllegalStateException("해결되지 않은 질문입니다."));
+        postComments.add(selectedPostComment);
+        List<PostComment> otherPostComments = postCommentRepository.findAllByPostAndSelectedFalse(post).orElseGet(()-> new ArrayList<>());
+        postComments.addAll(otherPostComments);
+        return postComments;
     }
 }

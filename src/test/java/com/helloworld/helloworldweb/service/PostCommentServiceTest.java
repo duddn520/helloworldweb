@@ -132,4 +132,83 @@ public class PostCommentServiceTest {
 
     }
 
+    @Test
+    @DisplayName("채택 댓글이 리스트 최상단에 위치(SolvedPost)")
+    void getPostCommentsInOrder_SolvedPost() throws Exception{
+        //given
+        User user = User.builder()
+                .posts(new ArrayList<>())
+                .subComments(new ArrayList<>())
+                .email("test@email.com")
+                .role(Role.USER)
+                .nickName("hihihi")
+                .build();
+
+        Post post = Post.builder()
+                .postComments(new ArrayList<>())
+                .title("hello")
+                .content("i dont know!!!")
+                .tags("java")
+                .category(Category.QNA)
+                .solved(true)
+                .build();
+
+        post.updateUser(user);
+        PostComment selectedPostComment = new PostComment();
+        List<PostComment> otherPostComments = new ArrayList<>();
+        for( int j=0;j<3;j++) {
+            if(j==1) {
+
+                PostComment postComment = PostComment.builder()
+                        .selected(true)
+                        .build();
+
+                postComment.updatePost(post);
+
+
+                for (int i = 0; i < 3; i++) {
+                    PostSubComment subComment = PostSubComment.builder()
+                            .content("1234" + i)
+                            .build();
+
+                    subComment.updateUser(user);
+                    subComment.updatePostComment(postComment);
+                }
+
+                selectedPostComment = postComment;
+
+            }
+            else
+            {
+                PostComment postComment = PostComment.builder()
+                    .selected(false)
+                    .build();
+
+                postComment.updatePost(post);
+
+                for (int i = 0; i < 3; i++) {
+                    PostSubComment subComment = PostSubComment.builder()
+                            .content("1234" + i)
+                            .build();
+
+                    subComment.updateUser(user);
+                    subComment.updatePostComment(postComment);
+                }
+
+                otherPostComments.add(postComment);
+            }
+
+        }
+        when(postCommentRepository.findByPostAndSelectedTrue(any(Post.class))).thenReturn(Optional.of(selectedPostComment));
+        when(postCommentRepository.findAllByPostAndSelectedFalse(any(Post.class))).thenReturn(Optional.of(otherPostComments));
+
+
+        //when
+        List<PostComment> postComments = postCommentService.getPostCommentsInOrder(post);
+
+        //then
+        assertThat(postComments.get(0).isSelected()).isEqualTo(true);
+        assertThat(postComments.size()).isEqualTo(3);
+    }
+
 }

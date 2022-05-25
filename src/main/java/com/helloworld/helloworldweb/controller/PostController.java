@@ -2,6 +2,7 @@ package com.helloworld.helloworldweb.controller;
 
 import com.helloworld.helloworldweb.domain.Category;
 import com.helloworld.helloworldweb.domain.Post;
+import com.helloworld.helloworldweb.domain.PostComment;
 import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.dto.Post.PostRequestDto;
 import com.helloworld.helloworldweb.dto.Post.PostResponseDto;
@@ -11,6 +12,7 @@ import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
 import com.helloworld.helloworldweb.model.HttpStatusCode;
+import com.helloworld.helloworldweb.service.PostCommentService;
 import com.helloworld.helloworldweb.service.PostService;
 import com.helloworld.helloworldweb.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,7 @@ public class PostController {
 
     private final PostService postService;
     private final UserService userService;
+    private final PostCommentService postCommentService;
     private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/api/post")
@@ -153,13 +156,29 @@ public class PostController {
         User caller = userService.getUserByJwt(jwtToken);
         Post post = postService.getPost(id);
         postService.updatePostViews(post);
-        //postsubcomment 에서 isOwner를 반환할수 있도록, isOwner를 직접 넘기기보다 caller를 넘겨 post, postsubcomment 작성자와 각각 대조할수 있도록 변경.
-        PostResponseDtoWithPostComments responseDto = new PostResponseDtoWithPostComments(post, caller);
+        if(post.isSolved()) {
+            List<PostComment> postComments = postCommentService.getPostCommentsInOrder(post);
 
-        return new ResponseEntity<>(ApiResponse.response(
-                HttpStatusCode.GET_SUCCESS,
-                HttpResponseMsg.GET_SUCCESS,
-                responseDto), HttpStatus.OK);
+            PostResponseDtoWithPostComments responseDto = new PostResponseDtoWithPostComments(post, postComments, caller);
+
+            return new ResponseEntity<>(ApiResponse.response(
+                    HttpStatusCode.GET_SUCCESS,
+                    HttpResponseMsg.GET_SUCCESS,
+                    responseDto), HttpStatus.OK);
+        }
+        else
+        {
+            //postsubcomment 에서 isOwner를 반환할수 있도록, isOwner를 직접 넘기기보다 caller를 넘겨 post, postsubcomment 작성자와 각각 대조할수 있도록 변경.
+            PostResponseDtoWithPostComments responseDto = new PostResponseDtoWithPostComments(post, caller);
+
+            return new ResponseEntity<>(ApiResponse.response(
+                    HttpStatusCode.GET_SUCCESS,
+                    HttpResponseMsg.GET_SUCCESS,
+                    responseDto), HttpStatus.OK);
+
+        }
+
+
     }
 
     @PutMapping("/api/post")
