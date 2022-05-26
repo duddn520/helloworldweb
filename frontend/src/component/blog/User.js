@@ -21,7 +21,7 @@ export default function({id , qnas ,comments }){
                         })
                         :
                         <Box sx={{ flex: 1 ,alignItems: 'center' ,justifyContent: 'center' ,display: 'flex' }}>
-                            <Typography sx={{ fontSize: 15 ,color: 'gray' ,marginTop: 10 }}>아직 작성한 답변이 없어요.</Typography>
+                            <Typography sx={{ fontSize: 15 ,color: 'gray' ,marginTop: 5 }}>아직 작성한 질문이 없어요.</Typography>
                         </Box>
                     }
                     </Box>
@@ -39,7 +39,7 @@ export default function({id , qnas ,comments }){
                         })
                         :
                         <Box sx={{ flex: 1 ,alignItems: 'center' ,justifyContent: 'center' ,display: 'flex' }}>
-                            <Typography sx={{ fontSize: 15 ,color: 'gray' ,marginTop: 10 }}>아직 작성한 답변이 없어요.</Typography>
+                            <Typography sx={{ fontSize: 15 ,color: 'gray' ,marginTop: 5 }}>아직 작성한 답변이 없어요.</Typography>
                         </Box>
                     }
                     </Box>

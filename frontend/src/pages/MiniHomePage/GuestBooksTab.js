@@ -3,6 +3,7 @@ import { Box ,Container ,styled ,Avatar ,Button ,Typography ,Divider ,
     TextField
 } from "@mui/material";
 import api from "../../api/api";
+import AlertDialog from "../../component/dialog/AlertDialog";
 
 function GuestBooksTab({ userInfo }){
     const [newComment,setNewComment] = React.useState("하이하이👆");
@@ -58,7 +59,7 @@ function GuestBooksTab({ userInfo }){
             {
                 comments.map( comment => {
                   return(
-                    <RenderComment comment={comment} />
+                    <RenderComment comment={comment} refresh={refresh} setRefresh={setRefresh}/>
                   );
                 })
             }
@@ -68,10 +69,23 @@ function GuestBooksTab({ userInfo }){
         </Box>
     )
 
-    function RenderComment( {comment} ){
+    function RenderComment( {comment ,refresh ,setRefresh} ){
         const [reply,setReply] = React.useState("");
+        const [open,setOpen] = React.useState(false);
+
+        function handleDelete(){
+            api.deleteGuestBook(comment.id)
+            .then( res => {
+                setRefresh(!refresh);
+            })
+            .catch( e => {
+                alert("다시 시도해주세요.")
+            })
+        }
+
         return(
                 <Container>
+                    <AlertDialog open={open} setOpen={setOpen} onAgree={handleDelete}/>
                     <Container sx={{ width: '100%' ,backgroundColor: 'rgb(240,240,240)' ,display: 'flex' ,flexDirection: 'row' ,alignItems: 'center' ,mt: 5 }}>
                         <Typography>No.{comment.id}</Typography> 
                         <Button sx={{ textTransform : 'none' }}>{comment.userName}</Button>
@@ -79,7 +93,7 @@ function GuestBooksTab({ userInfo }){
     
                         <Button sx={{ marginLeft: 'auto' }}>비밀로 하기</Button>
                         <Divider orientation='vertical' flexItem sx={{ m: 1 }}/>
-                        <Button sx={{ color: 'red' }}>삭제</Button>
+                        <Button sx={{ color: 'red' }} onClick={() => setOpen(true)}>삭제</Button>
                     </Container>
                     <Container sx={{ display: 'flex' ,flexDirection: 'row' ,alignItems: 'center' }}> 
                         <Box 
