@@ -27,10 +27,12 @@ public class GuestBookComment extends BaseTimeEntity {
     private String reply;
 
     @Builder
-    public GuestBookComment(String content,User user,String reply) {
-        this.content = content;
+    public GuestBookComment(Long id, User user, GuestBook guestBook, String content, String reply) {
+        this.id = id;
         this.user = user;
-        this.reply =reply;
+        this.guestBook = guestBook;
+        this.content = content;
+        this.reply = reply;
     }
 
     public GuestBookComment changeGuestBook(GuestBook guestBook){
