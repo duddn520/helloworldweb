@@ -40,28 +40,18 @@ public class PostService {
     //AWS S3에 파일을 업로드 하는 서비스
     //controller로 부터 Post 객체, User 객체, front에서 받은 file을 받음
     @Transactional
-    public Post addPost(Post post, User user, List<MultipartFile> files) throws IOException {
+    public Post addPost(Post post, User user, String[] storedUrls) throws IOException {
 
         //Post와 User 연관관계 맺어줌
         post.updateUser(user);
 
-        if(files != null){
-            for(MultipartFile file : files){
-
-                //Aws S3 file server에 file을 업로드
-                String uploadImageUrl = fileProcessService.uploadImage(file);
-
-                Base64.Encoder encoder = Base64.getEncoder();
-                byte[] photoEncode = encoder.encode(file.getBytes());
-                String fileBase64 = new String(photoEncode, "UTF8");
-                String base64ForFront = "data:"+file.getContentType()+";base64,"+fileBase64;
-
+        if(storedUrls != null){
+            for(String url : storedUrls){
+                String storedUrl = URLDecoder.decode(url, "UTF-8");
                 PostImage postImage = PostImage.builder()
-                        .originalFileName(file.getOriginalFilename())
-                        .storedFileName(fileProcessService.getFileName(URLDecoder.decode(uploadImageUrl, "UTF-8")))
-                        .storedUrl(uploadImageUrl)
-                        .fileSize(file.getSize())
-                        .base64(base64ForFront)
+                        .originalFileName("IMAGE")
+                        .storedFileName(fileProcessService.getFileName(storedUrl))
+                        .storedUrl(storedUrl)
                         .build();
 
                 //Post 와 PostImage의 연관관계 맺어줌
@@ -71,7 +61,13 @@ public class PostService {
             }
         }
 
-        return postRepository.save(post);
+        Post savedPost = postRepository.save(post);
+        if(savedPost == null) {
+            throw new NullPointerException("Post 저장에 실패했습니다.");
+        }
+        else {
+            return savedPost;
+        }
 
     }
 
@@ -101,7 +97,6 @@ public class PostService {
                     .originalFileName(file.getOriginalFilename())
                     .storedFileName(newFileName)
                     .storedUrl(newFileName) //로컬에 저장할 떄는 일단 url 없음
-                    .fileSize(file.getSize())
                     .build();
 
             postImage.updatePost(post);
@@ -197,45 +192,46 @@ public class PostService {
     }
 
     @Transactional
-    public Post updatePost(Post post, String title, String content, String tags, List<MultipartFile> files) throws IOException {
+    public Post updatePost(Post post, String title, String content, String tags, String[] storedUrls) throws IOException {
 
         List<PostImage> postImages = post.getPostImages();
 
-        //post의 이전 postImage들을 미리 Aws S3에서 삭제
+        //post의 이전 postImage들을 미리 삭제
         for(PostImage postImage : postImages){
-            String targetName = postImage.getStoredFileName();
-            fileProcessService.deleteImage(targetName);
             postImageRepository.delete(postImage);
         }
 
         post.updatePostTextContent(title, content, tags);
 
-        if(files != null){
-            for(MultipartFile file : files){
-
-                //Aws S3 file server에 file을 업로드
-                String uploadImageUrl = fileProcessService.uploadImage(file);
-
-                Base64.Encoder encoder = Base64.getEncoder();
-                byte[] photoEncode = encoder.encode(file.getBytes());
-                String fileBase64 = new String(photoEncode, "UTF8");
-                String base64ForFront = "data:"+file.getContentType()+";base64,"+fileBase64;
-
+        // 삭제 후 새로 객체 생성 후 연관관계 맺어줌
+        if(storedUrls != null){
+            for(String url : storedUrls){
+                String storedUrl = URLDecoder.decode(url, "UTF-8");
                 PostImage postImage = PostImage.builder()
-                        .originalFileName(file.getOriginalFilename())
-                        .storedFileName(fileProcessService.getFileName(URLDecoder.decode(uploadImageUrl, "UTF-8")))
-                        .storedUrl(uploadImageUrl)
-                        .fileSize(file.getSize())
-                        .base64(base64ForFront)
+                        .originalFileName("IMAGE")
+                        .storedFileName(fileProcessService.getFileName(storedUrl))
+                        .storedUrl(storedUrl)
                         .build();
 
                 //Post 와 PostImage의 연관관계 맺어줌
                 postImage.updatePost(post);
 
-                postImageRepository.save(postImage);
+                PostImage savedPostImage = postImageRepository.save(postImage);
+
+                if(savedPostImage == null) {
+                    throw new NullPointerException("Post 수정에 실패했습니다.");
+                }
             }
         }
-        return postRepository.save(post);
+
+        Post savedPost = postRepository.save(post);
+
+        if(savedPost == null) {
+            throw new NullPointerException("Post 수정에 실패했습니다.");
+        }
+        else {
+            return savedPost;
+        }
     }
 
     @Transactional

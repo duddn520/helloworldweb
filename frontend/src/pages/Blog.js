@@ -11,6 +11,7 @@ import BlogComment from "../component/blog/BlogComment";
 
 import CommentEditor from "../component/blog/CommentEditor";
 import strToHTML from "../function/strToHTML";
+import axios from "axios";
 
 const TitleBox = styled.div`
     flex: 1;
@@ -42,43 +43,13 @@ function Blog(){
         .then(res=>{
             setIsOwner(res.isOwner);
             setPost(res);
-            let divB = document.getElementById('BlogContent');
-            if(strToHTML( divB.innerHTML ).length == 0){
-                let imageIndex = 0;
-                if(res !== null && res !== undefined){
-                    const contentArray = res.content.split("\n");
-                    for (let i = 0 ; i < contentArray.length ; i += 1) {
-                        let currentLine = contentArray[i];
-
-                        if(currentLine == '&&&&'){
-                            let currentImg = res.postImageResponseDtos[imageIndex];
-                            let imgNode = document.createElement('img');
-                            imgNode.setAttribute("src", currentImg.storedUrl);
-                            imgNode.setAttribute("name", currentImg.originalFileName);
-                            imgNode.setAttribute("base64", currentImg.base64); // base64 인코딩된 값
-                            imgNode.setAttribute("variant", "contained");
-                            imgNode.setAttribute("alt", currentImg.storedUrl);
-                            imgNode.style.maxWidth = '300px';
-                            imgNode.style.maxHeight = 'auto';
-                            divB.appendChild(imgNode);
-                            imageIndex += 1;
-                        }
-                        else {
-                            let divNode = document.createElement('div');
-                            divNode.append(contentArray[i]);
-                            divB.appendChild(divNode);
-                        }
-                    }
-                }
-            }
-            
         })
         .catch(e=>{
             console.log(e);
         })
     },[reRender]);
 
-    function getMyInfo(){
+    React.useEffect(()=>{
         api.getUser()
         .then(res => {
             setMyInfo(res);
@@ -86,10 +57,11 @@ function Blog(){
         .catch(e=>{
             alert("사용자 프로필을 조회하지 못했습니다.");
         })
-    }
+    },[])
+
 
     function openCommentEditer(){
-        if(myInfo === null) getMyInfo();
+        if(myInfo === null);
         setIsOpenCommentEditor(!isOpenCommentEditer);
     }
 
@@ -101,6 +73,15 @@ function Blog(){
     function movetoUpdatePost(){
         navigate("/minihome/write", {state: {targetEmail: post.userResponseDto.email, post: post}});
     }
+    function deleteThisPost(){
+        api.deletePost(post.id)
+        .then(res=>{
+            navigate(`/minihome/`, {state: {tabIndex: 0, targetEmail: myInfo.email}});
+        })
+        .catch(e=>{
+            console.log(e);
+        })
+    }
 
     return(
         <div>
@@ -111,17 +92,17 @@ function Blog(){
                         <Box sx={{justifyContent: 'space-between', display: 'flex', width: '100%', alignItems: 'center', marginBottom: 1}}>
                             <Typography sx={{fontWeight :'bold', fontSize: 30}}>{post.title}</Typography>
                             {isOwner && <IconButton>
-                                <DeleteOutline/>
+                                <DeleteOutline onClick={()=>{deleteThisPost()}}/>
                             </IconButton>}
                         </Box>
                         <SmallUserProfile userInfo={post.userResponseDto}/>
                         <Box sx={{justifyContent: 'space-between', display: 'flex', width: '100%', marginBottom: 1}}>
                             <Typography sx={{fontWeight :'bold', fontSize: 20, color: 'gray'}}>{'태그: '+post.tags}</Typography>
-                            <Typography sx={{fontWeight :'bold', fontSize: 15}}>{post.modifiledTime === null ? post.createdTime : post.modifiedTime+' (수정됨)'}</Typography>
+                            <Typography sx={{fontWeight :'bold', fontSize: 15}}>{(post.modifiedTime === null || post.modifiedTime === post.createdTime) ? post.createdTime : post.modifiedTime+' (수정됨)'}</Typography>
                         </Box>
                     </TitleBox>
 
-                    <ContentBox id="BlogContent"/>
+                    <ContentBox id="BlogContent" dangerouslySetInnerHTML={ {__html: post.content} }/>
 
                     <Box sx={{borderBottom: 1, borderColor: 'lightgray', mt: 2, padding: 1}}>
                         <Box sx={{display: 'flex', border: 1, padding: 1, borderColor: 'gray', borderRadius: 2, width: 120, height: 30 }} onClick={()=>{setIsOpenComment(!isOpenComment)}}>
@@ -151,7 +132,7 @@ function Blog(){
                             commentType={'COMMENT'}
                             modify={false}/>
                         </Box>}
-                    <Box sx={{flex: 1, justifyContent: 'flex-end', display: 'flex', mt: 2}}>
+                    <Box sx={{flex: 1, justifyContent: 'flex-end', display: 'flex', mt: 2, mb: 2}}>
                         {isOwner && <Button onClick={movetoUpdatePost} variant="outlined" sx={{width: 100}}>수정</Button>}
                     </Box>
 

@@ -1,6 +1,7 @@
 package com.helloworld.helloworldweb.service;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.helloworld.helloworldweb.s3.FileFolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,7 +18,7 @@ public class FileProcessService {
 
     //이미지를 S3 버킷에 업로드 하는 함수
     public String uploadImage(MultipartFile file) {
-        String fileName = createFileName(file.getOriginalFilename());
+        String fileName = amazonS3Service.getFileFolder(FileFolder.IMAGE) + createFileName(file.getOriginalFilename());
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(file.getSize());

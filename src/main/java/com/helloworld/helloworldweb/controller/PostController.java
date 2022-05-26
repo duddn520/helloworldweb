@@ -11,6 +11,7 @@ import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
 import com.helloworld.helloworldweb.model.HttpStatusCode;
+import com.helloworld.helloworldweb.service.FileProcessService;
 import com.helloworld.helloworldweb.service.PostService;
 import com.helloworld.helloworldweb.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,16 +40,17 @@ public class PostController {
 
     private final PostService postService;
     private final UserService userService;
+    private final FileProcessService fileProcessService;
     private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/api/post")
     @Transactional
     public ResponseEntity<ApiResponse<PostResponseDto>> registerPost(@RequestHeader(value = "Auth") String jwtToken,
-                                                     @RequestParam(value = "files", required = false) List<MultipartFile> files,
                                                      @RequestParam(value = "content") String content,
                                                      @RequestParam(value = "category") Category category,
                                                      @RequestParam(value = "title") String title,
-                                                     @RequestParam(value = "tags", required = false, defaultValue = "") String tags) throws IOException {
+                                                     @RequestParam(value = "tags", required = false, defaultValue = "") String tags,
+                                                     @RequestParam(value = "imageUrlArray", required = false) String urls) throws IOException {
 
         User findUser = userService.getUserByJwt(jwtToken);
         //post 객체 생성
@@ -58,15 +62,51 @@ public class PostController {
                 .solved(false)
                 .build();
 
-        Post savedPost = postService.addPost(post, findUser, files);
+        String[] storedUrls;
+        if(urls != "" && urls != null) {
+            String decodeResult = URLDecoder.decode(urls, "UTF-8");
+            storedUrls = decodeResult.split(",");
+        }
+        else{
+            storedUrls = null;
+        }
+
+        Post savedPost = postService.addPost(post, findUser, storedUrls);
         PostResponseDto responseDto = new PostResponseDto(savedPost);
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.POST_SUCCESS,
                 HttpResponseMsg.POST_SUCCESS,
                 responseDto), HttpStatus.OK);
+    }
 
+    @PostMapping ("/api/image")
+    public ResponseEntity<ApiResponse<String>> getImageUrl(@RequestParam(value = "file") MultipartFile file) {
 
+        String uploadImageUrl = fileProcessService.uploadImage(file);
+
+        return new ResponseEntity (ApiResponse.response(
+                HttpStatusCode.POST_SUCCESS,
+                HttpResponseMsg.POST_SUCCESS,
+                uploadImageUrl), HttpStatus.OK);
+    }
+
+    @DeleteMapping ("/api/image")
+    public ResponseEntity<ApiResponse> deleteImageUrl(@RequestParam(value = "urls") String urls) throws UnsupportedEncodingException {
+
+        if(urls != ""){
+            String decodeResult = URLDecoder.decode(urls, "UTF-8");
+            String[] finalUrls = decodeResult.split(",");
+            System.out.println(Arrays.toString(finalUrls).length());
+
+            for(String url: finalUrls){
+                String storedUrl = URLDecoder.decode(url, "UTF-8");
+                fileProcessService.deleteImage(fileProcessService.getFileName(storedUrl));
+            }
+        }
+        return new ResponseEntity (ApiResponse.response(
+                HttpStatusCode.DELETE_SUCCESS,
+                HttpResponseMsg.DELETE_SUCCESS), HttpStatus.OK);
     }
 
     @GetMapping("/api/post/blogs")
@@ -165,17 +205,27 @@ public class PostController {
     @PutMapping("/api/post")
     @Transactional
     public ResponseEntity<ApiResponse<PostResponseDto>> updatePost(@RequestParam(value = "post_id") Long postId,
-                                                  @RequestParam(value = "files", required = false) List<MultipartFile> files,
-                                                  @RequestParam(value = "content") String content,
-                                                  @RequestParam(value = "title") String title,
-                                                  @RequestParam(value = "tags", required = false, defaultValue = "") String tags) throws IOException {
+                                                                   @RequestParam(value = "content") String content,
+                                                                   @RequestParam(value = "title") String title,
+                                                                   @RequestParam(value = "tags", required = false, defaultValue = "") String tags,
+                                                                   @RequestParam(value = "imageUrlArray", required = false) String urls) throws IOException {
 
         Post targetPost = postService.getPost(postId);
+
+        String[] storedUrls;
+        if(urls != "" && urls != null) {
+            String decodeResult = URLDecoder.decode(urls, "UTF-8");
+            storedUrls = decodeResult.split(",");
+        }
+        else{
+            storedUrls = null;
+        }
+
         Post savedPost = postService.updatePost(targetPost,
-                                                URLDecoder.decode(title, "UTF-8"),
-                                                URLDecoder.decode(content, "UTF-8"),
-                                                URLDecoder.decode(tags, "UTF-8"),
-                                                files);
+                URLDecoder.decode(title, "UTF-8"),
+                URLDecoder.decode(content, "UTF-8"),
+                URLDecoder.decode(tags, "UTF-8"),
+                storedUrls);
 
         PostResponseDto responseDto = new PostResponseDto(savedPost);
 
