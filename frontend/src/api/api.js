@@ -1,6 +1,7 @@
 import axios from 'axios';
 import request from './request';
 
+const serverUrl = 'http://3.35.188.47:8080';
 // Http Response statusCode 정리
 const status = {
     POST_SUCCESS : 210 ,
@@ -270,7 +271,7 @@ function registerPost(formdata, title, totalContent, tags){
                 reject();
             }
             else{
-                axios.post('/api/post', formdata, {
+                axios.post(`${serverUrl}/api/post`, formdata, {
                     headers: {
                         'content-type': 'multipart/form-data',
                         Auth: token
@@ -576,7 +577,7 @@ function updatePost(postId, formdata, title, totalContent, tags) {
                 reject();
             }
             else{
-                axios.put('/api/post', formdata, {
+                axios.put(`${serverUrl}/api/post`, formdata, {
                     headers: {
                         'content-type': 'multipart/form-data',
                         Auth: token
@@ -600,7 +601,7 @@ function getNewToken(accessToken,refreshToken){
     return new Promise((resolve,reject) => {
         axios({
             method: "GET" ,
-            url:"/api/user/getnewtoken",
+            url:`${serverUrl}/api/user/getnewtoken`,
             headers: {
                 "Auth" : accessToken ,
                 "Refresh" : refreshToken 
@@ -619,7 +620,7 @@ function updatePostSubComment(id,content){
     return new Promise((resolve,reject) => {
         axios({
             method: "PUT" ,
-            url:"/api/postsubcomment",
+            url:`${serverUrl}/api/postsubcomment`,
             data: {
                 "id" : id ,
                 "content" : content
@@ -638,7 +639,7 @@ function deletePostSubComment(id) {
     return new Promise((resolve,reject) => {
         axios({
             method: "DELETE" ,
-            url:"/api/postsubcomment",
+            url:`${serverUrl}/api/postsubcomment`,
             params: {
                 "id" : id ,
             }
@@ -656,7 +657,7 @@ function deleteGuestBook(id){
     return new Promise((resolve,reject) => {
         axios({
             method: "DELETE" ,
-            url:"/api/guestbook",
+            url:`${serverUrl}/api/guestbook`,
             params: {
                   "id" : id ,
               }
@@ -744,7 +745,7 @@ function getImgUrl(formdata){
             reject();
         }
         else{
-            axios.post('/api/image', formdata, {
+            axios.post(`${serverUrl}/api/image`, formdata, {
                 headers: {
                     'content-type': 'multipart/form-data',
                     Auth: token
