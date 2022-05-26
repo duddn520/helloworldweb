@@ -3,7 +3,8 @@ import api from "./api";
 import { useNavigate } from 'react-router-dom';
 
 const request = axios.create({
-    timeout: 20000
+    timeout: 20000,
+    baseURL: 'http://3.35.188.47:8080'
 })
 
 // HTTP 요청 직전에 가로챔. ( 전역 )
