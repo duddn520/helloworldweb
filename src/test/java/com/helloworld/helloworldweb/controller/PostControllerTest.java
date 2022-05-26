@@ -362,7 +362,7 @@ public class PostControllerTest {
 
         //when
         MvcResult result = mockMvc.perform(
-                        multipart("/api/imageupload")
+                        multipart("/api/image")
                                 .file(file)
                                 .contentType(MediaType.MULTIPART_FORM_DATA)
                                 .characterEncoding("UTF-8")
@@ -378,7 +378,7 @@ public class PostControllerTest {
         JSONParser p = new JSONParser();
         JSONObject obj = (JSONObject)p.parse(content);
         String url = (String) obj.get("data");
-        fileProcessService.deleteImage(fileProcessService.getFileName(url));
+        //fileProcessService.deleteImage(fileProcessService.getFileName(url));
     }
 
     @Test

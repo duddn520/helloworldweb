@@ -50,23 +50,11 @@ const BlogComment = ({postComment, MyInfo, afterSaveSubComment}) => {
     const [modifyTargetIndex, setModifyTargetIndex] = React.useState(null);
     const [myInfo, setMyInfo] = React.useState(MyInfo);
 
-    function getMyInfo(){
-        api.getUser()
-        .then(res => {
-            setMyInfo(res);
-        })
-        .catch(e=>{
-            alert("사용자 프로필을 조회하지 못했습니다.");
-        })
-    }
-
     function openCommentEditer(){
-        if(myInfo === null) getMyInfo();
         setIsOpenSubCommentEditor(!isOpenSubCommentEditor);
     }
 
     function openCommentModifyEditor(index){
-        if(myInfo === null) getMyInfo();
         setIsOpenSubCommentEditor(false);
         if(modifyTargetIndex === index) setModifyTargetIndex(null);
         else setModifyTargetIndex(index); 

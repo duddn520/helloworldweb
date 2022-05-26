@@ -49,7 +49,7 @@ public class PostService {
             for(String url : storedUrls){
                 String storedUrl = URLDecoder.decode(url, "UTF-8");
                 PostImage postImage = PostImage.builder()
-                        .originalFileName("IMAGE"+post.getId())
+                        .originalFileName("IMAGE")
                         .storedFileName(fileProcessService.getFileName(storedUrl))
                         .storedUrl(storedUrl)
                         .build();
@@ -203,13 +203,12 @@ public class PostService {
 
         post.updatePostTextContent(title, content, tags);
 
-        System.out.println("storedUrls = " + storedUrls);
         // 삭제 후 새로 객체 생성 후 연관관계 맺어줌
         if(storedUrls != null){
             for(String url : storedUrls){
                 String storedUrl = URLDecoder.decode(url, "UTF-8");
                 PostImage postImage = PostImage.builder()
-                        .originalFileName("IMAGE"+post.getId())
+                        .originalFileName("IMAGE")
                         .storedFileName(fileProcessService.getFileName(storedUrl))
                         .storedUrl(storedUrl)
                         .build();
@@ -217,7 +216,11 @@ public class PostService {
                 //Post 와 PostImage의 연관관계 맺어줌
                 postImage.updatePost(post);
 
-                postImageRepository.save(postImage);
+                PostImage savedPostImage = postImageRepository.save(postImage);
+
+                if(savedPostImage == null) {
+                    throw new NullPointerException("Post 수정에 실패했습니다.");
+                }
             }
         }
 

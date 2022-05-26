@@ -49,7 +49,7 @@ function Blog(){
         })
     },[reRender]);
 
-    function getMyInfo(){
+    React.useEffect(()=>{
         api.getUser()
         .then(res => {
             setMyInfo(res);
@@ -57,10 +57,11 @@ function Blog(){
         .catch(e=>{
             alert("사용자 프로필을 조회하지 못했습니다.");
         })
-    }
+    },[])
+
 
     function openCommentEditer(){
-        if(myInfo === null) getMyInfo();
+        if(myInfo === null);
         setIsOpenCommentEditor(!isOpenCommentEditer);
     }
 
@@ -72,6 +73,15 @@ function Blog(){
     function movetoUpdatePost(){
         navigate("/minihome/write", {state: {targetEmail: post.userResponseDto.email, post: post}});
     }
+    function deleteThisPost(){
+        api.deletePost(post.id)
+        .then(res=>{
+            navigate(`/minihome/`, {state: {tabIndex: 0, targetEmail: myInfo.email}});
+        })
+        .catch(e=>{
+            console.log(e);
+        })
+    }
 
     return(
         <div>
@@ -82,7 +92,7 @@ function Blog(){
                         <Box sx={{justifyContent: 'space-between', display: 'flex', width: '100%', alignItems: 'center', marginBottom: 1}}>
                             <Typography sx={{fontWeight :'bold', fontSize: 30}}>{post.title}</Typography>
                             {isOwner && <IconButton>
-                                <DeleteOutline/>
+                                <DeleteOutline onClick={()=>{deleteThisPost()}}/>
                             </IconButton>}
                         </Box>
                         <SmallUserProfile userInfo={post.userResponseDto}/>
