@@ -2,15 +2,14 @@ package com.helloworld.helloworldweb.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.helloworld.helloworldweb.domain.Category;
-import com.helloworld.helloworldweb.domain.Post;
-import com.helloworld.helloworldweb.domain.Role;
-import com.helloworld.helloworldweb.domain.User;
+import com.helloworld.helloworldweb.domain.*;
 import com.helloworld.helloworldweb.dto.PostComment.PostCommentRequestDto;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.repository.PostRepository;
 import com.helloworld.helloworldweb.repository.UserRepository;
 import com.helloworld.helloworldweb.service.PostCommentService;
+import com.nimbusds.jose.shaded.json.JSONObject;
+import com.nimbusds.jose.shaded.json.parser.JSONParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +25,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -109,6 +109,65 @@ public class PostCommentControllerTest {
         //then
                 .andExpect(status().isOk());
 
+
+
+    }
+
+    @Test
+    void selectPostComment() throws Exception
+    {
+        //given
+        Post post = Post.builder()
+                .postComments(new ArrayList<>())
+                .title("hello")
+                .content("i dont know!!!")
+                .tags("java")
+                .category(Category.QNA)
+                .build();
+
+        User user = User.builder()
+                .email(testEmail)
+                .repo_url(" ")
+                .profileUrl(" ")
+                .nickName(testEmail)
+                .role(Role.USER)
+                .posts(new ArrayList<>())
+                .subComments(new ArrayList<>())
+                .build();
+
+        post.updateUser(user);
+        User savedUser = userRepository.save(user);
+        Post savedPost = postRepository.save(post);
+
+        String accessToken = jwtTokenProvider.createToken(savedUser.getEmail(),Role.USER);
+
+        PostComment postComment = PostComment.builder()
+                .selected(false)
+                .build();
+
+        PostSubComment postSubComment = PostSubComment.builder()
+                .content("1234")
+                .build();
+
+        postCommentService.registerPostComment(postComment,post,postSubComment,user);
+
+        //when
+        MvcResult result = mvc.perform(
+                put("/api/postcomment/select")
+                        .header("Auth",accessToken)
+                        .param("id",Long.toString(postComment.getId())))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //then
+        String response = result.getResponse().getContentAsString();
+
+        JSONParser p = new JSONParser();
+        JSONObject obj = (JSONObject)p.parse(response);
+        JSONObject data = (JSONObject) p.parse(obj.get("data").toString());
+        boolean solved = Boolean.valueOf(String.valueOf(data.get("isSolved")));
+
+        assertThat(solved).isEqualTo(true);
 
 
     }

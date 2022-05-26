@@ -42,6 +42,21 @@ public class PostResponseDtoWithPostComments {
         this.IsOwner = checkIsOwner(post.getUser(),caller);
         this.IsSolved = post.isSolved();
     }
+    //공급받은 PostComment List로 ResponseDto 제작하는 생성자.
+    public PostResponseDtoWithPostComments(Post post,List<PostComment> postComments, User caller) {
+        this.id = post.getId();
+        this.userResponseDto = new UserResponseDto(post.getUser(), caller);
+        this.category = post.getCategory();
+        this.title = post.getTitle();
+        this.content = post.getContent();
+        this.tags = post.getTags();
+        this.createdTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(post.getCreatedTime());
+        this.modifiedTime = post.getModifiedTime() != null ? DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(post.getModifiedTime()) : null;
+        this.postCommentResponseDtos = postCommentsToResponseDtos(postComments,caller);
+        this.postImageResponseDtos = postImageResponseDtos(post.getPostImages());
+        this.IsOwner = checkIsOwner(post.getUser(),caller);
+        this.IsSolved = post.isSolved();
+    }
 
     //post의 PostComment List를 PostCommentResponseDto의 List로 바꿔주는함수.
     private List<PostCommentResponseDto> postCommentsToResponseDtos(List<PostComment> postComments)

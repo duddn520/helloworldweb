@@ -27,6 +27,10 @@ export default function QnA( props ){
     const [userProfileUrl,setUserProfileUrl] = React.useState("");
     // 유저이름
     const [userName,setUserName] = React.useState("");
+    // Owner 여부
+    const [isOwner, setIsOwner] = React.useState("");
+    // 해결여부
+    const [isSolved, setIsSolved] = React.useState("");
 
 
     const handleChange = (event, newValue) => {
@@ -60,6 +64,8 @@ export default function QnA( props ){
             setUserProfileUrl(res.userResponseDto.profileUrl);
             setUserName(res.userResponseDto.userName);
             setWriter(res.userResponseDto)
+            setIsSolved(res.isSolved)
+            setIsOwner(res.isOwner)
         })
         .catch( e => { })
     
@@ -126,7 +132,7 @@ export default function QnA( props ){
                     </Box>
                     
                     {
-                        postComment.length ?  <QnACommentList postComments={postComment} /> : <Box/>
+                        postComment.length ?  <QnACommentList postComments={postComment} Solved={isSolved} Owner={isOwner} /> : <Box/>
                     }
                     
                     <Typography sx={{ m : 2 ,fontSize: 25 ,fontWeight: '600' }}>{'당신의 답변'}</Typography>

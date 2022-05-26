@@ -2,7 +2,7 @@ import { Typography } from "@mui/material";
 import React from "react";
 import QnAComment from "./QnAComment";
 
-export default function QnACommentList({postComments}){
+export default function QnACommentList({postComments, Solved, Owner}){
     const [comments,setComments] = React.useState([]);
     
     React.useEffect(() => {
@@ -16,7 +16,7 @@ export default function QnACommentList({postComments}){
         {
         comments.map((postComment)=>{
             return(
-                <QnAComment postsubcomments={postComment.postSubCommentResponseDtos} postCommentId={postComment.id}></QnAComment>
+                <QnAComment postsubcomments={postComment.postSubCommentResponseDtos} postComment={postComment} Solved={Solved} Owner={Owner}></QnAComment>
             )
         })
     }

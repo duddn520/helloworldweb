@@ -5,23 +5,40 @@ import { Divider,} from "@mui/material";
 import PostSubCommentTextBox from "./PostSubCommentTextBox";
 import MDEditor from '@uiw/react-md-editor';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import CheckIcon from '@mui/icons-material/Check'
 import api from "../../api/api";
 import { useNavigate } from 'react-router';
 import AlertDialog from "../dialog/AlertDialog";
+import { green } from "@mui/material/colors";
 
 
 
-export default function QnAComment({postsubcomments, postCommentId}){
+export default function QnAComment({postsubcomments, postComment, Solved, Owner}){
     const [subComments, setSubComments] = React.useState([]);
-    // const [likes, setLikes] = React.useState("")
+    const [isSelected, setIsSelected] = React.useState("");
 
 
     useEffect(()=>{
         if(postsubcomments){
-            setSubComments(postsubcomments)
+            console.log(postComment)
+            setSubComments(postsubcomments);
+            setIsSelected(postComment.selected);
         }        
 
     },[])
+
+    function selectPostComment(postCommentId){
+        if(window.confirm("이 댓글을 채택하시겠습니까?"))
+        {
+            api.selectPostComment(postCommentId)
+            .then(res=>{
+                window.location.reload();
+            }).catch(e=>{
+                console.log(e)
+            })
+        }
+
+    }
 
 
     return(
@@ -36,8 +53,7 @@ export default function QnAComment({postsubcomments, postCommentId}){
                     flexDirection:"column" ,
                     alignItems: 'center'
                 }}>
-                <Typography variant="h6">300</Typography>
-                <ThumbUpIcon fontSize="large" />
+                { Solved ? isSelected ? <CheckIcon color="success" fontSize="large"/>: <Box /> : Owner &&<CheckIcon color="disabled" fontSize="large" sx={{ "&:hover":{color:"green"}}} onClick={()=>{selectPostComment(postComment.id)}}/>}
                 </Box>
             </Grid>
             <Grid item xs={11}>
@@ -57,7 +73,7 @@ export default function QnAComment({postsubcomments, postCommentId}){
                     } 
                 )
                 }
-                    <PostSubCommentTextBox postCommentId={postCommentId}/>
+                    <PostSubCommentTextBox postCommentId={postComment.id}/>
             </Grid>
         </Grid>
         <Divider variant="fullWidth" sx={{ flexGrow: 1 }}/>
@@ -94,8 +110,6 @@ function QnACommentComponent({postsubcomment,boxsize}){
         .catch( e => { });
     };
     
-    console.log(postsubcomment);
-
     return(
         <div key={postsubcomment.id}>
             <Box sx={{ display: 'flex' ,flexDireciton: 'row' ,mt: 0.5 }}>

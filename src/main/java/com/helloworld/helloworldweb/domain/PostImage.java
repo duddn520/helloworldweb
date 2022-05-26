@@ -25,20 +25,13 @@ public class PostImage {
     @NotNull
     private String storedUrl;
 
-    private Long fileSize;
-
-    @Lob
-    private String base64;
-
     @Builder
-    public PostImage(Long id, Post post, String originalFileName, String storedFileName, String storedUrl, Long fileSize, String base64) {
+    public PostImage(Long id, Post post, String originalFileName, String storedFileName, String storedUrl) {
         this.id = id;
         this.post = post;
         this.originalFileName = originalFileName;
         this.storedFileName = storedFileName;
         this.storedUrl = storedUrl;
-        this.fileSize = fileSize;
-        this.base64 = base64;
     }
 
     public void updatePost(Post post) {

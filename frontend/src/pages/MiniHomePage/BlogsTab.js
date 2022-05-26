@@ -17,7 +17,10 @@ function BlogsTab({ userInfo }){
         api.getBlogPosts(userInfo.email)
         .then(res => {
             setIsOwner(res.isOwner);
-            setPosts(res.postResponseDtos);
+            let sortedBlogs = res.postResponseDtos.sort((a, b) => {
+                return new Date(b.createdTime) - new Date(a.createdTime);
+            })
+            setPosts(sortedBlogs);
         })
         .catch(e => {
             alert("게시물을 불러오는데 실패했습니다.");
@@ -27,7 +30,6 @@ function BlogsTab({ userInfo }){
     return(
         <Box>
             <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
-                {/* <Typography variant='h5'>내 게시물</Typography> */}
                 {isOwner && <Button onClick={moveToWrite} variant="outlined" sx={{width: 100}}>글쓰기</Button>}
             </Box>
             <Box>

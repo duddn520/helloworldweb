@@ -12,4 +12,10 @@ public class AmazonS3Component {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
+
+    @Value("${cloud.aws.s3.folder.image}")
+    private String imageFolder;
+
+    @Value("${cloud.aws.s3.folder.music}")
+    private String musicFolder;
 }
