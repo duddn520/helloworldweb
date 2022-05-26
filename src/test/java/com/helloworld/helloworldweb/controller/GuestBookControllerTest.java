@@ -31,12 +31,12 @@ public class GuestBookControllerTest {
         return jwtTokenProvider.createToken("wlsdn1372@hanmail.net", Role.USER);
     }
 
-    @Test
-    void getGuestBooks() throws Exception {
-        mvc.perform(get("/api/guestbook")
-            .header("Auth",generateToken()))
-                .andExpect(status().isOk());
-    }
+//    @Test
+//    void getGuestBooks() throws Exception {
+//        mvc.perform(get("/api/guestbook")
+//            .header("Auth",generateToken()))
+//                .andExpect(status().isOk());
+//    }
 
     @Test
     void registerGuestBook() throws Exception {
@@ -50,25 +50,25 @@ public class GuestBookControllerTest {
                     .andExpect(status().isOk());
     }
 
-    @Test
-    void updateGuestBook() throws Exception{
+//    @Test
+//    void updateGuestBook() throws Exception{
+//
+//        String body = mapper.writeValueAsString(
+//                GuestBookRequestDto.builder().id(11L).targetUserEmail("wlsdn1372@hanmail.net").content("test").build()
+//        );
+//        mvc.perform(put("/api/guestbook")
+//                .header("Auth", generateToken())
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(body))
+//                    .andExpect(status().isOk());
+//    }
 
-        String body = mapper.writeValueAsString(
-                GuestBookRequestDto.builder().id(11L).targetUserEmail("wlsdn1372@hanmail.net").content("test").build()
-        );
-        mvc.perform(put("/api/guestbook")
-                .header("Auth", generateToken())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body))
-                    .andExpect(status().isOk());
-    }
-
-    @Test
-    void deleteGuestBook() throws Exception {
-        mvc.perform(delete("/api/guestbook")
-                .header("Auth", generateToken())
-                .param("id","11")
-                .contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isOk());
-    }
+//    @Test
+//    void deleteGuestBook() throws Exception {
+//        mvc.perform(delete("/api/guestbook")
+//                .header("Auth", generateToken())
+//                .param("id","11")
+//                .contentType(MediaType.APPLICATION_JSON))
+//                    .andExpect(status().isOk());
+//    }
 }
