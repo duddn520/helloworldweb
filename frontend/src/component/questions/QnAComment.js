@@ -60,13 +60,13 @@ export default function QnAComment({postsubcomments, postComment, Solved, Owner}
                 {subComments.map((postsubcomment,idx)=>{
                     if(idx===0){
                         return (
-                                <QnACommentComponent postsubcomment={postsubcomment} boxsize="60px" />
+                                <QnACommentComponent postsubcomment={postsubcomment} boxsize="60px" Solved={Solved} postComment={postComment} />
                             );
                         }
                         else{       // 대댓글인 경우
                             return(
                                 <Box sx={{ ml: 2 }}>
-                                    <QnACommentComponent postsubcomment={postsubcomment} boxsize="20px" />
+                                    <QnACommentComponent postsubcomment={postsubcomment} boxsize="20px" Solved={Solved} postComment={postComment} />
                                 </Box>
                             )
                     }
@@ -82,7 +82,7 @@ export default function QnAComment({postsubcomments, postComment, Solved, Owner}
 
 }
 
-function QnACommentComponent({postsubcomment,boxsize}){
+function QnACommentComponent({postsubcomment,boxsize, Solved, postComment}){
     const [editEnabled,setEditEnabled] = React.useState(false);
     const [newComment,setNewComment] = React.useState(postsubcomment.content);
     // 다이얼로그 드로어
@@ -128,7 +128,7 @@ function QnACommentComponent({postsubcomment,boxsize}){
                     }
                 </Box>
                 {
-                    postsubcomment.isOwner &&
+                    postsubcomment.isOwner && !postComment.selected &&
                     <Box sx={{ ml: 'auto' ,display: 'flex' ,height: 30 , flex: 1 }}>
                         <Button  size="small" sx={{ ml: 'auto' , color: editEnabled ? 'gray' : 'default' }} onClick={() => setEditEnabled(!editEnabled)}>{ !editEnabled ? "수정" : "수정취소" }</Button>
                         <Button  size="small" sx={{ color: 'red' }} onClick={handleOpen}>삭제</Button>
