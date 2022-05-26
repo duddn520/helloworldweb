@@ -652,6 +652,24 @@ function deletePostSubComment(id) {
     });  
 }
 
+function selectPostComment(id) {
+    return new Promise((resolve,reject) => {
+        request({
+            method: "POST" ,
+            url:"/api/postcomment/select",
+            params: {
+                "id" : id ,
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            reject();
+        })
+    });  
+}
+
 function registerBlog(title, content, tags, imageUrlArray){
     return new Promise((resolve,reject) => {
         request({
@@ -751,5 +769,5 @@ export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver,
     getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
     getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName 
     ,getUserQnas ,getUserComments, getGithubRepositories, registerUserWithGithub, connectUserToGithub , getNewToken
-    ,updatePostSubComment ,deletePostSubComment, registerBlog, getImgUrl, updateBlog, deleteImgUrl
+    ,updatePostSubComment ,deletePostSubComment, registerBlog, getImgUrl, updateBlog, deleteImgUrl, selectPostComment
 } ;
