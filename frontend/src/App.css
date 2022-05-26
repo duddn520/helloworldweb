@@ -27,6 +27,13 @@
 .App-link {
   color: #61dafb;
 }
+pre.ql-syntax {
+  background-color: #E6E8EB;
+  overflow: visible;
+}
+.ql-container, .ql-editor {
+  min-height: inherit;
+}
 
 @keyframes App-logo-spin {
   from {

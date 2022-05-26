@@ -6,6 +6,7 @@ import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.helloworld.helloworldweb.s3.AmazonS3Component;
+import com.helloworld.helloworldweb.s3.FileFolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -30,5 +31,17 @@ public class AmazonS3Service implements FileService{
     @Override
     public String getFileUrl(String fileName) {
         return amazonS3.getUrl(amazonS3Component.getBucket(), fileName).toString();
+    }
+
+    @Override
+    public String getFileFolder(FileFolder fileFolder) {
+        String folder = "";
+        if (fileFolder == FileFolder.IMAGE) {
+            folder = amazonS3Component.getImageFolder();
+        }
+        else if (fileFolder == FileFolder.MUSIC) {
+            folder = amazonS3Component.getMusicFolder();
+        }
+        return folder;
     }
 }

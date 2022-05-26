@@ -8,6 +8,7 @@ import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.repository.PostRepository;
 import com.helloworld.helloworldweb.repository.UserRepository;
+import com.helloworld.helloworldweb.service.FileProcessService;
 import com.helloworld.helloworldweb.service.PostService;
 import com.helloworld.helloworldweb.service.UserService;
 import com.nimbusds.jose.shaded.json.JSONObject;
@@ -26,6 +27,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import java.io.FileInputStream;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +47,8 @@ public class PostControllerTest {
     UserService userService;
     @Autowired
     PostService postService;
+    @Autowired
+    FileProcessService fileProcessService;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -343,6 +347,65 @@ public class PostControllerTest {
         assertThat(savedPost.getTitle()).isEqualTo("newBLog title");
         assertThat(savedPost.getContent()).isEqualTo("this is new Content");
         assertThat(savedPost.getTags()).isEqualTo("newTest");
+    }
+
+    @Test
+    void 이미지_한장_등록() throws Exception {
+        //given
+        MultiValueMap<String, String> requestParam = new LinkedMultiValueMap<>();
+
+        MockMultipartFile file = new MockMultipartFile("file",
+                "TestImage.png",
+                "image/png",
+                //이미지경로는 각 로컬에서 수정해야함.
+                new FileInputStream("/Users/heojihun/Project/helloworldweb/src/test/java/com/helloworld/helloworldweb/controller/TestImage.png"));
+
+        //when
+        MvcResult result = mockMvc.perform(
+                        multipart("/api/image")
+                                .file(file)
+                                .contentType(MediaType.MULTIPART_FORM_DATA)
+                                .characterEncoding("UTF-8")
+                                .header("Auth", getToken())
+                )
+
+                //then
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //S3에 저장된 테스트 이미지파일 삭제
+        String content = result.getResponse().getContentAsString();
+        JSONParser p = new JSONParser();
+        JSONObject obj = (JSONObject)p.parse(content);
+        String url = (String) obj.get("data");
+        //fileProcessService.deleteImage(fileProcessService.getFileName(url));
+    }
+
+    @Test
+    void 블로그_작성시_지운_이미지들_삭제() throws Exception {
+        //given
+        List<String> urls = new ArrayList<>();
+        for (int i = 0; i < 0; i++) {
+            MockMultipartFile file = new MockMultipartFile("file",
+                    "테스트이미지"+i+".png",
+                    "image/png",
+                    //이미지경로는 각 로컬에서 수정해야함.
+                    new FileInputStream("/Users/heojihun/Project/helloworldweb/src/test/java/com/helloworld/helloworldweb/controller/TestImage.png"));
+            urls.add(fileProcessService.uploadImage(file));
+        }
+        //when
+        MvcResult result = mockMvc.perform(
+                        delete("/api/image")
+                                .param("urls", String.valueOf(urls))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("UTF-8")
+                                .header("Auth", getToken())
+                )
+
+        //then
+        .andExpect(status().isOk())
+        .andReturn();
+
     }
 
 

@@ -670,12 +670,104 @@ function selectPostComment(id) {
     });  
 }
 
+function registerBlog(title, content, tags, imageUrlArray){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'POST',
+            url : '/api/post',
+            params: {
+                content: encodeURIComponent(content),
+                category: "BLOG",
+                title: encodeURIComponent(title),
+                tags: encodeURIComponent(tags),
+                imageUrlArray: encodeURIComponent(imageUrlArray)
+            }
+        })
+        .then( res => {
+            if ( res.data.statusCode === status.POST_SUCCESS ){
+                resolve(res.data);
+            }
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
+function updateBlog(postId, title, content, tags, imageUrlArray){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'PUT',
+            url : '/api/post',
+            params: {
+                post_id: postId,
+                content: encodeURIComponent(content),
+                title: encodeURIComponent(title),
+                tags: encodeURIComponent(tags),
+                imageUrlArray: encodeURIComponent(imageUrlArray)
+            }
+        })
+        .then( res => {
+            if ( res.data.statusCode === status.PUT_SUCCESS ){
+                resolve(res.data);
+            }
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
 
+function getImgUrl(formdata){
+    const token = window.sessionStorage.getItem("Auth");
+    return new Promise((resolve,reject) => {
+        if(token === null){
+            reject();
+        }
+        else{
+            axios.post('/api/image', formdata, {
+                headers: {
+                    'content-type': 'multipart/form-data',
+                    Auth: token
+                }
+            })
+            .then( res => {
+                if ( res.data.statusCode === status.POST_SUCCESS ){
+                    resolve(res.data.data);
+                }
+            })
+            .catch( e => {
+                console.log(e);
+                reject();
+            })
+        }
+    });
+}
+
+function deleteImgUrl(urls){
+    return new Promise((resolve,reject) => {
+        request({
+            method: 'DELETE',
+            url : "/api/image",
+            params: {
+                urls: encodeURIComponent(urls)
+            }
+        })
+        .then( res => {
+            resolve(res.data.data);
+        })
+        .catch( e => {
+            console.log(e);
+            reject();
+        })
+    });
+}
 
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
     getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , 
     getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
     getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName 
     ,getUserQnas ,getUserComments, getGithubRepositories, registerUserWithGithub, connectUserToGithub , getNewToken
-    ,updatePostSubComment ,deletePostSubComment, selectPostComment
+    ,updatePostSubComment ,deletePostSubComment, registerBlog, getImgUrl, updateBlog, deleteImgUrl, selectPostComment
 } ;

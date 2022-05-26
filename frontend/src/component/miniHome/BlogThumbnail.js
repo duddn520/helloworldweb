@@ -30,9 +30,21 @@ const OnePost = muiStyled(Box)({
 function PostThumbnail({post, isOwner}){
     const navigate = useNavigate();
 
-    function makeThumbnailContent(text){
-        return text.split('&&&&')[0]
+    function makeThumbnailContent(content){
+        // return content.replace(/<[^>]+>/g, ' ');
+        let temp = content.replace(/<[^>]+>/g, '%').split('%');
+        let result = "";
+        let i;
+        for (i = 0; i < temp.length; i++) {
+            if(temp[i] !== ""){
+                result = temp[i];
+                break;
+            }
+        }
+        return result;
+        
     }
+
     function deletePost(postId){
         api.deletePost(postId)
         .then(res=>{
@@ -45,13 +57,6 @@ function PostThumbnail({post, isOwner}){
 
     function MoveToOnePost(id){
         navigate("/blog", {state: {postId: id}});
-        // api.getPost(id)
-        // .then(res=>{
-        //     console.log(res);
-        // })
-        // .catch(e=>{
-        //     console.log(e);
-        // })
     }
 
     return(
@@ -63,7 +68,7 @@ function PostThumbnail({post, isOwner}){
                 </IconButton>}
             </Box>
             <ContentBox>{makeThumbnailContent(post.content)}</ContentBox>
-            <ContentBox>{post.createdTime}</ContentBox>
+            <ContentBox>{(post.modifiedTime === null || post.modifiedTime === post.createdTime) ? post.createdTime.split('T')[0] : post.modifiedTime.split('T')[0]}</ContentBox>
             <ContentBox>{'views: '+post.views}</ContentBox>
         </OnePost>
     )
