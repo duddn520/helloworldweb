@@ -15,12 +15,12 @@ import { green } from "@mui/material/colors";
 
 export default function QnAComment({postsubcomments, postComment, Solved, Owner}){
     const [subComments, setSubComments] = React.useState([]);
-    const [isSelected, setIsSelected] = React.useState("");
+    const [isSelected, setIsSelected] = React.useState(false);
 
 
     useEffect(()=>{
         if(postsubcomments){
-            console.log(postComment)
+
             setSubComments(postsubcomments);
             setIsSelected(postComment.selected);
         }        

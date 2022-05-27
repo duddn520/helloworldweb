@@ -52,7 +52,6 @@ function getGuestBooks( email ){
             }
         })
         .catch( e => {
-            console.log(e);
             reject();
         })
     });
@@ -69,8 +68,7 @@ function updateGuestBook({ id, reply }){
             }
         })
         .then( res => {
-            console.log(res);
-
+            resolve(res.data.data);
         })
         .catch( e => {
             console.log(e);
@@ -94,7 +92,6 @@ function registerGuestBook({ targetUserEmail ,content }){
         .then( res => {
             // Jwt 반환
             if ( res.data.statusCode === status.POST_SUCCESS ){
-                console.log(res.data.data);
                 resolve (res.data.data);
             }
         })
