@@ -47,7 +47,6 @@ public class UserController extends HttpServlet {
     @PostMapping("/api/user/register/kakao")
     public ResponseEntity<ApiResponse> registerUserWithKakao(HttpServletRequest request,HttpServletResponse response) throws ParseException {
 
-        response.addHeader("Access-Control-Allow-Origin","*");
         response.addHeader("Access-Control-Expose-Headers", "Auth");
 
         // 카카오로 부터 받아온 정보로 유저로 등록
@@ -83,7 +82,6 @@ public class UserController extends HttpServlet {
 
         response.addHeader("Auth", jwt);
         response.addHeader("Refresh",refresh);
-        response.addHeader("Access-Control-Allow-Origin","*");
         response.addHeader("Access-Control-Expose-Headers", "Auth");
 
         return new ResponseEntity<>(ApiResponse.response(
@@ -95,7 +93,6 @@ public class UserController extends HttpServlet {
     @PostMapping("/api/user/register/github")
     public ResponseEntity<ApiResponse> registerUserWithGithub(@RequestParam(name = "code") String code,HttpServletResponse servletresponse) throws ParseException {
 
-        servletresponse.addHeader("Access-Control-Allow-Origin","*");
         servletresponse.addHeader("Access-Control-Expose-Headers", "Auth");
 
         String token = userService.getGithubAccessTokenByCode(code);
@@ -123,7 +120,6 @@ public class UserController extends HttpServlet {
     {
         User user = userService.getUserByEmail(email);
 
-        response.addHeader("Access-Control-Allow-Origin", "*");
         response.addHeader("Access-Control-Expose-Headers", "Auth");
 
 
@@ -154,12 +150,16 @@ public class UserController extends HttpServlet {
 
     @GetMapping("/api/user")
     public ResponseEntity<ApiResponse<UserResponseDto>> getUser(@RequestHeader(value = "Auth") String jwtToken,
-                                                                @RequestParam(value = "email", required = false) String email) {
+                                                                @RequestParam(value = "email", required = false) String email,
+                                                                HttpServletResponse response) {
         if(email == null){
             // 자기가 자기자신의 정보 조회(customAppbar 에서 사용)
             String userEmail = jwtTokenProvider.getUserEmail(jwtToken);
             User findUser = userService.getUserByEmail(userEmail);
             UserResponseDto responseDto = new UserResponseDto(findUser, true);
+
+            response.setHeader("Access-Control-Allow-Origin","http://localhost:3000");
+            response.addHeader("Access-Control-Allow-Credentials", "true");
 
             return new ResponseEntity<>(ApiResponse.response(
                     HttpStatusCode.GET_SUCCESS,
@@ -171,6 +171,9 @@ public class UserController extends HttpServlet {
             User caller = userService.getUserByJwt(jwtToken);
             User findUser = userService.getUserByEmail(email);
             UserResponseDto responseDto = new UserResponseDto(findUser, caller.getId() == findUser.getId());
+
+            response.setHeader("Access-Control-Allow-Origin","http://localhost:3000");
+            response.addHeader("Access-Control-Allow-Credentials", "true");
 
             return new ResponseEntity<>(ApiResponse.response(
                     HttpStatusCode.GET_SUCCESS,
@@ -186,7 +189,6 @@ public class UserController extends HttpServlet {
         String email = jwtTokenProvider.getUserEmail(jwtTokenProvider.getTokenByHeader(request));
         User user = userService.getUserByEmail(email);
 
-        response.addHeader("Access-Control-Allow-Origin", "*");
         response.addHeader("Access-Control-Expose-Headers", "Auth");
 
         String token = userService.getGithubAccessTokenByCode(code);
@@ -269,7 +271,6 @@ public class UserController extends HttpServlet {
                 String newJwt = jwtTokenProvider.createToken(email, Role.USER);
 
                 response.addHeader("Auth", newJwt);
-                response.addHeader("Access-Control-Allow-Origin","*");
                 response.addHeader("Access-Control-Expose-Headers", "Auth");
 
                 return new ResponseEntity (ApiResponse.response(
