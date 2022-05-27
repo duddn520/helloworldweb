@@ -13,7 +13,6 @@ export default function GithubRedirect(){
         api.registerUserWithGithub(code)
         .then(async (res)=>{
              // SessionStorage에 jwt 저장
-             console.log(res);
              window.sessionStorage.setItem("Auth", res.accessToken);
              window.sessionStorage.setItem("Refresh", res.refreshToken);
 

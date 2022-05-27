@@ -88,7 +88,6 @@ public class PostCommentController {
         String token = jwtTokenProvider.getTokenByHeader(request);
         User user = userService.getUserByEmail(jwtTokenProvider.getUserEmail(token));
 
-        response.addHeader("Access-Control-Allow-Origin", "*");
         PostComment postComment = postCommentService.getPostCommentById(id);
         postCommentService.selectPostComment(postComment);
 
