@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 const request = axios.create({
     timeout: 20000,
-    baseURL: 'http://3.35.188.47:8080'
+    baseURL: "http://3.35.188.47:8080"
 })
 
 // HTTP 요청 직전에 가로챔. ( 전역 )
@@ -31,7 +31,7 @@ request.interceptors.response.use(
     (error) => {
         
         // 서버 에러가 난 경우
-        if( error.response.status === 500 && hasToken() ){
+        if( error?.response?.status === 500 && hasToken() ){
             api.getNewToken( window.sessionStorage.getItem("Auth") , window.sessionStorage.getItem("Refresh") )
             .then( res => {
                 if( res.auth )
