@@ -1,17 +1,26 @@
-FROM node:16.10.0
+# nginx 이미지를 사용합니다. 뒤에 tag가 없으면 latest 를 사용합니다.
+FROM nginx
 
-# set working directory
+# root 에 app 폴더를 생성
+RUN mkdir /app
+
+# work dir 고정
 WORKDIR /app
 
-# `/app/node_modules/.bin`을 $PATH 에 추가
-ENV PATH /app/node_modules/.bin:$PATH
+# work dir 에 build 폴더 생성 /app/build
+RUN mkdir ./build
 
-# app dependencies, install 및 caching
-COPY package.json /app/package.json
-RUN yarn install
-RUN npm install react-scripts@3.0.1 -g
+# host pc의 현재경로의 build 폴더를 workdir 의 build 폴더로 복사
+ADD ./build ./build
 
-COPY . /app
+# nginx 의 default.conf 를 삭제
+RUN rm /etc/nginx/conf.d/default.conf
 
-# 앱 실행
-CMD ["npm", "start"]
+# host pc 의 nginx.conf 를 아래 경로에 복사
+COPY ./nginx.conf /etc/nginx/conf.d
+
+# 80 포트 오픈
+EXPOSE 3000
+
+# container 실행 시 자동으로 실행할 command. nginx 시작함
+CMD ["nginx", "-g", "daemon off;"]
