@@ -158,9 +158,6 @@ public class UserController extends HttpServlet {
             User findUser = userService.getUserByEmail(userEmail);
             UserResponseDto responseDto = new UserResponseDto(findUser, true);
 
-            response.setHeader("Access-Control-Allow-Origin","http://localhost:3000");
-            response.addHeader("Access-Control-Allow-Credentials", "true");
-
             return new ResponseEntity<>(ApiResponse.response(
                     HttpStatusCode.GET_SUCCESS,
                     HttpResponseMsg.GET_SUCCESS,
@@ -171,9 +168,6 @@ public class UserController extends HttpServlet {
             User caller = userService.getUserByJwt(jwtToken);
             User findUser = userService.getUserByEmail(email);
             UserResponseDto responseDto = new UserResponseDto(findUser, caller.getId() == findUser.getId());
-
-            response.setHeader("Access-Control-Allow-Origin","http://localhost:3000");
-            response.addHeader("Access-Control-Allow-Credentials", "true");
 
             return new ResponseEntity<>(ApiResponse.response(
                     HttpStatusCode.GET_SUCCESS,
