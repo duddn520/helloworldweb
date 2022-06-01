@@ -1,7 +1,8 @@
 import axios from 'axios';
 import request from './request';
+import urls from './URL';
 
-const serverUrl = 'http://3.35.188.47:8080';
+const serverUrl = urls.server;
 // Http Response statusCode 정리
 const status = {
     POST_SUCCESS : 210 ,
