@@ -394,5 +394,4 @@ public class PostServiceUnitTest {
         assertThat(findPosts.size()).isEqualTo(50);
     }
 
-
 }

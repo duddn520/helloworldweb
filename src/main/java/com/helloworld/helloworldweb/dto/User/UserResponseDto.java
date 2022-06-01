@@ -13,6 +13,8 @@ public class UserResponseDto {
     private String email;
     private String userName;
     private String profileUrl;
+    private String profileMusicUrl;
+    private String profileMusic;
     private boolean IsOwner;
 
     public UserResponseDto(User user, boolean isOwner) {
@@ -20,6 +22,8 @@ public class UserResponseDto {
         this.email = user.getEmail();
         this.userName = user.getNickName();
         this.profileUrl = user.getProfileUrl();
+        this.profileMusic = user.getProfileMusic();
+        this.profileMusicUrl = user.getProfileMusicUrl();
         this.IsOwner = isOwner;
     }
     public UserResponseDto(User user, User caller) {

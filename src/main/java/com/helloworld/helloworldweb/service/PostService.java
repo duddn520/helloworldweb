@@ -47,11 +47,11 @@ public class PostService {
 
         if(storedUrls != null){
             for(String url : storedUrls){
-                String storedUrl = URLDecoder.decode(url, "UTF-8");
+                String decodeUrl = URLDecoder.decode(url, "UTF-8");
                 PostImage postImage = PostImage.builder()
                         .originalFileName("IMAGE")
-                        .storedFileName(fileProcessService.getFileName(storedUrl))
-                        .storedUrl(storedUrl)
+                        .storedFileName(fileProcessService.getFileName(decodeUrl))
+                        .storedUrl(url)
                         .build();
 
                 //Post 와 PostImage의 연관관계 맺어줌
@@ -206,11 +206,11 @@ public class PostService {
         // 삭제 후 새로 객체 생성 후 연관관계 맺어줌
         if(storedUrls != null){
             for(String url : storedUrls){
-                String storedUrl = URLDecoder.decode(url, "UTF-8");
+                String decodeUrl = URLDecoder.decode(url, "UTF-8");
                 PostImage postImage = PostImage.builder()
                         .originalFileName("IMAGE")
-                        .storedFileName(fileProcessService.getFileName(storedUrl))
-                        .storedUrl(storedUrl)
+                        .storedFileName(fileProcessService.getFileName(decodeUrl))
+                        .storedUrl(url)
                         .build();
 
                 //Post 와 PostImage의 연관관계 맺어줌

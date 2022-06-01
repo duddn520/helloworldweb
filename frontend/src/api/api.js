@@ -781,10 +781,38 @@ function deleteImgUrl(urls){
     });
 }
 
+function updateProfileMusic(formdata, userId) {
+    const token = window.sessionStorage.getItem("Auth");
+    formdata.append("id", userId);
+    return new Promise((resolve,reject) => {
+        if(token === null){
+            reject();
+        }
+        else{
+            axios.post(`${serverUrl}/api/user/music`, formdata, {
+                headers: {
+                    'content-type': 'multipart/form-data',
+                    Auth: token
+                }
+            })
+            .then( res => {
+                if ( res.data.statusCode === status.POST_SUCCESS ){
+                    resolve(res.data.data);
+                }
+            })
+            .catch( e => {
+                console.log(e);
+                reject();
+            })
+        }
+    });
+}
+
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
     getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , 
     getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
     getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName 
     ,getUserQnas ,getUserComments, getGithubRepositories, registerUserWithGithub, connectUserToGithub , getNewToken
-    ,updatePostSubComment ,deletePostSubComment, registerBlog, getImgUrl, updateBlog, deleteImgUrl, selectPostComment, deleteGuestBook
+    ,updatePostSubComment ,deletePostSubComment, registerBlog, getImgUrl, updateBlog, deleteImgUrl, selectPostComment, deleteGuestBook,
+    updateProfileMusic
 } ;

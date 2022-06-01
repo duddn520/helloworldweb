@@ -42,6 +42,8 @@ public class User implements UserDetails {
     private String profileUrl;
     private String repo_url;
     private String nickName;
+    private String profileMusic;
+    private String profileMusicUrl;
 
     @Transient
     private Collection<SimpleGrantedAuthority> authorities;
@@ -84,7 +86,7 @@ public class User implements UserDetails {
 
     @Builder
     public User(Long id, List<Post> posts, List<PostSubComment> subComments, UserHome userHome, GuestBook guestBook, List<GuestBookComment> guestBookComments, Role role, String email
-    ,String repo_url ,String profileUrl, String nickName) {
+    ,String repo_url ,String profileUrl, String nickName, String profileMusic, String profileMusicUrl) {
         this.id = id;
         this.posts = posts;
         this.subComments = subComments;
@@ -96,6 +98,8 @@ public class User implements UserDetails {
         this.profileUrl = profileUrl;
         this.repo_url = repo_url;
         this.nickName = nickName;
+        this.profileMusic = profileMusic;
+        this.profileMusicUrl = profileMusicUrl;
     }
 
     public void updateRepoUrl(String repo_url)
@@ -105,5 +109,10 @@ public class User implements UserDetails {
 
     public void updateNickName(String nickName) {
         this.nickName = nickName;
+    }
+
+    public void updateProfileMusic(String profileMusic, String profileMusicUrl) {
+        this.profileMusic = profileMusic;
+        this.profileMusicUrl = profileMusicUrl;
     }
 }

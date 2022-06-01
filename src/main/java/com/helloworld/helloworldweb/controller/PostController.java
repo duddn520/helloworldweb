@@ -100,10 +100,10 @@ public class PostController {
         if(urls != ""){
             String decodeResult = URLDecoder.decode(urls, "UTF-8");
             String[] finalUrls = decodeResult.split(",");
-            System.out.println(Arrays.toString(finalUrls).length());
 
             for(String url: finalUrls){
                 String storedUrl = URLDecoder.decode(url, "UTF-8");
+                System.out.println("storedUrl = " + storedUrl);
                 fileProcessService.deleteImage(fileProcessService.getFileName(storedUrl));
             }
         }

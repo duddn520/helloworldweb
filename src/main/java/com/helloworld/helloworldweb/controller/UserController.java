@@ -8,6 +8,7 @@ import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
 import com.helloworld.helloworldweb.model.HttpStatusCode;
+import com.helloworld.helloworldweb.service.FileProcessService;
 import com.helloworld.helloworldweb.service.PostService;
 import com.helloworld.helloworldweb.service.PostSubCommentService;
 import com.helloworld.helloworldweb.service.UserService;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,11 +26,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -42,6 +46,7 @@ public class UserController extends HttpServlet {
     private final JwtTokenProvider jwtTokenProvider;
     private final PostService postService;
     private final PostSubCommentService postSubCommentService;
+    private final FileProcessService fileProcessService;
 
     // 카카오 로그인 및 회원가입 요청
     @PostMapping("/api/user/register/kakao")
@@ -279,5 +284,20 @@ public class UserController extends HttpServlet {
             }
         }
 
+    }
+
+    @PostMapping ("/api/user/music")
+    @Transactional
+    public ResponseEntity<ApiResponse<String>> updateProfileMusic(@RequestParam(value = "file") MultipartFile file,
+                                                                  @RequestParam(value = "id") Long userId) throws UnsupportedEncodingException {
+
+        String uploadMusicUrl = fileProcessService.uploadMusic(file);
+        User findUser = userService.getUserById(userId);
+        userService.updateProfileMusic(findUser, file.getOriginalFilename(), uploadMusicUrl);
+
+        return new ResponseEntity (ApiResponse.response(
+                HttpStatusCode.POST_SUCCESS,
+                HttpResponseMsg.POST_SUCCESS,
+                uploadMusicUrl), HttpStatus.OK);
     }
 }

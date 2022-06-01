@@ -236,7 +236,8 @@ function WriteBlog(){
                         type="file"
                         accept="image/png, image/jpeg, image/jpg"
                         multiple={false}
-                        onChange={InvokeKakaoOcrApi} hidden/>
+                        onChange={InvokeKakaoOcrApi} 
+                        hidden/>
                     </Button>
                 </Box>
                 <Typography sx={{fontWeight: 'bold', marginBottom: 1 }}>태그</Typography>
