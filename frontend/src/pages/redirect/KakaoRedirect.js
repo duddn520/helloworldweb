@@ -7,6 +7,7 @@ import urls from '../../api/URL';
 const rest_api_key = "0961546bc0d26c67ab09717f36939b7c";
 const redirect_url = `${urls.front}/login/redirect`;
 
+
 export default function Redirect(){
     const navigate = useNavigate();
 
