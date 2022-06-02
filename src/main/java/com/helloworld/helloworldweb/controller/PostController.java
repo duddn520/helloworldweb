@@ -18,6 +18,9 @@ import com.helloworld.helloworldweb.service.PostService;
 import com.helloworld.helloworldweb.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -131,6 +134,27 @@ public class PostController {
                 HttpResponseMsg.GET_SUCCESS,
                 responseDtos), HttpStatus.OK);
     }
+    @GetMapping("/api/post/blogsPage")
+    public ResponseEntity<ApiResponse<List<PostResponseDto>>> getPageBlog(@PageableDefault(size=5, sort="id", direction = Sort.Direction.DESC) Pageable pageable,
+                                                                          @RequestHeader(value = "Auth") String jwtToken,
+                                                                          @RequestParam(value = "email") String email) {
+
+        User findUser = userService.getUserByEmail(email);
+
+        // api 호출한 유저가 게시물의 주인인지 판단
+        User caller = userService.getUserByJwt(jwtToken);
+        boolean isOwner = caller.getId() == findUser.getId();
+
+        List<Post> blogs = postService.getPageUserPosts(findUser.getId(), Category.BLOG, pageable);
+
+        PostResponseDtoWithIsOwner responseDtos = new PostResponseDtoWithIsOwner(blogs, isOwner);
+
+        return new ResponseEntity (ApiResponse.response(
+                HttpStatusCode.GET_SUCCESS,
+                HttpResponseMsg.GET_SUCCESS,
+                responseDtos), HttpStatus.OK);
+
+    }
 
     @GetMapping("/api/post/qnas")
     public ResponseEntity<ApiResponse<List<PostResponseDto>>> getAllQna() {
@@ -147,6 +171,20 @@ public class PostController {
                 responseDtos), HttpStatus.OK);
     }
 
+    @GetMapping("/api/post/qnasPage")
+    public ResponseEntity<ApiResponse<List<PostResponseDto>>> getPageQna(@PageableDefault(size=5, sort="id", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        List<Post> qnas = postService.getPagePosts(Category.QNA, pageable);
+
+        List<PostResponseDto> responseDtos = qnas.stream()
+                .map(PostResponseDto::new)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity (ApiResponse.response(
+                HttpStatusCode.GET_SUCCESS,
+                HttpResponseMsg.GET_SUCCESS,
+                responseDtos), HttpStatus.OK);
+    }
 
     @GetMapping("/api/search")
     public ResponseEntity<ApiResponse<List<PostRequestDto>>> getSearchedPost(@RequestParam(name="sentence") String sentence){
@@ -253,5 +291,6 @@ public class PostController {
                 HttpResponseMsg.PUT_SUCCESS,
                 responseDto), HttpStatus.OK);
     }
+
 }
 

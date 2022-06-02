@@ -9,6 +9,7 @@ import com.helloworld.helloworldweb.repository.PostImageRepository;
 import com.helloworld.helloworldweb.repository.PostRepository;
 import com.helloworld.helloworldweb.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -259,6 +260,22 @@ public class PostService {
             }
         }
     }
+
+    @Transactional
+    public List<Post> getPagePosts(Category category, Pageable pageable){
+
+        List<Post> posts = postRepository.findByCategory(category, pageable).orElseGet(() -> new ArrayList<>());
+
+        return posts;
+    }
+    @Transactional
+    public List<Post> getPageUserPosts(Long userId, Category category, Pageable pageable) {
+
+        List<Post> posts = postRepository.findByUserIdAndCategory(userId, category, pageable).orElseGet(() -> new ArrayList<>());
+
+        return posts;
+    }
+
 
 
 

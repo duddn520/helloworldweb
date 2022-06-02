@@ -368,5 +368,102 @@ public class PostControllerTest {
         .andReturn();
     }
 
+    @Test
+    void QNA_페이지조회() throws Exception {
+        //given
+        for(int i =0 ; i< 30; i++){
+            Post newPost = Post.builder()
+                    .category(Category.QNA)
+                    .title("Qna"+i)
+                    .content("hello my name is Jihun"+i)
+                    .postComments(new ArrayList<>())
+                    .tags("TEST")
+                    .build();
+            String testUserJwt = getToken();
+            User user = userService.getUserByJwt(testUserJwt);
+            postService.addPost(newPost, user, null);
+        }
+        for(int i =0 ; i< 30; i++){
+            Post newPost = Post.builder()
+                    .category(Category.BLOG)
+                    .title("BLOG"+i)
+                    .content("hello my name is Jihun"+i)
+                    .postComments(new ArrayList<>())
+                    .tags("TEST")
+                    .build();
+            String testUserJwt = getToken();
+            User user = userService.getUserByJwt(testUserJwt);
+            postService.addPost(newPost, user, null);
+        }
+
+        MultiValueMap<String, String> requestParam = new LinkedMultiValueMap<>();
+        requestParam.set("page", "2");
+
+        //when
+        MvcResult result = mockMvc.perform(
+                        get("/api/post/qnasPage")
+                                .params(requestParam)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("UTF-8")
+                                .header("Auth", getToken())
+                )
+
+                //then
+                .andExpect(status().isOk())
+                .andReturn();
+        String content = result.getResponse().getContentAsString();
+        System.out.println("content = " + content);
+
+    }
+
+    @Test
+    void 블로그_페이지조회() throws Exception {
+        //given
+        for(int i =0 ; i< 30; i++){
+            Post newPost = Post.builder()
+                    .category(Category.QNA)
+                    .title("Qna"+i)
+                    .content("hello my name is Jihun"+i)
+                    .postComments(new ArrayList<>())
+                    .tags("TEST")
+                    .build();
+            String testUserJwt = getToken();
+            User user = userService.getUserByJwt(testUserJwt);
+            postService.addPost(newPost, user, null);
+        }
+        for(int i =0 ; i< 30; i++){
+            Post newPost = Post.builder()
+                    .category(Category.BLOG)
+                    .title("BLOG"+i)
+                    .content("hello my name is Jihun"+i)
+                    .postComments(new ArrayList<>())
+                    .tags("TEST")
+                    .build();
+            String testUserJwt = getToken();
+            User user = userService.getUserByJwt(testUserJwt);
+            postService.addPost(newPost, user, null);
+        }
+
+        MultiValueMap<String, String> requestParam = new LinkedMultiValueMap<>();
+        requestParam.set("email", testEmail);
+        requestParam.set("page", "2");
+
+        //when
+        MvcResult result = mockMvc.perform(
+                        get("/api/post/blogsPage")
+                                .params(requestParam)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("UTF-8")
+                                .header("Auth", getToken())
+                )
+
+                //then
+                .andExpect(status().isOk())
+                .andReturn();
+        String content = result.getResponse().getContentAsString();
+        System.out.println("content = " + content);
+
+    }
+
 
 }
