@@ -258,16 +258,15 @@ public class PostController {
     }
 
     @PostMapping("/api/post/alarm")
-    public ResponseEntity<ApiResponse> alarmTest(HttpServletRequest request, HttpServletResponse response)
+    public ResponseEntity<ApiResponse> alarmTest(HttpServletRequest request)
     {
-        String fcmToken = request.getHeader("FCM");
-
+        String FCM = request.getHeader("FCM");
         try{
-            firebaseCloudMessageService.sendMessageTo(fcmToken,"123","abc","000");
+            firebaseCloudMessageService.sendMessageTo(FCM,"123","abc","000");
         }
-        catch (Exception e)
+        catch (IOException e)
         {
-
+            System.out.println(e.getMessage());
         }
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.POST_SUCCESS,
