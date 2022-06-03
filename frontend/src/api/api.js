@@ -807,12 +807,41 @@ function updateProfileMusic(formdata, userId) {
         }
     });
 }
+      
+function alarmTest(fcm){
+    const token = window.sessionStorage.getItem("Auth");
+    console.log(fcm)
+        return new Promise((resolve,reject) => {
+        if(token === null){
+            reject();
+        }
+        else{
+          axios({
+                method: 'POST',
+                url:`${serverUrl}/api/post/alarm`,
+                headers:{
+                    Auth: token,
+                    FCM:fcm
+                  }
+            })
+            .then( res => {
+                if ( res.data.statusCode === status.POST_SUCCESS ){
+                    resolve(res);
+                  }
+            })
+            .catch( e => {
+                console.log(e);
+                reject();
+            })
+        }
+    });
+}
+                  
 
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
     getUser ,registerPost ,getAllQna,registerGuestBook,updateGuestBook , 
     getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
     getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName 
     ,getUserQnas ,getUserComments, getGithubRepositories, registerUserWithGithub, connectUserToGithub , getNewToken
-    ,updatePostSubComment ,deletePostSubComment, registerBlog, getImgUrl, updateBlog, deleteImgUrl, selectPostComment, deleteGuestBook,
-    updateProfileMusic
+    ,updatePostSubComment ,deletePostSubComment, registerBlog, getImgUrl, updateBlog, deleteImgUrl, selectPostComment, deleteGuestBook,updateProfileMusic, alarmTest
 } ;

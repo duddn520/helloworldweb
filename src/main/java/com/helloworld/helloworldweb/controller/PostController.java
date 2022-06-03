@@ -8,6 +8,7 @@ import com.helloworld.helloworldweb.dto.Post.PostRequestDto;
 import com.helloworld.helloworldweb.dto.Post.PostResponseDto;
 import com.helloworld.helloworldweb.dto.Post.PostResponseDtoWithIsOwner;
 import com.helloworld.helloworldweb.dto.Post.PostResponseDtoWithPostComments;
+import com.helloworld.helloworldweb.firebase.FirebaseCloudMessageService;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
@@ -30,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -47,6 +49,7 @@ public class PostController {
     private final UserService userService;
     private final PostCommentService postCommentService;
     private final FileProcessService fileProcessService;
+    private final FirebaseCloudMessageService firebaseCloudMessageService;
     private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/api/post")
@@ -290,6 +293,23 @@ public class PostController {
                 HttpStatusCode.PUT_SUCCESS,
                 HttpResponseMsg.PUT_SUCCESS,
                 responseDto), HttpStatus.OK);
+    }
+
+    @PostMapping("/api/post/alarm")
+    public ResponseEntity<ApiResponse> alarmTest(HttpServletRequest request)
+    {
+        String FCM = request.getHeader("FCM");
+        try{
+            firebaseCloudMessageService.sendMessageTo(FCM,"123","abc","000");
+        }
+        catch (IOException e)
+        {
+            System.out.println(e.getMessage());
+        }
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.POST_SUCCESS,
+                HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
+
     }
 
 }
