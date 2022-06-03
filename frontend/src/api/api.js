@@ -128,11 +128,14 @@ function registerQnA( {content,type,title,tags}){
     });
 }
 // GET - 모든 QnA 조회
-function getAllQna(){
+function getAllQna(page){
     return new Promise((resolve,reject) => {
         request({
             method: 'GET' ,
-            url: '/api/post/qnas',
+            url: "/api/post/qnasPage",
+            params: {
+                page: page,
+            }
         })
         .then( res => {
             if ( res.data.statusCode == status.GET_SUCCESS ){

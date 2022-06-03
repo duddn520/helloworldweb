@@ -17,11 +17,18 @@ public class PostResponseDtoWithIsOwner {
 
     private List<PostResponseDto> postResponseDtos = new ArrayList<>();
     private boolean IsOwner;
+    private int pageNum;
 
     public PostResponseDtoWithIsOwner(List<Post> posts, boolean isOwner) {
         this.postResponseDtos = postResponseDtos(posts);
         this.IsOwner = isOwner;
     }
+    public PostResponseDtoWithIsOwner(List<Post> posts, boolean isOwner, int pageNum) {
+        this.postResponseDtos = postResponseDtos(posts);
+        this.IsOwner = isOwner;
+        this.pageNum = pageNum;
+    }
+
 
     // 게시물의 썸네일 표시에 필요한 정보
     private List<PostResponseDto> postResponseDtos (List<Post> posts) {
