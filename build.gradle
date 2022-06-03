@@ -29,6 +29,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+지	// actuator
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 	// devtools 추가 - 개발 단계에서 restart 대신 rebuild 가능
 	implementation 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'org.springframework.boot:spring-boot-devtools'

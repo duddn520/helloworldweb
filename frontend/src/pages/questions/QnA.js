@@ -91,15 +91,15 @@ export default function QnA( props ){
                     sx={{ borderRight: 1, borderColor: 'lightgray' ,width: 200 }}
                 >
                     <Tab label="홈" href="/" sx={{ display: 'flex' ,flexDirection: 'row'}} />
-                    <Tab label="Questions" href="/" icon={<SearchIcon sx={{ m: 1 ,width: 20 ,height: 20}}/>} sx={{ display: 'flex' ,flexDirection: 'row' ,textAlign: 'center' ,textTransform: 'none' }}  />
+                    <Tab label="질문" href="/" icon={<SearchIcon sx={{ m: 1 ,width: 20 ,height: 20}}/>} sx={{ display: 'flex' ,flexDirection: 'row' ,textAlign: 'center' ,textTransform: 'none' }}  />
                 </Tabs>
 
                 <Container>
                     <Box sx={{ justifyContent: 'start' }}>
-                        <Typography sx={{ m : 1 ,ml: 2 ,fontSize: 25 ,fontWeight: '600'}}>{qna.title}</Typography>
+                        <Typography sx={styles.title}>{qna.title}</Typography>
                         <Box sx={{ display: 'flex' ,flexDirection: 'row' ,mb: 2 ,alignItems: 'center'}}>
-                            <Typography sx={{ ml: 2 ,fontSize: 13}}>조회수 {qna.views}</Typography>
-                            <Typography sx={{ ml: 2 ,fontSize: 13}}>작성일 {qna.createdTime}</Typography>
+                            <Typography sx={styles.subinfo}>조회수 {qna.views}</Typography>
+                            <Typography sx={styles.subinfo}>작성일 {qna.createdTime}</Typography>
                         </Box>
                     </Box>
                     <Divider variant="fullWidth" sx={{ flexGrow: 1 }}/>
@@ -119,13 +119,15 @@ export default function QnA( props ){
                                 sx={{ borderRadius: 2 ,m: 0.5 }}    
                             />
                             </IconButton>
-                            <Box sx={{ alignItems: 'start' ,flexGrow: 1 }}>
+                            <Box sx={styles.userBox}>
                                 <Typography sx={{ fontSize: 10 ,ml: 0.5 }}>Asked By</Typography>
                                 <Button 
                                     onClick={() => navigate("/minihome", {state: {tabIndex: 0, targetEmail: targetUserEmail}}) }
-                                    sx={{ ml: 0.5 ,p: 0,pr: 0.5 ,textAlign: 'start' ,justifyContent: 'start' ,textTransform: 'none'}}
+                                    sx={styles.userButton}
                                 >
-                                    {userName}
+                                    <div style={{ overflow: 'hidden' ,whiteSpace: 'nowrap' ,textOverflow: 'ellipsis' }}>
+                                        {userName}
+                                    </div>
                                 </Button>
                             </Box>
                         </Box>
@@ -159,3 +161,18 @@ export default function QnA( props ){
         </Box>
     );
 };
+
+const styles = {
+    subinfo: {
+        ml: 2 ,fontSize: 13
+    },
+    title: { 
+        m : 1 ,ml: 2 ,fontSize: 25 ,fontWeight: '600' ,wordBreak: 'break-all' 
+    },
+    userBox: { 
+        alignItems: 'start' ,overflow: 'hidden'
+    } ,
+    userButton: {
+        ml: 0.5 ,p: 0,pr: 0.5 ,textAlign: 'start' ,justifyContent: 'start' ,textTransform: 'none' ,overflow: 'hidden' 
+    }
+}

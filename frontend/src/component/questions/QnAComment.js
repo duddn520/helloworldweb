@@ -60,13 +60,13 @@ export default function QnAComment({postsubcomments, postComment, Solved, Owner}
                 {subComments.map((postsubcomment,idx)=>{
                     if(idx===0){
                         return (
-                                <QnACommentComponent postsubcomment={postsubcomment} boxsize="60px" Solved={Solved} postComment={postComment} />
+                                <QnACommentComponent postsubcomment={postsubcomment} boxsize="60px" Solved={Solved} postComment={postComment} fontSize={17}/>
                             );
                         }
                         else{       // 대댓글인 경우
                             return(
                                 <Box sx={{ ml: 2 }}>
-                                    <QnACommentComponent postsubcomment={postsubcomment} boxsize="20px" Solved={Solved} postComment={postComment} />
+                                    <QnACommentComponent postsubcomment={postsubcomment} boxsize="20px" Solved={Solved} postComment={postComment} fontSize={14}/>
                                 </Box>
                             )
                     }
@@ -82,7 +82,7 @@ export default function QnAComment({postsubcomments, postComment, Solved, Owner}
 
 }
 
-function QnACommentComponent({postsubcomment,boxsize, Solved, postComment}){
+function QnACommentComponent({postsubcomment,boxsize, Solved, postComment,fontSize}){
     const [editEnabled,setEditEnabled] = React.useState(false);
     const [newComment,setNewComment] = React.useState(postsubcomment.content);
     // 다이얼로그 드로어
@@ -111,7 +111,7 @@ function QnACommentComponent({postsubcomment,boxsize, Solved, postComment}){
     };
     
     return(
-        <div key={postsubcomment.id}>
+        <div key={postsubcomment.id} style={{ whiteSpace: 'unset' ,wordBreak: 'break-all'}}>
             <Box sx={{ display: 'flex' ,flexDireciton: 'row' ,mt: 0.5 }}>
                 <AlertDialog open={open} setOpen={setOpen} onAgree={handleDelete}/>
                 <Box sx={{
@@ -124,7 +124,7 @@ function QnACommentComponent({postsubcomment,boxsize, Solved, postComment}){
                             <MDEditor style={{ flex: 1 }} value={newComment} onChange={setNewComment} /> 
                             <Button variant="contained" sx={{ mt: 1 }} onClick={handleSubmit}>수정하기</Button>
                         </Box>
-                        : <MDEditor.Markdown source={postsubcomment.content} style={{ marginTop: 5 }}/>
+                        : <MDEditor.Markdown source={postsubcomment.content} style={{ marginTop: 5 ,fontSize: fontSize }}/>
                     }
                 </Box>
                 {
@@ -161,7 +161,7 @@ function QnACommentComponent({postsubcomment,boxsize, Solved, postComment}){
                         <Box sx={{width: 25, height: 25, borderRadius: 15, overflow: 'hidden', marginRight: 1, display: 'flex', alignItems: 'center'}}>
                             <img src={postsubcomment.userResponseDto.profileUrl} width={25} height={25} alt={'프로필 사진'}></img>
                         </Box>
-                        <Typography variant="caption">{postsubcomment.userResponseDto.userName}</Typography>
+                        <Typography variant="caption" sx={{}}>{postsubcomment.userResponseDto.userName}</Typography>
                     </Button>
                 </Box>
             </Box>
@@ -169,6 +169,5 @@ function QnACommentComponent({postsubcomment,boxsize, Solved, postComment}){
         </div>
     );
 }
-
 
 
