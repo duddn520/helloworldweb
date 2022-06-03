@@ -178,8 +178,8 @@ public class PostController {
         List<Post> qnas = postService.getPagePosts(Category.QNA, pageable);
         int pageNum = postService.getAllPostPageNum(Category.QNA);
 
-        List<PostResponseDto> responseDtos = qnas.stream()
-                .map(PostResponseDto::new)
+        List<PostResponseDtoWithUser> responseDtos = qnas.stream()
+                .map(PostResponseDtoWithUser::new)
                 .collect(Collectors.toList());
 
         PostResponseDtoWithPageNum postResponseDtoWithPageNum = new PostResponseDtoWithPageNum(responseDtos, pageNum);
