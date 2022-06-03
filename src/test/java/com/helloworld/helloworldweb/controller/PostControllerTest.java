@@ -397,7 +397,7 @@ public class PostControllerTest {
         }
 
         MultiValueMap<String, String> requestParam = new LinkedMultiValueMap<>();
-        requestParam.set("page", "2");
+        requestParam.set("page", "1");
 
         //when
         MvcResult result = mockMvc.perform(
