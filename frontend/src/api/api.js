@@ -293,12 +293,13 @@ function registerPost(formdata, title, totalContent, tags){
     
 }
 
-function getBlogPosts(email){
+function getBlogPosts(email, page){
     return new Promise((resolve,reject) => {
         request({
             method: 'GET',
-            url : "/api/post/blogs",
+            url : "/api/post/blogsPage",
             params: {
+                page: page,
                 email: email
             }
         })
