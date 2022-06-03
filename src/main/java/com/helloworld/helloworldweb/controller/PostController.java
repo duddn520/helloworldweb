@@ -140,6 +140,7 @@ public class PostController {
                                                                           @RequestParam(value = "email") String email) {
 
         User findUser = userService.getUserByEmail(email);
+        int pageNum = postService.getUserPostPageNum(Category.BLOG, findUser.getId());
 
         // api 호출한 유저가 게시물의 주인인지 판단
         User caller = userService.getUserByJwt(jwtToken);
@@ -147,7 +148,7 @@ public class PostController {
 
         List<Post> blogs = postService.getPageUserPosts(findUser.getId(), Category.BLOG, pageable);
 
-        PostResponseDtoWithIsOwner responseDtos = new PostResponseDtoWithIsOwner(blogs, isOwner);
+        PostResponseDtoWithIsOwner responseDtos = new PostResponseDtoWithIsOwner(blogs, isOwner, pageNum);
 
         return new ResponseEntity (ApiResponse.response(
                 HttpStatusCode.GET_SUCCESS,
