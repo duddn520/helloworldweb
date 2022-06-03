@@ -92,7 +92,7 @@ export default function(){
     }
 
     return(
-        <AppBar position='static' sx={{ backgroundColor: 'white' ,boxShadow: 0 }} >
+        <AppBar position='static' sx={{ backgroundColor: 'white' ,boxShadow: 0 ,borderBottomWidth: 1 }} >
                 <Toolbar>
                     <IconButton disableRipple onClick={() => navigate('/')}>
                         <Typography 

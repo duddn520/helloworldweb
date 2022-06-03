@@ -23,7 +23,7 @@ export default function ( props ){
     const handlePageChange = (event,value) => {
         
         api.getAllQna(value-1)
-        .then( res => { setAllQna(res.postResponseDtos);})
+        .then( res => { setAllQna(res.postResponseDtoWithUser);})
         .catch();
 
         setPage(value);
@@ -33,7 +33,7 @@ export default function ( props ){
     React.useEffect(() => {
 
         api.getAllQna(0)
-        .then( res => { setAllQna(res.postResponseDtos); setPageCount(res.pageNum); })
+        .then( res => { setAllQna(res.postResponseDtoWithUser); setPageCount(res.pageNum); })
         .catch( e => { });
 
         api.getTopQuestions()

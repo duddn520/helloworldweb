@@ -1,9 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
-import { Box ,Typography ,Button ,ListItem } from '@mui/material';
+import { Box ,Typography ,Button ,ListItem ,Avatar } from '@mui/material';
 import styled from '@emotion/styled';
 export default function QnAItem({item}){
     const navigate = useNavigate();
+
     return(
         <Box border={1} borderColor='rgb(240,240,240)' sx={styles.container}>
             <Box sx={styles.leftBox}>
@@ -20,10 +21,23 @@ export default function QnAItem({item}){
                     </div>
                 </Button>
                 <Typography sx={styles.content}>{item.content.substr(0,100)}</Typography>
-                <ListItem sx={{ display: 'flex' ,flexDirection: 'row' }}>
-                {
-                    item.tags.split(',').map( tag => { if(tag.length) return <Button size='small' sx={styles.tagButton}>{tag}</Button>})
-                }
+                <ListItem sx={{ display: 'flex' ,flexDirection: 'row' ,alignItems: 'center' }}>
+                    {
+                        item.tags.split(',').map( tag => { if(tag.length) return <Button size='small' sx={styles.tagButton}>{tag}</Button>})
+                    }
+                    {
+                        item.userResponseDto &&
+                        <Box sx={{ ml: 'auto' ,display: 'flex' ,flexDirection: 'row' ,alignItems: 'center' }}>
+                            <Avatar sx={{ width: 25 ,height: 25 }} src={item.userResponseDto.profileUrl}/>
+                            <Button 
+                                onClick={() => navigate("/minihome", {state: {tabIndex: 0, targetEmail: item.userResponseDto.email }}) } 
+                                sx={{ textTransform: 'none'}}
+                            >
+                                {item.userResponseDto.userName}
+                            </Button>
+                            <Typography sx={{ fontSize: 13 ,color: 'gray' }}>Asked {item.createdTime.split("T")[0]}</Typography>
+                        </Box>
+                    }
                 </ListItem>
             </Box>
         </Box>
@@ -39,13 +53,13 @@ const TitleBox = styled.div`
 
 const styles = {
     container: {
-        display: 'flex' ,flexDirection: 'row' ,alignItems: 'start' ,height: 120
+        display: 'flex' ,flexDirection: 'row' ,alignItems: 'start' ,height: 130
     },
     leftBox: {
         flex: 1 ,ml: 3 ,justifyContent: 'end' ,alignItems: 'end' ,display: 'flex' ,flexDirection: 'column' , mt: 2.5 
     },
     rightBox: {
-        flex: 9 ,alignItems: 'start' ,justifyContent: 'start' ,whiteSpace: 'nowrap' ,textOverflow: 'ellipsis' ,overflow: 'hidden' ,pr: 2
+        flex: 9 ,alignItems: 'start' ,justifyContent: 'start' ,whiteSpace: 'nowrap' ,textOverflow: 'ellipsis' ,overflow: 'hidden' ,pr: 2 ,pl: 1
     },
     titleButton: {
         textAlignLast: 'start' ,ml: 1,fontSize: 17 
