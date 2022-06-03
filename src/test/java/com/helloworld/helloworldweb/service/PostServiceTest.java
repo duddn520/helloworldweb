@@ -1,9 +1,11 @@
 package com.helloworld.helloworldweb.service;
 
+import com.helloworld.helloworldweb.domain.Category;
 import com.helloworld.helloworldweb.domain.Post;
 import com.helloworld.helloworldweb.domain.Role;
 import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
+import com.helloworld.helloworldweb.repository.PostRepository;
 import com.helloworld.helloworldweb.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,8 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Transactional
 @SpringBootTest
@@ -25,6 +29,8 @@ public class PostServiceTest {
     @Autowired UserRepository userRepository;
     @Autowired UserService userService;
     @Autowired PostService postService;
+    @Autowired
+    PostRepository postRepository;
 
     String testEmail = "helloworldtest@gmail.com";
 
@@ -169,6 +175,17 @@ public class PostServiceTest {
 
         // then - 50개의 게시물이 있는 지 ( "react native"만 포함하는 게시물만 결과로 나와야 함 )
         Assertions.assertEquals(50,findPosts.size());
+    }
+
+    @Test
+    void 금일_조회_상위5개_게시물(){
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime today = LocalDateTime.of(time.getYear(),time.getMonth(),time.getDayOfMonth(),0,0);
+        Optional<List<Post>> findQnas = postRepository.findTop5ByCreatedTimeGreaterThanEqualAndCategoryOrderByViewsDesc(today, Category.QNA);
+        for ( Post post : findQnas.get()){
+            Assertions.assertEquals(Category.QNA,post.getCategory());
+            org.assertj.core.api.Assertions.assertThat(post.getCreatedTime()).isAfterOrEqualTo(today);
+        }
     }
 
 }

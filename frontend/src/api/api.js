@@ -839,6 +839,81 @@ function alarmTest(fcm){
         }
     });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function getTopQuestions(){
+    return new Promise((resolve,reject) => {
+        request({
+            method: "GET" ,
+            url:`/api/post/top-questions`,
+          })
+          .then( res => {
+              resolve(res.data.data);
+          })
+          .catch( e => {
+              reject();
+          }) 
+    });      
+}
                   
 
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
@@ -847,4 +922,5 @@ export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver,
     getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName 
     ,getUserQnas ,getUserComments, getGithubRepositories, registerUserWithGithub, connectUserToGithub , getNewToken
     ,updatePostSubComment ,deletePostSubComment, registerBlog, getImgUrl, updateBlog, deleteImgUrl, selectPostComment, deleteGuestBook,updateProfileMusic, alarmTest
+    ,getTopQuestions
 } ;

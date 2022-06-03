@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -277,8 +278,8 @@ public class PostService {
 
         return posts;
     }
+  
     public int getAllPostPageNum(Category category) {
-
         Pageable pageable = PageRequest.ofSize(10);
         Page<Post> allByCategory = postRepository.findAllByCategory(category, pageable);
         int totalPages = allByCategory.getTotalPages();
@@ -292,5 +293,13 @@ public class PostService {
         int totalPages = allByCategory.getTotalPages();
 
         return totalPages;
+    }
+  
+    // 상위 5개의 QNA 반환
+    @Transactional
+    public List<Post> getTop5Questions(){
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime today = LocalDateTime.of(time.getYear(),time.getMonth(),time.getDayOfMonth(),0,0);
+        return postRepository.findTop5ByCreatedTimeGreaterThanEqualAndCategoryOrderByViewsDesc(today, Category.QNA).orElseGet(ArrayList::new);
     }
 }

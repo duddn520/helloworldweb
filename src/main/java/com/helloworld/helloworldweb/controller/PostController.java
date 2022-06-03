@@ -313,5 +313,18 @@ public class PostController {
 
     }
 
+    @GetMapping("/api/post/top-questions")
+    public ResponseEntity<ApiResponse> getTopQuestions(){
+        List<Post> findPosts = postService.getTop5Questions();
+
+        List<PostResponseDto> responseDtos = findPosts.stream()
+                .map(PostResponseDto::new)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity (ApiResponse.response(
+                HttpStatusCode.GET_SUCCESS,
+                HttpResponseMsg.GET_SUCCESS,
+                responseDtos), HttpStatus.OK);
+    }
 }
 
