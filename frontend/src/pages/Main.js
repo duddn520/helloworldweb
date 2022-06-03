@@ -36,6 +36,7 @@ export default function ( props ){
         api.getAllQna()
         .then( res => { setAllQna(res) })
         .catch( e => { });
+        
     },[]);
 
     return(
@@ -127,3 +128,5 @@ function Questions(){
 const StyledForm = styled('form')({  
 
 });
+
+

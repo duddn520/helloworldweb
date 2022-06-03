@@ -35,6 +35,8 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
 	implementation 'com.h2database:h2'
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+	implementation 'com.google.firebase:firebase-admin:8.1.0'
+	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version : '4.2.2'
 }
 
 tasks.named('test') {

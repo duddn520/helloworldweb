@@ -13,8 +13,54 @@ import GithubConnectRedirect from "./pages/redirect/GithubConnectRedirect";
 import Search from './pages/search/Search';
 import Blog from './pages/Blog';
 import MakeUserName from './pages/MakeUserName';
+import React from 'react';
+import { firebaseApp, vapidKey } from './firebase';
+import { getMessaging, getToken, onMessage } from 'firebase/messaging'
+import { onBackgroundMessage } from 'firebase/messaging/sw';
+import api from './api/api';
+import { MessageOutlined } from '@mui/icons-material';
+
+const firebaseMessaging = getMessaging(firebaseApp);
 
 function App() {
+
+  onMessage(firebaseMessaging,(payload)=>{
+    console.log(payload.notification.title);
+    console.log(payload.notification.body);
+  });
+
+  // onBackgroundMessage(firebaseMessaging, (payload) => {
+  //   console.log('[firebase-messaging-sw.js] Received background message ', payload);
+  //   // Customize notification here
+  //   const notificationTitle = 'Background Message Title';
+  //   const notificationOptions = {
+  //     body: 'Background Message body.',
+  //     icon: '/firebase-logo.png'
+  //   };
+  // });
+
+  React.useEffect(()=>{
+    getToken(firebaseMessaging,{vapidKey:vapidKey})
+    .then((currentToken) => {
+      if(currentToken){
+        console.log(currentToken);
+        window.sessionStorage.setItem("fcm",currentToken);
+        console.log(window.sessionStorage.getItem("fcm"))
+        api.alarmTest(currentToken)
+        .then(res=>{ console.log(res)})
+        .catch(e=>{ console.log(e)})
+      }
+      else
+      {
+        console.log("fcm 획득 실패")
+      }
+    })
+    .catch(function (error) {
+      console.log("FCM Error : ", error);
+    });
+
+  },[])
+
   return (
     <BrowserRouter>
       <Routes>
