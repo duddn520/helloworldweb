@@ -4,10 +4,7 @@ import com.helloworld.helloworldweb.domain.Category;
 import com.helloworld.helloworldweb.domain.Post;
 import com.helloworld.helloworldweb.domain.PostComment;
 import com.helloworld.helloworldweb.domain.User;
-import com.helloworld.helloworldweb.dto.Post.PostRequestDto;
-import com.helloworld.helloworldweb.dto.Post.PostResponseDto;
-import com.helloworld.helloworldweb.dto.Post.PostResponseDtoWithIsOwner;
-import com.helloworld.helloworldweb.dto.Post.PostResponseDtoWithPostComments;
+import com.helloworld.helloworldweb.dto.Post.*;
 import com.helloworld.helloworldweb.firebase.FirebaseCloudMessageService;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
@@ -138,7 +135,7 @@ public class PostController {
                 responseDtos), HttpStatus.OK);
     }
     @GetMapping("/api/post/blogsPage")
-    public ResponseEntity<ApiResponse<List<PostResponseDto>>> getPageBlog(@PageableDefault(size=5, sort="id", direction = Sort.Direction.DESC) Pageable pageable,
+    public ResponseEntity<ApiResponse<List<PostResponseDto>>> getPageBlog(@PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable,
                                                                           @RequestHeader(value = "Auth") String jwtToken,
                                                                           @RequestParam(value = "email") String email) {
 
@@ -175,18 +172,21 @@ public class PostController {
     }
 
     @GetMapping("/api/post/qnasPage")
-    public ResponseEntity<ApiResponse<List<PostResponseDto>>> getPageQna(@PageableDefault(size=5, sort="id", direction = Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<ApiResponse<List<PostResponseDto>>> getPageQna(@PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable) {
 
         List<Post> qnas = postService.getPagePosts(Category.QNA, pageable);
+        int pageNum = postService.getAllPostPageNum(Category.QNA);
 
         List<PostResponseDto> responseDtos = qnas.stream()
                 .map(PostResponseDto::new)
                 .collect(Collectors.toList());
 
+        PostResponseDtoWithPageNum postResponseDtoWithPageNum = new PostResponseDtoWithPageNum(responseDtos, pageNum);
+
         return new ResponseEntity (ApiResponse.response(
                 HttpStatusCode.GET_SUCCESS,
                 HttpResponseMsg.GET_SUCCESS,
-                responseDtos), HttpStatus.OK);
+                postResponseDtoWithPageNum), HttpStatus.OK);
     }
 
     @GetMapping("/api/search")
