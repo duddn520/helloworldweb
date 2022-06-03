@@ -1,6 +1,8 @@
 import React from "react";
 import { Button ,Typography ,Box , 
-         List ,Card ,CardHeader ,CardContent ,ListItem
+         List ,Card ,CardContent ,
+         Pagination
+
 } 
 from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -13,13 +15,26 @@ import api from "../api/api";
 export default function ( props ){
     const navigate = useNavigate();
     // 탭(Tab)
-    const [value, setValue] = React.useState(0);
     const [allQna,setAllQna] = React.useState([]);
+    const [topQna,setTopQna] = React.useState([]);
+    const [page,setPage] = React.useState(1);
+
+    const handlePageChange = (event,value) => {
+        
+        setPage(value);
+
+    }
 
     React.useEffect(() => {
         api.getAllQna()
         .then( res => { setAllQna(res) })
         .catch( e => { });
+
+        api.getTopQuestions()
+        .then( res => {
+            setTopQna(res);
+        })
+        .catch();
         
     },[]);
 
@@ -32,6 +47,17 @@ export default function ( props ){
                         <CardContent>
                             <Home />
                         </CardContent>
+                        <Box sx={{ justifyContent : 'center' ,display: 'flex'}}>
+                            <Box sx={{ flex: 1 }}/>
+                            <Pagination 
+                                page={page} 
+                                onChange={handlePageChange} 
+                                count={10} 
+                                showFirstButton showLastButton 
+                                sx={{ flex: 3 ,m: 2}}
+                            />
+                            <Box sx={{ flex: 1 }} />
+                        </Box>
                     </Card> 
                 </Box>
                 <Box sx={styles.rightBox}>
@@ -79,7 +105,7 @@ function Questions(){
                     </Box>
                     <List>
                     {
-                        allQna.sort((a,b) => b.views - a.views ).slice(0,5).map( (item,index) => {
+                        topQna.map( (item,index) => {
                             return(
                                 <Box sx={styles.mostViewedBox}>
                                     <div> {index+1} </div>
