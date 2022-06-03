@@ -4,16 +4,27 @@ import com.helloworld.helloworldweb.domain.Role;
 import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.repository.UserRepository;
+import com.helloworld.helloworldweb.service.FileProcessService;
+import com.helloworld.helloworldweb.service.UserService;
+import com.nimbusds.jose.shaded.json.JSONObject;
+import com.nimbusds.jose.shaded.json.parser.JSONParser;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URLDecoder;
 import java.rmi.server.ExportException;
 import java.util.ArrayList;
 
@@ -31,6 +42,12 @@ public class UserControllerTest {
     JwtTokenProvider jwtTokenProvider;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    MockMvc mockMvc;
+    @Autowired
+    FileProcessService fileProcessService;
+    @Autowired
+    UserService userService;
 
     String testEmail = "test@email.com";
 
@@ -91,5 +108,35 @@ public class UserControllerTest {
                         .headers(noExpiredHeader))
                 .andExpect(status().isServiceUnavailable())
                 .andExpect(header().doesNotExist("Auth"));
+    }
+
+    @Test
+    @DisplayName("이미지 업로드 성공")
+    void updateUserProfilMusic_success() throws Exception {
+        //given
+        MockMultipartFile file = new MockMultipartFile("file",
+                "테스트음악.png",
+                "audio/mp3",
+                //이미지경로는 각 로컬에서 수정해야함.
+                new FileInputStream("/Users/heojihun/Downloads/Over_the_Horizon.mp3"));
+
+        //when
+        MvcResult result = mockMvc.perform(
+                        multipart("/api/user/music")
+                                .file(file)
+                                .param("id", userService.getUserByEmail(testEmail).getId().toString())
+                                .contentType(MediaType.MULTIPART_FORM_DATA)
+                                .header("Auth", generateAccessToken())
+                )
+
+        //then
+                .andExpect(status().isOk())
+                .andReturn();
+        String content = result.getResponse().getContentAsString();
+        JSONParser p = new JSONParser();
+        JSONObject obj = (JSONObject)p.parse(content);
+        String url = (String) obj.get("data");
+        String fileName = fileProcessService.getFileName(URLDecoder.decode(url, "UTF-8"));
+        fileProcessService.deleteMusic(fileName);
     }
 }

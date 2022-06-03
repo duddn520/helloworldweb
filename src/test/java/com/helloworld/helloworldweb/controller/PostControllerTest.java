@@ -27,6 +27,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import java.io.FileInputStream;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -225,44 +226,6 @@ public class PostControllerTest {
         assertThat(savedBlog).isEqualTo(blogs.get(blogs.toArray().length - 1));
     }
 
-//    @Test
-//    void 아미지를_포함한_게시물등록() throws Exception {
-//        //given
-//        MultiValueMap<String, String> requestParam = new LinkedMultiValueMap<>();
-//        requestParam.set("title", "title");
-//        requestParam.set("category", "BLOG");
-//        requestParam.set("tags", "TEST");
-//        requestParam.set("content", "hello my name is Jihun\n&&&&\n");
-//
-//        MockMultipartFile file = new MockMultipartFile("files",
-//                "TestImage.png",
-//                "image/png",
-//                //이미지경로는 각 로컬에서 수정해야함.
-//                new FileInputStream("/Users/heojihun/Project/helloworldweb/src/test/java/com/helloworld/helloworldweb/controller/TestImage.png"));
-//
-//        //when
-//        MvcResult result = mockMvc.perform(
-//                        multipart("/api/post")
-//                                .file(file)
-//                                .params(requestParam)
-//                                .contentType(MediaType.MULTIPART_FORM_DATA)
-//                                .characterEncoding("UTF-8")
-//                                .header("Auth", getToken())
-//                )
-//
-//        //then
-//                .andExpect(status().isOk())
-//                .andReturn();
-//
-//        //S3에 저장된 테스트 이미지파일 삭제
-//        String content = result.getResponse().getContentAsString();
-//        JSONParser p = new JSONParser();
-//        JSONObject obj = (JSONObject)p.parse(content);
-//        JSONObject data = (JSONObject) p.parse(obj.get("data").toString());
-//        Post deleteTargetPost = postService.getPost(Long.valueOf(String.valueOf(data.get("id"))));
-//        postService.deletePost(deleteTargetPost);
-//    }
-
     @Test
     void 게시물_하나_조회() throws Exception {
         //given
@@ -349,62 +312,156 @@ public class PostControllerTest {
         assertThat(savedPost.getTags()).isEqualTo("newTest");
     }
 
-//    @Test
-//    void 이미지_한장_등록() throws Exception {
-//        //given
-//        MultiValueMap<String, String> requestParam = new LinkedMultiValueMap<>();
-//
-//        MockMultipartFile file = new MockMultipartFile("file",
-//                "TestImage.png",
-//                "image/png",
-//                //이미지경로는 각 로컬에서 수정해야함.
-//                new FileInputStream("/Users/heojihun/Project/helloworldweb/src/test/java/com/helloworld/helloworldweb/controller/TestImage.png"));
-//
-//        //when
-//        MvcResult result = mockMvc.perform(
-//                        multipart("/api/image")
-//                                .file(file)
-//                                .contentType(MediaType.MULTIPART_FORM_DATA)
-//                                .characterEncoding("UTF-8")
-//                                .header("Auth", getToken())
-//                )
-//
-//                //then
-//                .andExpect(status().isOk())
-//                .andReturn();
-//
-//        //S3에 저장된 테스트 이미지파일 삭제
-//        String content = result.getResponse().getContentAsString();
-//        JSONParser p = new JSONParser();
-//        JSONObject obj = (JSONObject)p.parse(content);
-//        String url = (String) obj.get("data");
-//        //fileProcessService.deleteImage(fileProcessService.getFileName(url));
-//    }
+    @Test
+    void 이미지_한장_등록() throws Exception {
+        //given
+        MockMultipartFile file = new MockMultipartFile("file",
+                "TestImage.png",
+                "image/png",
+                //이미지경로는 각 로컬에서 수정해야함.
+                new FileInputStream("/Users/heojihun/Project/helloworldweb/src/test/java/com/helloworld/helloworldweb/controller/TestImage.png"));
+
+        //when
+        MvcResult result = mockMvc.perform(
+                        multipart("/api/image")
+                                .file(file)
+                                .contentType(MediaType.MULTIPART_FORM_DATA)
+                                .header("Auth", getToken())
+                )
+
+                //then
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //S3에 저장된 테스트 이미지파일 삭제
+        String content = result.getResponse().getContentAsString();
+        JSONParser p = new JSONParser();
+        JSONObject obj = (JSONObject)p.parse(content);
+        String url = (String) obj.get("data");
+        String fileName = fileProcessService.getFileName(URLDecoder.decode(url, "UTF-8"));
+        fileProcessService.deleteImage(fileName);
+    }
 
     @Test
     void 블로그_작성시_지운_이미지들_삭제() throws Exception {
         //given
         List<String> urls = new ArrayList<>();
-        for (int i = 0; i < 0; i++) {
+        for (int i = 0; i < 2; i++) {
             MockMultipartFile file = new MockMultipartFile("file",
-                    "테스트이미지"+i+".png",
+                    "테스트이미지" + i + ".png",
                     "image/png",
                     //이미지경로는 각 로컬에서 수정해야함.
                     new FileInputStream("/Users/heojihun/Project/helloworldweb/src/test/java/com/helloworld/helloworldweb/controller/TestImage.png"));
             urls.add(fileProcessService.uploadImage(file));
         }
+        String joinUrls = urls.toString().replaceAll("\\[|\\]", "").replaceAll(", ",", ");
         //when
         MvcResult result = mockMvc.perform(
                         delete("/api/image")
-                                .param("urls", String.valueOf(urls))
+                                .param("urls", URLEncoder.encode(joinUrls))
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .characterEncoding("UTF-8")
                                 .header("Auth", getToken())
                 )
 
         //then
         .andExpect(status().isOk())
         .andReturn();
+    }
+
+    @Test
+    void QNA_페이지조회() throws Exception {
+        //given
+        for(int i =0 ; i< 30; i++){
+            Post newPost = Post.builder()
+                    .category(Category.QNA)
+                    .title("Qna"+i)
+                    .content("hello my name is Jihun"+i)
+                    .postComments(new ArrayList<>())
+                    .tags("TEST")
+                    .build();
+            String testUserJwt = getToken();
+            User user = userService.getUserByJwt(testUserJwt);
+            postService.addPost(newPost, user, null);
+        }
+        for(int i =0 ; i< 30; i++){
+            Post newPost = Post.builder()
+                    .category(Category.BLOG)
+                    .title("BLOG"+i)
+                    .content("hello my name is Jihun"+i)
+                    .postComments(new ArrayList<>())
+                    .tags("TEST")
+                    .build();
+            String testUserJwt = getToken();
+            User user = userService.getUserByJwt(testUserJwt);
+            postService.addPost(newPost, user, null);
+        }
+
+        MultiValueMap<String, String> requestParam = new LinkedMultiValueMap<>();
+        requestParam.set("page", "2");
+
+        //when
+        MvcResult result = mockMvc.perform(
+                        get("/api/post/qnasPage")
+                                .params(requestParam)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("UTF-8")
+                                .header("Auth", getToken())
+                )
+
+                //then
+                .andExpect(status().isOk())
+                .andReturn();
+        String content = result.getResponse().getContentAsString();
+        System.out.println("content = " + content);
+
+    }
+
+    @Test
+    void 블로그_페이지조회() throws Exception {
+        //given
+        for(int i =0 ; i< 30; i++){
+            Post newPost = Post.builder()
+                    .category(Category.QNA)
+                    .title("Qna"+i)
+                    .content("hello my name is Jihun"+i)
+                    .postComments(new ArrayList<>())
+                    .tags("TEST")
+                    .build();
+            String testUserJwt = getToken();
+            User user = userService.getUserByJwt(testUserJwt);
+            postService.addPost(newPost, user, null);
+        }
+        for(int i =0 ; i< 30; i++){
+            Post newPost = Post.builder()
+                    .category(Category.BLOG)
+                    .title("BLOG"+i)
+                    .content("hello my name is Jihun"+i)
+                    .postComments(new ArrayList<>())
+                    .tags("TEST")
+                    .build();
+            String testUserJwt = getToken();
+            User user = userService.getUserByJwt(testUserJwt);
+            postService.addPost(newPost, user, null);
+        }
+
+        MultiValueMap<String, String> requestParam = new LinkedMultiValueMap<>();
+        requestParam.set("email", testEmail);
+        requestParam.set("page", "2");
+
+        //when
+        MvcResult result = mockMvc.perform(
+                        get("/api/post/blogsPage")
+                                .params(requestParam)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("UTF-8")
+                                .header("Auth", getToken())
+                )
+
+                //then
+                .andExpect(status().isOk())
+                .andReturn();
+        String content = result.getResponse().getContentAsString();
+        System.out.println("content = " + content);
 
     }
 

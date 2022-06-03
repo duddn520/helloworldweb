@@ -9,6 +9,7 @@ import com.helloworld.helloworldweb.repository.PostImageRepository;
 import com.helloworld.helloworldweb.repository.PostRepository;
 import com.helloworld.helloworldweb.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,11 +48,11 @@ public class PostService {
 
         if(storedUrls != null){
             for(String url : storedUrls){
-                String storedUrl = URLDecoder.decode(url, "UTF-8");
+                String decodeUrl = URLDecoder.decode(url, "UTF-8");
                 PostImage postImage = PostImage.builder()
                         .originalFileName("IMAGE")
-                        .storedFileName(fileProcessService.getFileName(storedUrl))
-                        .storedUrl(storedUrl)
+                        .storedFileName(fileProcessService.getFileName(decodeUrl))
+                        .storedUrl(url)
                         .build();
 
                 //Post 와 PostImage의 연관관계 맺어줌
@@ -206,11 +207,11 @@ public class PostService {
         // 삭제 후 새로 객체 생성 후 연관관계 맺어줌
         if(storedUrls != null){
             for(String url : storedUrls){
-                String storedUrl = URLDecoder.decode(url, "UTF-8");
+                String decodeUrl = URLDecoder.decode(url, "UTF-8");
                 PostImage postImage = PostImage.builder()
                         .originalFileName("IMAGE")
-                        .storedFileName(fileProcessService.getFileName(storedUrl))
-                        .storedUrl(storedUrl)
+                        .storedFileName(fileProcessService.getFileName(decodeUrl))
+                        .storedUrl(url)
                         .build();
 
                 //Post 와 PostImage의 연관관계 맺어줌
@@ -259,6 +260,22 @@ public class PostService {
             }
         }
     }
+
+    @Transactional
+    public List<Post> getPagePosts(Category category, Pageable pageable){
+
+        List<Post> posts = postRepository.findByCategory(category, pageable).orElseGet(() -> new ArrayList<>());
+
+        return posts;
+    }
+    @Transactional
+    public List<Post> getPageUserPosts(Long userId, Category category, Pageable pageable) {
+
+        List<Post> posts = postRepository.findByUserIdAndCategory(userId, category, pageable).orElseGet(() -> new ArrayList<>());
+
+        return posts;
+    }
+
 
 
 

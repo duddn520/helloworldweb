@@ -23,6 +23,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -34,6 +35,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final FileProcessService fileProcessService;
 
     @Transactional
     public User addUser(User user)
@@ -354,6 +356,17 @@ public class UserService {
     public void updateNickName(User user, String nickName) {
 
         user.updateNickName(nickName);
+        userRepository.save(user);
+    }
+
+    public void updateProfileMusic(User user, String fileName, String url) throws UnsupportedEncodingException {
+
+        if(user.getProfileMusic() != null){
+            String deleteTarget = user.getProfileMusic();
+            String decodeTarget = URLDecoder.decode(deleteTarget, "UTF-8");
+            fileProcessService.deleteMusic(fileProcessService.getFileName(decodeTarget));
+        }
+        user.updateProfileMusic(fileName, url);
         userRepository.save(user);
     }
 
