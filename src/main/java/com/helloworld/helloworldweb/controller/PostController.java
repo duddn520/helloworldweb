@@ -8,6 +8,7 @@ import com.helloworld.helloworldweb.dto.Post.PostRequestDto;
 import com.helloworld.helloworldweb.dto.Post.PostResponseDto;
 import com.helloworld.helloworldweb.dto.Post.PostResponseDtoWithIsOwner;
 import com.helloworld.helloworldweb.dto.Post.PostResponseDtoWithPostComments;
+import com.helloworld.helloworldweb.firebase.FirebaseCloudMessageService;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
@@ -18,6 +19,9 @@ import com.helloworld.helloworldweb.service.PostService;
 import com.helloworld.helloworldweb.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -27,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -44,6 +49,7 @@ public class PostController {
     private final UserService userService;
     private final PostCommentService postCommentService;
     private final FileProcessService fileProcessService;
+    private final FirebaseCloudMessageService firebaseCloudMessageService;
     private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/api/post")
@@ -100,10 +106,10 @@ public class PostController {
         if(urls != ""){
             String decodeResult = URLDecoder.decode(urls, "UTF-8");
             String[] finalUrls = decodeResult.split(",");
-            System.out.println(Arrays.toString(finalUrls).length());
 
             for(String url: finalUrls){
                 String storedUrl = URLDecoder.decode(url, "UTF-8");
+                System.out.println("storedUrl = " + storedUrl);
                 fileProcessService.deleteImage(fileProcessService.getFileName(storedUrl));
             }
         }
@@ -131,6 +137,27 @@ public class PostController {
                 HttpResponseMsg.GET_SUCCESS,
                 responseDtos), HttpStatus.OK);
     }
+    @GetMapping("/api/post/blogsPage")
+    public ResponseEntity<ApiResponse<List<PostResponseDto>>> getPageBlog(@PageableDefault(size=5, sort="id", direction = Sort.Direction.DESC) Pageable pageable,
+                                                                          @RequestHeader(value = "Auth") String jwtToken,
+                                                                          @RequestParam(value = "email") String email) {
+
+        User findUser = userService.getUserByEmail(email);
+
+        // api 호출한 유저가 게시물의 주인인지 판단
+        User caller = userService.getUserByJwt(jwtToken);
+        boolean isOwner = caller.getId() == findUser.getId();
+
+        List<Post> blogs = postService.getPageUserPosts(findUser.getId(), Category.BLOG, pageable);
+
+        PostResponseDtoWithIsOwner responseDtos = new PostResponseDtoWithIsOwner(blogs, isOwner);
+
+        return new ResponseEntity (ApiResponse.response(
+                HttpStatusCode.GET_SUCCESS,
+                HttpResponseMsg.GET_SUCCESS,
+                responseDtos), HttpStatus.OK);
+
+    }
 
     @GetMapping("/api/post/qnas")
     public ResponseEntity<ApiResponse<List<PostResponseDto>>> getAllQna() {
@@ -147,6 +174,20 @@ public class PostController {
                 responseDtos), HttpStatus.OK);
     }
 
+    @GetMapping("/api/post/qnasPage")
+    public ResponseEntity<ApiResponse<List<PostResponseDto>>> getPageQna(@PageableDefault(size=5, sort="id", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        List<Post> qnas = postService.getPagePosts(Category.QNA, pageable);
+
+        List<PostResponseDto> responseDtos = qnas.stream()
+                .map(PostResponseDto::new)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity (ApiResponse.response(
+                HttpStatusCode.GET_SUCCESS,
+                HttpResponseMsg.GET_SUCCESS,
+                responseDtos), HttpStatus.OK);
+    }
 
     @GetMapping("/api/search")
     public ResponseEntity<ApiResponse<List<PostRequestDto>>> getSearchedPost(@RequestParam(name="sentence") String sentence){
@@ -253,5 +294,23 @@ public class PostController {
                 HttpResponseMsg.PUT_SUCCESS,
                 responseDto), HttpStatus.OK);
     }
+
+    @PostMapping("/api/post/alarm")
+    public ResponseEntity<ApiResponse> alarmTest(HttpServletRequest request)
+    {
+        String FCM = request.getHeader("FCM");
+        try{
+            firebaseCloudMessageService.sendMessageTo(FCM,"123","abc","000");
+        }
+        catch (IOException e)
+        {
+            System.out.println(e.getMessage());
+        }
+        return new ResponseEntity<>(ApiResponse.response(
+                HttpStatusCode.POST_SUCCESS,
+                HttpResponseMsg.POST_SUCCESS), HttpStatus.OK);
+
+    }
+
 }
 
