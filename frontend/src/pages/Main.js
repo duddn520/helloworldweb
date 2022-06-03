@@ -18,16 +18,22 @@ export default function ( props ){
     const [allQna,setAllQna] = React.useState([]);
     const [topQna,setTopQna] = React.useState([]);
     const [page,setPage] = React.useState(1);
+    const [pageCount,setPageCount] = React.useState(10);
 
     const handlePageChange = (event,value) => {
         
+        api.getAllQna(value-1)
+        .then( res => { setAllQna(res.postResponseDtos);})
+        .catch();
+
         setPage(value);
 
     }
 
     React.useEffect(() => {
-        api.getAllQna()
-        .then( res => { setAllQna(res) })
+
+        api.getAllQna(0)
+        .then( res => { setAllQna(res.postResponseDtos); setPageCount(res.pageNum); })
         .catch( e => { });
 
         api.getTopQuestions()
@@ -52,7 +58,7 @@ export default function ( props ){
                             <Pagination 
                                 page={page} 
                                 onChange={handlePageChange} 
-                                count={10} 
+                                count={pageCount} 
                                 showFirstButton showLastButton 
                                 sx={{ flex: 3 ,m: 2}}
                             />
