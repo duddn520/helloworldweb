@@ -46,7 +46,7 @@ function App() {
         console.log(currentToken);
         window.sessionStorage.setItem("fcm",currentToken);
         console.log(window.sessionStorage.getItem("fcm"))
-        api.alarmTest(currentToken)
+        api.updateFcm(currentToken)
         .then(res=>{ console.log(res)})
         .catch(e=>{ console.log(e)})
       }

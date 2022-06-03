@@ -3,6 +3,9 @@ package com.helloworld.helloworldweb.firebase;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.Message;
+import com.helloworld.helloworldweb.domain.User;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,23 +49,21 @@ public class FirebaseCloudMessageService {
     }
 
     public void sendMessageTo(String targetToken, String title, String body, String index) throws IOException {
-        String message = makeMessage(targetToken, title, body, index);
 
-        OkHttpClient client = new OkHttpClient();
-        RequestBody requestBody = RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));
+            String message = makeMessage(targetToken, title, body, index);
 
-        Request request = new Request.Builder()
-                .url(API_URL)
-                .post(requestBody)
-                .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
-                .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
-                .build();
+            OkHttpClient client = new OkHttpClient();
+            RequestBody requestBody = RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));
+
+            Request request = new Request.Builder()
+                    .url(API_URL)
+                    .post(requestBody)
+                    .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
+                    .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
+                    .build();
 
 
-        Response response = client.newCall(request)
-                .execute();
-
-        System.out.println(response.body().string());
+            client.newCall(request).execute();
     }
 
     private String makeMessage(String targetToken, String title, String body,String index) throws JsonProcessingException {
@@ -102,6 +103,14 @@ public class FirebaseCloudMessageService {
 
 
         return objectMapper.writeValueAsString(fcmMessage);
+    }
+
+    public void sendSubCommentNotificationToManyUser(List<User> targetUsers, User sender) throws IOException {
+        for(User u : targetUsers)
+        {   //송신인에게는 알림 보내지않음.
+            if(!u.equals(sender))
+                sendMessageTo(u.getFcm(),"NEW SUBCOMMENT","new subcomment","001");
+        }
     }
 
 }

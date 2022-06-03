@@ -370,5 +370,12 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
+    public User updateFcm(User user ,String fcmToken)
+    {
+        user.updateFcm(fcmToken);
+        return userRepository.save(user);
+    }
+
 
 }
