@@ -8,6 +8,7 @@ import LoadingSpinner from "../../component/LoadingSpinner";
 import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import ImageResize from 'quill-image-resize';
+import { ContentCutSharp } from "@mui/icons-material";
 Quill.register('modules/ImageResize', ImageResize);
 
 function WriteBlog(){
@@ -112,11 +113,13 @@ function WriteBlog(){
     
     //OCR 기능
     function InvokeKakaoOcrApi(e){
+        const range = quillRef.current.getEditor().getSelection(true); 
+        // 서버에 올려질때까지 표시할 로딩 placeholder 삽입 
+        quillRef.current.getEditor().insertEmbed(range.index, "image", require('../../images/Loading.gif')); 
         const file = e.target.files[0];
         var total = ""
         let formData = new FormData();
         formData.append('image',file);
-        console.log(file)
         axios.post("https://dapi.kakao.com/v2/vision/text/ocr",formData,{
             headers:{
                 'Content-Type':'multipart/form-data',
@@ -130,17 +133,24 @@ function WriteBlog(){
             for(let i = 0 ; i<recognizedResult.length ; i++)
             {
                 let word = recognizedResult[i].recognition_words
-                console.log(word)
                 total += word
             }
-
-            const newDiv = document.createElement('div');
-            const newText = document.createTextNode(`${total}`);
-            newDiv.appendChild(newText);
-            document.getElementById('Content').appendChild(newDiv);
+            
+            try { 
+                // // 정상적으로 업로드 됐다면 로딩 placeholder 삭제 
+                quillRef.current.getEditor().deleteText(range.index, 1); 
+                // 받아온 url을 이미지 태그에 삽입 
+                quillRef.current.getEditor().insertText(range.index, total, true);
+                // 사용자 편의를 위해 커서 이미지 오른쪽으로 이동 
+                quillRef.current.getEditor().setSelection(range.index + 1);
+            } catch (e) { 
+                console.log(e);
+                quillRef.current.getEditor().deleteText(range.index, 1); 
+            } 
 
         }).catch(e =>{
-            console.log(e)
+            quillRef.current.getEditor().deleteText(range.index, 1);
+            alert("변환에 실패했습니다.");
         })
         
     }
@@ -199,9 +209,6 @@ function WriteBlog(){
         catch (e) {
             alert("실패");
         }
-        
-
-       
     }
 
     return(

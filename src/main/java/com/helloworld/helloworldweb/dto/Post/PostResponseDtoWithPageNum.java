@@ -13,9 +13,16 @@ import java.util.List;
 public class PostResponseDtoWithPageNum {
     private List<PostResponseDtoWithUser> postResponseDtoWithUser = new ArrayList<>();
     private int pageNum;
+    private boolean IsOwner;
 
     public PostResponseDtoWithPageNum(List<PostResponseDtoWithUser> responseDtos, int pageNum) {
         this.postResponseDtoWithUser = responseDtos;
         this.pageNum = pageNum;
+    }
+
+    public PostResponseDtoWithPageNum(List<PostResponseDtoWithUser> responseDtos, int pageNum, boolean IsOwner) {
+        this.postResponseDtoWithUser = responseDtos;
+        this.pageNum = pageNum;
+        this.IsOwner = IsOwner;
     }
 }
