@@ -39,10 +39,11 @@ export default function(){
     }
     // 검색 - "Enter" 눌렀을 때  
     const handleSubmit = (event) => {
-        event.preventDefault();
-        api.getSearchedPost({sentence : sentence})
+
+        api.getSearchedPost({sentence : sentence, page: state.page })
             .then( res => {
-                navigate('/search',{ state: { res: res , sentence: sentence } })
+                
+                navigate('/search',{ state: { res: res , sentence: sentence ,page: state.page } })
             })
         .catch()
     }

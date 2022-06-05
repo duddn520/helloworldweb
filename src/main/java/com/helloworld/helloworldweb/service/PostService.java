@@ -7,9 +7,11 @@ import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.dto.Post.PostRequestDto;
 import com.helloworld.helloworldweb.repository.PostImageRepository;
 import com.helloworld.helloworldweb.repository.PostRepository;
+import com.helloworld.helloworldweb.repository.PostRepositorySupport;
 import com.helloworld.helloworldweb.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostImageRepository postImageRepository;
     private final FileProcessService fileProcessService;
+    private final PostRepositorySupport postRepositorySupport;
 
     @Transactional
     //Post 한 개 조회
@@ -132,6 +135,11 @@ public class PostService {
         List<Post> posts = postRepository.findByCategory(category).orElseGet(() -> new ArrayList<>());
 
         return posts;
+    }
+
+    @Transactional
+    public PageImpl<Post> getPagedSearchedPosts(String sentence, Pageable pageable){
+        return postRepositorySupport.findCustomSearchResultsWithPagination(sentence,pageable);
     }
 
     @Transactional

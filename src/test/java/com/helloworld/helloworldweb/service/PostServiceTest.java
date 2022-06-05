@@ -1,19 +1,27 @@
 package com.helloworld.helloworldweb.service;
 
-import com.helloworld.helloworldweb.domain.Category;
-import com.helloworld.helloworldweb.domain.Post;
-import com.helloworld.helloworldweb.domain.Role;
-import com.helloworld.helloworldweb.domain.User;
+import com.helloworld.helloworldweb.domain.*;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.repository.PostRepository;
+import com.helloworld.helloworldweb.repository.PostRepositorySupport;
 import com.helloworld.helloworldweb.repository.UserRepository;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.provider.QueryExtractor;
+import org.springframework.data.jpa.repository.query.DefaultJpaQueryMethodFactory;
+import org.springframework.data.jpa.repository.query.JpaQueryMethodFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
@@ -187,5 +195,28 @@ public class PostServiceTest {
             org.assertj.core.api.Assertions.assertThat(post.getCreatedTime()).isAfterOrEqualTo(today);
         }
     }
+
+    @Autowired PostRepositorySupport postRepositorySupport;
+
+    @Test
+    void 동적쿼리_테스트(){
+        String sentence = "%react% hi \"asd\"" ;
+
+
+        Sort.Order order = Sort.Order.desc("id");
+        Sort sort = Sort.by(order);
+
+        Pageable pageable = PageRequest.of(0, 10, sort);
+        PageImpl<Post> customSearchResultsWithPagination = postRepositorySupport.findCustomSearchResultsWithPagination(sentence, pageable);
+
+
+        for( Post p : customSearchResultsWithPagination ) {
+            System.out.println("p.getCreatedTime() = " + p.getCreatedTime());
+            System.out.println("p.getTitle() = " + p.getTitle());
+            System.out.println("p.getContent() = " + p.getContent());
+        }
+
+    }
+
 
 }

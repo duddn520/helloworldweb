@@ -1,8 +1,7 @@
 import React from "react";
 import { Button ,Typography ,Box , 
          List ,Card ,CardContent ,
-         Pagination
-
+         Pagination , Divider
 } 
 from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -49,7 +48,7 @@ export default function ( props ){
             <CustomAppBar />
             <Box sx={styles.InnerBox}>
                 <Box sx={styles.leftBox}>
-                    <Card sx={{ flex: 0.9, m: 2 }}>
+                    <Card sx={{ flex: 0.9, m: 2 ,boxShadow: 0.1 }}>
                         <CardContent>
                             <Home />
                         </CardContent>
@@ -67,7 +66,7 @@ export default function ( props ){
                     </Card> 
                 </Box>
                 <Box sx={styles.rightBox}>
-                    <Card sx={{ flex: 1,m: 5 }}>
+                    <Card sx={{ flex: 1,m: 5 ,boxShadow: 0.1 }}>
                         <CardContent>
                             <Questions />
                         </CardContent>
@@ -81,16 +80,17 @@ function Home(){
     return(
         <div>
                     <Box sx={styles.titleBox}>
-                        <Typography sx={styles.cardLabel}>질문</Typography>
+                        <Typography sx={{ ...styles.cardLabel ,ml: 0.5 ,mt: 0.5 }}>질문</Typography>
                         <Button 
                             onClick={() => navigate('/qna/register')}
                             variant='contained' 
                             size='small' 
-                            sx={{ mb: 1 ,p: 1 ,ml: 'auto' }}
+                            sx={{ mb: 0.5 ,p: 1,ml: 'auto' }}
                         >
                             질문 작성하기
                         </Button>
                     </Box>
+                    <Divider variant="fullWidth" sx={{ mt: 1,mb: 1  }} />
                     <List sx={{ flex: 1 }}>
                     {
                         allQna.map( (item,index) => {
@@ -109,6 +109,7 @@ function Questions(){
                     <Box sx={styles.titleBox}>
                         <Typography sx={styles.cardLabel}>많이 본 질문</Typography>
                     </Box>
+                    <Divider variant="fullWidth" sx={{ mt: 1,mb: 1 }}/>
                     <List>
                     {
                         topQna.map( (item,index) => {
@@ -153,7 +154,7 @@ const styles={
         display: 'flex' ,flexDirection: 'row'
     },
     cardLabel: {
-        fontSize: 18,flex: 1 ,fontWeight: 'bold'
+        fontSize: 18,flex: 1 ,fontWeight: 'bold'  
     },
     mostViewedBox : {
         flex: 1,alignItems: 'start' ,justifyContent: 'start' ,
