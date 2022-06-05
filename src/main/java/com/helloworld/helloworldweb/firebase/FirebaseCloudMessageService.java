@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -63,7 +64,8 @@ public class FirebaseCloudMessageService {
                     .build();
 
 
-            client.newCall(request).execute();
+            Response response = client.newCall(request).execute();
+        System.out.println("response.body().string() = " + response.body().string());
     }
 
     private String makeMessage(String targetToken, String title, String body,String index) throws JsonProcessingException {

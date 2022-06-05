@@ -24,7 +24,7 @@ public class PostComment extends BaseTimeEntity{
     @OneToMany(mappedBy = "postComment", cascade = CascadeType.ALL)
     private List<PostSubComment> postSubComments = new ArrayList<>();
 
-    @OneToMany
+    @ManyToMany
     private List<User> engagingUserList = new ArrayList<>();
 
     private boolean selected;

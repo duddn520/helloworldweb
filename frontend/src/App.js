@@ -45,10 +45,6 @@ function App() {
       if(currentToken){
         console.log(currentToken);
         window.sessionStorage.setItem("fcm",currentToken);
-        console.log(window.sessionStorage.getItem("fcm"))
-        api.updateFcm(currentToken)
-        .then(res=>{ console.log(res)})
-        .catch(e=>{ console.log(e)})
       }
       else
       {
