@@ -16,6 +16,7 @@ import com.helloworld.helloworldweb.service.PostService;
 import com.helloworld.helloworldweb.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -191,12 +192,17 @@ public class PostController {
     }
 
     @GetMapping("/api/search")
-    public ResponseEntity<ApiResponse<List<PostRequestDto>>> getSearchedPost(@RequestParam(name="sentence") String sentence){
+    public ResponseEntity<ApiResponse<?>> getSearchedPost(
+            @RequestParam(name="sentence") String sentence,
+            @PageableDefault(size=10,sort="id",direction= Sort.Direction.DESC) Pageable pageable
+    ){
 
         List<Post> posts = postService.getSearchedPost(sentence);
 
-        List<PostResponseDto> responseDtos = posts.stream()
-                .map(PostResponseDto::new)
+        PageImpl<Post> pagedSearchedPosts = postService.getPagedSearchedPosts(sentence, pageable);
+
+        List<PostResponseDtoWithUser> responseDtos = pagedSearchedPosts.stream()
+                .map(PostResponseDtoWithUser::new)
                 .collect(Collectors.toList());
 
         return new ResponseEntity (ApiResponse.response(

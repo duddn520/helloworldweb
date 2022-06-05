@@ -25,6 +25,8 @@ export default function QnAItem({item}){
                     {
                         item.tags.split(',').map( tag => { if(tag.length) return <Button size='small' sx={styles.tagButton}>{tag}</Button>})
                     }
+                </ListItem>
+                <Box sx={{ display: 'flex'}}>
                     {
                         item.userResponseDto &&
                         <Box sx={{ ml: 'auto' ,display: 'flex' ,flexDirection: 'row' ,alignItems: 'center' }}>
@@ -32,13 +34,13 @@ export default function QnAItem({item}){
                             <Button 
                                 onClick={() => navigate("/minihome", {state: {tabIndex: 0, targetEmail: item.userResponseDto.email }}) } 
                                 sx={{ textTransform: 'none'}}
-                            >
+                                >
                                 {item.userResponseDto.userName}
                             </Button>
                             <Typography sx={{ fontSize: 13 ,color: 'gray' }}>Asked {item.createdTime.split("T")[0]}</Typography>
                         </Box>
                     }
-                </ListItem>
+                </Box>
             </Box>
         </Box>
     );
@@ -53,7 +55,7 @@ const TitleBox = styled.div`
 
 const styles = {
     container: {
-        display: 'flex' ,flexDirection: 'row' ,alignItems: 'start' ,height: 130
+        display: 'flex' ,flexDirection: 'row' ,alignItems: 'start' ,height: 140
     },
     leftBox: {
         flex: 1 ,ml: 3 ,justifyContent: 'end' ,alignItems: 'end' ,display: 'flex' ,flexDirection: 'column' , mt: 2.5 

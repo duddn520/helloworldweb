@@ -151,14 +151,15 @@ function getAllQna(page){
 }
 
 // GET - Post 검색
-function getSearchedPost({ sentence }){
+function getSearchedPost({ sentence ,page }){
     sentence = sentence.replace("[","%").replace("]","%");
     return new Promise((resolve,reject) => {
         request({
             method: 'GET' ,
             url: '/api/search',
             params: {
-                sentence: sentence
+                sentence: sentence ,
+                page: page
             }
         })
         .then( res => {
