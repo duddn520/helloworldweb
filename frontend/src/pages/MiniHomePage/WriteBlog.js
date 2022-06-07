@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Button, Typography, TextField } from "@mui/material";
+import { Box, Button, Typography, TextField, Backdrop, CircularProgress } from "@mui/material";
 import api from "../../api/api";
 import { useNavigate, useLocation } from 'react-router';
 import axios from "axios";
@@ -262,7 +262,7 @@ function WriteBlog(){
                     <Button onClick={()=>{savePost()}} variant={'contained'}>저장</Button>
                 </Box>
             </Box>
-            {isLoading && <LoadingSpinner/>}
+            <LoadingSpinner open={isLoading}/>
         </div>
     )
 }

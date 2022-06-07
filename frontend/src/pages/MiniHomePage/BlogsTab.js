@@ -1,8 +1,9 @@
 import React from "react";
 import { useNavigate } from 'react-router';
-import { Button, Box, Pagination, Typography } from "@mui/material";
+import { Button, Box, Pagination, Typography, Backdrop, CircularProgress } from "@mui/material";
 import api from "../../api/api";
 import BlogThumbnail from "../../component/miniHome/BlogThumbnail";
+import LoadingSpinner from "../../component/LoadingSpinner";
 
 function BlogsTab({ userInfo }){
     const navigate = useNavigate();
@@ -10,12 +11,13 @@ function BlogsTab({ userInfo }){
     const [isOwner, setIsOwner] = React.useState(false);
     const [page,setPage] = React.useState(1);
     const [pageCount,setPageCount] = React.useState();
+    const [isLoading, setIsLoading] = React.useState(false);
 
     const handlePageChange = (event,value) => {
 
+        setIsLoading(true);
         api.getBlogPosts(userInfo.email, value-1)
         .then(res => {
-            console.log(res);
             setIsOwner(res.isOwner);
             setPosts(res.postResponseDtoWithUser);
         })
@@ -24,6 +26,7 @@ function BlogsTab({ userInfo }){
         });
 
         setPage(value);
+        setIsLoading(false);
 
     }
 
@@ -32,14 +35,17 @@ function BlogsTab({ userInfo }){
     }
 
     React.useEffect(()=>{
+        setIsLoading(true);
         api.getBlogPosts(userInfo.email, 0)
         .then(res => {
             setIsOwner(res.isOwner);
             setPosts(res.postResponseDtoWithUser);
             setPageCount(res.pageNum === 0 ? 1 : res.pageNum);
+            setIsLoading(false);
         })
         .catch(e => {
             alert("게시물을 불러오는데 실패했습니다.");
+            setIsLoading(false);
         });
     },[]);
 
@@ -69,6 +75,9 @@ function BlogsTab({ userInfo }){
                     />
                 </Box>
             </Box>
+            <div>
+                <LoadingSpinner open={isLoading}/>
+            </div>
         </Box>
 
     )
