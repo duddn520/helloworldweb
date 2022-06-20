@@ -300,4 +300,19 @@ public class UserController extends HttpServlet {
                 HttpResponseMsg.POST_SUCCESS,
                 uploadMusicUrl), HttpStatus.OK);
     }
+
+    @PostMapping("/api/user/fcm")
+    public ResponseEntity<ApiResponse> updateFcm(HttpServletRequest request)
+    {
+        String email = jwtTokenProvider.getUserEmail(request.getHeader("Auth"));
+        String fcmToken = request.getHeader("FCM");
+        User user = userService.getUserByEmail(email);
+
+        UserResponseDto responseDto = new UserResponseDto(userService.updateFcm(user,fcmToken));
+
+        return new ResponseEntity (ApiResponse.response(
+                HttpStatusCode.POST_SUCCESS,
+                HttpResponseMsg.POST_SUCCESS,
+                responseDto), HttpStatus.OK);
+    }
 }

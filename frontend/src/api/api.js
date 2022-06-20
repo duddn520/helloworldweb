@@ -813,7 +813,7 @@ function updateProfileMusic(formdata, userId) {
     });
 }
       
-function alarmTest(fcm){
+function updateFcm(fcm){
     const token = window.sessionStorage.getItem("Auth");
     console.log(fcm)
         return new Promise((resolve,reject) => {
@@ -823,7 +823,7 @@ function alarmTest(fcm){
         else{
           axios({
                 method: 'POST',
-                url:`${serverUrl}/api/post/alarm`,
+                url:`${serverUrl}/api/user/fcm`,
                 headers:{
                     Auth: token,
                     FCM:fcm
@@ -924,5 +924,5 @@ export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver,
     getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName 
     ,getUserQnas ,getUserComments, getGithubRepositories, registerUserWithGithub, connectUserToGithub , getNewToken
     ,updatePostSubComment ,deletePostSubComment, registerBlog, getImgUrl, updateBlog, deleteImgUrl, selectPostComment, deleteGuestBook,updateProfileMusic, alarmTest
-    ,getTopQuestions
+    ,getTopQuestions, updateFcm
 } ;

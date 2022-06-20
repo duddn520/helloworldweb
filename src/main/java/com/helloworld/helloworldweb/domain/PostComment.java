@@ -24,6 +24,9 @@ public class PostComment extends BaseTimeEntity{
     @OneToMany(mappedBy = "postComment", cascade = CascadeType.ALL)
     private List<PostSubComment> postSubComments = new ArrayList<>();
 
+    @ManyToMany
+    private List<User> engagingUserList = new ArrayList<>();
+
     private boolean selected;
 
     @Builder
@@ -33,6 +36,7 @@ public class PostComment extends BaseTimeEntity{
         this.post = post;
         this.postSubComments = new ArrayList<>();
         this.selected = selected;
+        this.engagingUserList = new ArrayList<>();
     }
 
     public void updatePost(Post post)
@@ -41,10 +45,18 @@ public class PostComment extends BaseTimeEntity{
         this.post = post;
     }
 
-
     public void selectPostComment()
     {
         this.selected = true;
+    }
+
+    public void updateEngagingUserList(User user)
+    {
+        //engageUserList 에 이미 등록된 유저면 등록하지 않는다.
+        if(!this.engagingUserList.contains(user))
+        {
+            this.engagingUserList.add(user);
+        }
     }
 
 }

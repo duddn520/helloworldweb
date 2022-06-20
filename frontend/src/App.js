@@ -16,6 +16,8 @@ import MakeUserName from './pages/MakeUserName';
 import React from 'react';
 import { firebaseApp, vapidKey } from './firebase';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging'
+import {Button, Row, Col, Toast} from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { onBackgroundMessage } from 'firebase/messaging/sw';
 import api from './api/api';
 import { MessageOutlined } from '@mui/icons-material';
@@ -23,11 +25,16 @@ import { MessageOutlined } from '@mui/icons-material';
 const firebaseMessaging = getMessaging(firebaseApp);
 
 function App() {
+  
+  const [show,setShow] = React.useState(false);
+  const [notification,setNotification] = React.useState({title:"",body:""});
 
   onMessage(firebaseMessaging,(payload)=>{
-    console.log(payload.notification.title);
-    console.log(payload.notification.body);
+    setShow(true);
+    setNotification({title : payload.notification.title, body : payload.notification.body})
+    console.log(payload)
   });
+
 
   // onBackgroundMessage(firebaseMessaging, (payload) => {
   //   console.log('[firebase-messaging-sw.js] Received background message ', payload);
@@ -45,10 +52,6 @@ function App() {
       if(currentToken){
         console.log(currentToken);
         window.sessionStorage.setItem("fcm",currentToken);
-        console.log(window.sessionStorage.getItem("fcm"))
-        api.alarmTest(currentToken)
-        .then(res=>{ console.log(res)})
-        .catch(e=>{ console.log(e)})
       }
       else
       {
@@ -62,26 +65,42 @@ function App() {
   },[])
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route exact path="/" element={<Main />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/login/redirect/kakao" element={<KakaoRedirect />} />
-        <Route path="/login/redirect/github" element={<GithubRedirect />} />
-        <Route path="/login/redirect/naver" element={<NaverRedirect />} />
-        <Route path="/login/redirect/github/connect" element={<GithubConnectRedirect />} />
-        <Route path="/makeusername" element={<MakeUserName />} />
-        {/* QnA */}
-        <Route exact path="/qna/:id" element={<QnA />} />
-        <Route exact path="/qna/register" element={<QnARegister />} />
-        {/* search */}
-        <Route path="/search" element={<Search />} />
+      <BrowserRouter>
+      <Toast onClose={() => setShow(false)} show={show} delay={3000} autohide animation style={{
+        position: 'absolute',
+        top: 62,
+        right: 20,
+      }}>
+        <Toast.Header>
+          <img
+            src="holder.js/20x20?text=%20"
+            className="rounded mr-2"
+            alt=""
+          />
+          <strong className="mr-auto">{notification.title}</strong>
+          <small>12 mins ago</small>
+        </Toast.Header>
+        <Toast.Body>{notification.body}</Toast.Body>
+      </Toast>
+        <Routes>
+          <Route exact path="/" element={<Main />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/login/redirect/kakao" element={<KakaoRedirect />} />
+          <Route path="/login/redirect/github" element={<GithubRedirect />} />
+          <Route path="/login/redirect/naver" element={<NaverRedirect />} />
+          <Route path="/login/redirect/github/connect" element={<GithubConnectRedirect />} />
+          <Route path="/makeusername" element={<MakeUserName />} />
+          {/* QnA */}
+          <Route exact path="/qna/:id" element={<QnA />} />
+          <Route exact path="/qna/register" element={<QnARegister />} />
+          {/* search */}
+          <Route path="/search" element={<Search />} />
 
-        <Route path="/minihome" element={<MiniHome />} />
-        <Route path="/minihome/write" element={<WriteBlog />} />
-        <Route path="/blog" element={<Blog/>} />
-      </Routes>
-    </BrowserRouter>
+          <Route path="/minihome" element={<MiniHome />} />
+          <Route path="/minihome/write" element={<WriteBlog />} />
+          <Route path="/blog" element={<Blog/>} />
+        </Routes>
+      </BrowserRouter>
   );
 }
 

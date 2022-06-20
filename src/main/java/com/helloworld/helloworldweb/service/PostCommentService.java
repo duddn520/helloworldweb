@@ -26,6 +26,7 @@ public class PostCommentService {
     public PostComment registerPostComment(PostComment postComment, Post post, PostSubComment postSubComment, User user)
     {
         postComment.updatePost(post);
+        postComment.updateEngagingUserList(user);
         postSubComment.updatePostComment(postComment);
         postSubComment.updateUser(user);
         postSubCommentRepository.save(postSubComment);

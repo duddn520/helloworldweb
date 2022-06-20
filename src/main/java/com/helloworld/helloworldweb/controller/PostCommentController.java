@@ -4,6 +4,7 @@ import com.helloworld.helloworldweb.domain.*;
 import com.helloworld.helloworldweb.dto.Post.PostResponseDtoWithPostComments;
 import com.helloworld.helloworldweb.dto.PostComment.PostCommentRequestDto;
 import com.helloworld.helloworldweb.dto.PostComment.PostCommentResponseDto;
+import com.helloworld.helloworldweb.firebase.FirebaseCloudMessageService;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Controller
 @RequiredArgsConstructor
@@ -29,13 +31,13 @@ public class PostCommentController {
     private final PostService postService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
+    private final FirebaseCloudMessageService firebaseCloudMessageService;
 
     //PostComment CRUD
 
     @Transactional
     @PostMapping("/api/postcomment")
-    public ResponseEntity<ApiResponse<PostCommentResponseDto>> registerPostComment(@RequestBody PostCommentRequestDto postCommentRequestDto, HttpServletRequest request)
-    {
+    public ResponseEntity<ApiResponse<PostCommentResponseDto>> registerPostComment(@RequestBody PostCommentRequestDto postCommentRequestDto, HttpServletRequest request) throws IOException {
         String token = jwtTokenProvider.getTokenByHeader(request);
         User user = userService.getUserByEmail(jwtTokenProvider.getUserEmail(token));
 
@@ -49,6 +51,8 @@ public class PostCommentController {
 
         PostCommentResponseDto responseDto = new PostCommentResponseDto(postCommentService.registerPostComment(postComment,post,postSubComment,user));
 
+        //게시글 주인에게 알림.
+        firebaseCloudMessageService.sendMessageTo(post.getUser().getFcm(),"NEW COMMENT","new comment","000");
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.OK,
                 HttpResponseMsg.POST_SUCCESS,

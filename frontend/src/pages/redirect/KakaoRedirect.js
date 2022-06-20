@@ -35,14 +35,18 @@ export default function Redirect(){
                     // SessionStorage에 jwt 저장
                     window.sessionStorage.setItem("Auth", res.accessToken);
                     window.sessionStorage.setItem("Refresh", res.refreshToken);
-
-                    if( res.isAlreadyRegister ){
-                        // 미니홈피페이지로 이동
-                        navigate("/", {replace: true});
-                    }
-                    else{
-                        navigate("/makeusername", {replace: true});
-                    }
+                    api.updateFcm(window.sessionStorage.getItem("fcm"))
+                    .then(response =>{
+                        if( res.isAlreadyRegister ){
+                            // 미니홈피페이지로 이동
+                            navigate("/", {replace: true});
+                        }
+                        else{
+                            navigate("/makeusername", {replace: true});
+                        }
+                    }).catch(e=>{
+                        console.log(e)
+                    })
                 });
 
             })

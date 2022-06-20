@@ -7,6 +7,7 @@ import com.helloworld.helloworldweb.dto.Post.PostResponseDto;
 import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.dto.PostSubComment.PostSubCommentRequestDto;
 import com.helloworld.helloworldweb.dto.PostSubComment.PostSubCommentResponseDto;
+import com.helloworld.helloworldweb.firebase.FirebaseCloudMessageService;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
 import com.helloworld.helloworldweb.model.ApiResponse;
 import com.helloworld.helloworldweb.model.HttpResponseMsg;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
@@ -33,11 +35,11 @@ public class PostSubCommentController {
     private final PostSubCommentService postSubCommentService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
+    private final FirebaseCloudMessageService firebaseCloudMessageService;
 
     @Transactional
     @PostMapping("/api/postsubcomment")
-    public ResponseEntity<ApiResponse<PostSubCommentResponseDto>> registerPostSubComment(@RequestBody PostSubCommentRequestDto requestDto, HttpServletRequest request)
-    {
+    public ResponseEntity<ApiResponse<PostSubCommentResponseDto>> registerPostSubComment(@RequestBody PostSubCommentRequestDto requestDto, HttpServletRequest request) throws IOException {
         String token = jwtTokenProvider.getTokenByHeader(request);
         User user = userService.getUserByEmail(jwtTokenProvider.getUserEmail(token));
 
@@ -46,6 +48,8 @@ public class PostSubCommentController {
         PostSubComment postSubComment = requestDto.toEntity();
 
         PostSubCommentResponseDto responseDto = new PostSubCommentResponseDto(postSubCommentService.registerPostSubComment(postSubComment,postComment,user));
+
+        firebaseCloudMessageService.sendSubCommentNotificationToManyUser(postComment.getEngagingUserList(),user);
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.OK,

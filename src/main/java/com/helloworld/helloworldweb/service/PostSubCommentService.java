@@ -25,6 +25,7 @@ public class PostSubCommentService {
     @Transactional
     public PostSubComment registerPostSubComment(PostSubComment postSubComment, PostComment postComment, User user)
     {
+        postComment.updateEngagingUserList(user);
         postSubComment.updatePostComment(postComment);
         postSubComment.updateUser(user);
         return postSubCommentRepository.save(postSubComment);
