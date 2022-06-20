@@ -13,7 +13,6 @@ const rest_api_key = "0961546bc0d26c67ab09717f36939b7c";
 const redirect_url = `${urls.front}/login/redirect/kakao`;
 
 const naver_client_id = '3RFZ_7joHf_HlJXavuMB';
-// const naverLogin_redirect_url = 'http://3.35.188.47/login/redirect/naver';
 const naverLogin_redirect_url = `${urls.front}/login/redirect/naver`;
 
 const kakao_url = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${rest_api_key}&redirect_uri=${redirect_url}`;
