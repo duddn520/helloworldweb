@@ -7,8 +7,12 @@ import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.dto.Post.PostRequestDto;
 import com.helloworld.helloworldweb.repository.PostImageRepository;
 import com.helloworld.helloworldweb.repository.PostRepository;
+import com.helloworld.helloworldweb.repository.PostRepositorySupport;
 import com.helloworld.helloworldweb.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -27,6 +32,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostImageRepository postImageRepository;
     private final FileProcessService fileProcessService;
+    private final PostRepositorySupport postRepositorySupport;
 
     @Transactional
     //Post 한 개 조회
@@ -129,6 +135,11 @@ public class PostService {
         List<Post> posts = postRepository.findByCategory(category).orElseGet(() -> new ArrayList<>());
 
         return posts;
+    }
+
+    @Transactional
+    public PageImpl<Post> getPagedSearchedPosts(String sentence, Pageable pageable){
+        return postRepositorySupport.findCustomSearchResultsWithPagination(sentence,pageable);
     }
 
     @Transactional
@@ -275,8 +286,28 @@ public class PostService {
 
         return posts;
     }
+  
+    public int getAllPostPageNum(Category category) {
+        Pageable pageable = PageRequest.ofSize(10);
+        Page<Post> allByCategory = postRepository.findAllByCategory(category, pageable);
+        int totalPages = allByCategory.getTotalPages();
 
+        return totalPages;
+    }
+    public int getUserPostPageNum(Category category, Long userId) {
 
+        Pageable pageable = PageRequest.ofSize(10);
+        Page<Post> allByCategory = postRepository.findAllByUserIdAndCategory(userId, category, pageable);
+        int totalPages = allByCategory.getTotalPages();
 
-
+        return totalPages;
+    }
+  
+    // 상위 5개의 QNA 반환
+    @Transactional
+    public List<Post> getTop5Questions(){
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime today = LocalDateTime.of(time.getYear(),time.getMonth(),time.getDayOfMonth(),0,0);
+        return postRepository.findTop5ByCreatedTimeGreaterThanEqualAndCategoryOrderByViewsDesc(today, Category.QNA).orElseGet(ArrayList::new);
+    }
 }

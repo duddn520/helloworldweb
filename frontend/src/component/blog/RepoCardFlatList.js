@@ -4,6 +4,7 @@ import RepoCard from "./RepoCard";
 import request from "../../api/request";
 import {Avatar, Box, Button, Typography} from "@mui/material";
 import api from "../../api/api";
+import urls from "../../api/URL";
 //useEffect사용하여 getPosts 로 postList 받고, 렌더링.
 
 export default function RepoCardFlatList({email, isOwner})
@@ -12,7 +13,7 @@ export default function RepoCardFlatList({email, isOwner})
     const [flag,setFlag] = React.useState([false]);
     const [userEmail,setUserEmail] = React.useState(email);
 
-    const github_url = "https://github.com/login/oauth/authorize?client_id=105e0b50eefc27b4dc81&redirect_uri=http://localhost:3000/login/redirect/github/connect";
+    const github_url = `https://github.com/login/oauth/authorize?client_id=105e0b50eefc27b4dc81&redirect_uri=${urls.front}/login/redirect/github/connect`;
 
     function getGitCode(){
         window.location.replace(github_url)

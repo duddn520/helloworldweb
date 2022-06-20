@@ -1,21 +1,33 @@
 package com.helloworld.helloworldweb.service;
 
-import com.helloworld.helloworldweb.domain.Post;
-import com.helloworld.helloworldweb.domain.Role;
-import com.helloworld.helloworldweb.domain.User;
+import com.helloworld.helloworldweb.domain.*;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
+import com.helloworld.helloworldweb.repository.PostRepository;
+import com.helloworld.helloworldweb.repository.PostRepositorySupport;
 import com.helloworld.helloworldweb.repository.UserRepository;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.provider.QueryExtractor;
+import org.springframework.data.jpa.repository.query.DefaultJpaQueryMethodFactory;
+import org.springframework.data.jpa.repository.query.JpaQueryMethodFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Transactional
 @SpringBootTest
@@ -25,6 +37,8 @@ public class PostServiceTest {
     @Autowired UserRepository userRepository;
     @Autowired UserService userService;
     @Autowired PostService postService;
+    @Autowired
+    PostRepository postRepository;
 
     String testEmail = "helloworldtest@gmail.com";
 
@@ -170,5 +184,39 @@ public class PostServiceTest {
         // then - 50개의 게시물이 있는 지 ( "react native"만 포함하는 게시물만 결과로 나와야 함 )
         Assertions.assertEquals(50,findPosts.size());
     }
+
+    @Test
+    void 금일_조회_상위5개_게시물(){
+        LocalDateTime time = LocalDateTime.now();
+        LocalDateTime today = LocalDateTime.of(time.getYear(),time.getMonth(),time.getDayOfMonth(),0,0);
+        Optional<List<Post>> findQnas = postRepository.findTop5ByCreatedTimeGreaterThanEqualAndCategoryOrderByViewsDesc(today, Category.QNA);
+        for ( Post post : findQnas.get()){
+            Assertions.assertEquals(Category.QNA,post.getCategory());
+            org.assertj.core.api.Assertions.assertThat(post.getCreatedTime()).isAfterOrEqualTo(today);
+        }
+    }
+
+    @Autowired PostRepositorySupport postRepositorySupport;
+
+    @Test
+    void 동적쿼리_테스트(){
+        String sentence = "%react% hi \"asd\"" ;
+
+
+        Sort.Order order = Sort.Order.desc("id");
+        Sort sort = Sort.by(order);
+
+        Pageable pageable = PageRequest.of(0, 10, sort);
+        PageImpl<Post> customSearchResultsWithPagination = postRepositorySupport.findCustomSearchResultsWithPagination(sentence, pageable);
+
+
+        for( Post p : customSearchResultsWithPagination ) {
+            System.out.println("p.getCreatedTime() = " + p.getCreatedTime());
+            System.out.println("p.getTitle() = " + p.getTitle());
+            System.out.println("p.getContent() = " + p.getContent());
+        }
+
+    }
+
 
 }

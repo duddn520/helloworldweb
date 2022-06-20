@@ -128,11 +128,14 @@ function registerQnA( {content,type,title,tags}){
     });
 }
 // GET - 모든 QnA 조회
-function getAllQna(){
+function getAllQna(page){
     return new Promise((resolve,reject) => {
         request({
             method: 'GET' ,
-            url: '/api/post/qnas',
+            url: "/api/post/qnasPage",
+            params: {
+                page: page,
+            }
         })
         .then( res => {
             if ( res.data.statusCode == status.GET_SUCCESS ){
@@ -148,14 +151,15 @@ function getAllQna(){
 }
 
 // GET - Post 검색
-function getSearchedPost({ sentence }){
+function getSearchedPost({ sentence ,page }){
     sentence = sentence.replace("[","%").replace("]","%");
     return new Promise((resolve,reject) => {
         request({
             method: 'GET' ,
             url: '/api/search',
             params: {
-                sentence: sentence
+                sentence: sentence ,
+                page: page
             }
         })
         .then( res => {
@@ -290,12 +294,13 @@ function registerPost(formdata, title, totalContent, tags){
     
 }
 
-function getBlogPosts(email){
+function getBlogPosts(email, page){
     return new Promise((resolve,reject) => {
         request({
             method: 'GET',
-            url : "/api/post/blogs",
+            url : "/api/post/blogsPage",
             params: {
+                page: page,
                 email: email
             }
         })
@@ -836,6 +841,81 @@ function updateFcm(fcm){
         }
     });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function getTopQuestions(){
+    return new Promise((resolve,reject) => {
+        request({
+            method: "GET" ,
+            url:`/api/post/top-questions`,
+          })
+          .then( res => {
+              resolve(res.data.data);
+          })
+          .catch( e => {
+              reject();
+          }) 
+    });      
+}
                   
 
 export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver, 
@@ -843,5 +923,6 @@ export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver,
     getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
     getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName 
     ,getUserQnas ,getUserComments, getGithubRepositories, registerUserWithGithub, connectUserToGithub , getNewToken
-    ,updatePostSubComment ,deletePostSubComment, registerBlog, getImgUrl, updateBlog, deleteImgUrl, selectPostComment, deleteGuestBook,updateProfileMusic, updateFcm
+    ,updatePostSubComment ,deletePostSubComment, registerBlog, getImgUrl, updateBlog, deleteImgUrl, selectPostComment, deleteGuestBook,updateProfileMusic, alarmTest
+    ,getTopQuestions, updateFcm
 } ;
