@@ -12,7 +12,7 @@ export default function RepoCardFlatList({email, isOwner})
     const [flag,setFlag] = React.useState([false]);
     const [userEmail,setUserEmail] = React.useState(email);
 
-    const github_url = "https://github.com/login/oauth/authorize?client_id=105e0b50eefc27b4dc81&redirect_uri=http://3.35.188.47/login/redirect/github/connect";
+    const github_url = "https://github.com/login/oauth/authorize?client_id=105e0b50eefc27b4dc81&redirect_uri=http://localhost:3000/login/redirect/github/connect";
 
     function getGitCode(){
         window.location.replace(github_url)
