@@ -32,6 +32,8 @@ public class UserResponseDto {
         this.userName = user.getNickName();
         this.profileUrl = user.getProfileUrl();
         this.IsOwner = checkIsOwner(user,caller);
+        this.profileMusic = user.getProfileMusic();
+        this.profileMusicUrl = user.getProfileMusicUrl();
     }
 
     public UserResponseDto(User user)

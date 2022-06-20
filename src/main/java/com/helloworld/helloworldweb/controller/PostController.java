@@ -116,25 +116,6 @@ public class PostController {
                 HttpResponseMsg.DELETE_SUCCESS), HttpStatus.OK);
     }
 
-    @GetMapping("/api/post/blogs")
-    //blog 리스트로 썸네일 구성시 사용
-    public ResponseEntity<ApiResponse<PostResponseDtoWithIsOwner>> getBlogs(@RequestHeader(value = "Auth") String jwtToken,
-                                                                            @RequestParam(value = "email") String email) {
-        User findUser = userService.getUserByEmail(email);
-
-        // api 호출한 유저가 게시물의 주인인지 판단
-        User caller = userService.getUserByJwt(jwtToken);
-        boolean isOwner = caller.getId() == findUser.getId();
-
-        List<Post> blogs = postService.getAllUserPosts(findUser.getId(), Category.BLOG);
-
-        PostResponseDtoWithIsOwner responseDtos = new PostResponseDtoWithIsOwner(blogs, isOwner);
-
-        return new ResponseEntity (ApiResponse.response(
-                HttpStatusCode.GET_SUCCESS,
-                HttpResponseMsg.GET_SUCCESS,
-                responseDtos), HttpStatus.OK);
-    }
     @GetMapping("/api/post/blogsPage")
     public ResponseEntity<ApiResponse<List<PostResponseDto>>> getPageBlog(@PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable,
                                                                           @RequestHeader(value = "Auth") String jwtToken,
@@ -149,28 +130,17 @@ public class PostController {
 
         List<Post> blogs = postService.getPageUserPosts(findUser.getId(), Category.BLOG, pageable);
 
-        PostResponseDtoWithIsOwner responseDtos = new PostResponseDtoWithIsOwner(blogs, isOwner, pageNum);
+        List<PostResponseDtoWithUser> responseDtos = blogs.stream()
+                .map(PostResponseDtoWithUser::new)
+                .collect(Collectors.toList());
+
+        PostResponseDtoWithPageNum postResponseDtoWithPageNum = new PostResponseDtoWithPageNum(responseDtos, pageNum, isOwner);
 
         return new ResponseEntity (ApiResponse.response(
                 HttpStatusCode.GET_SUCCESS,
                 HttpResponseMsg.GET_SUCCESS,
-                responseDtos), HttpStatus.OK);
+                postResponseDtoWithPageNum), HttpStatus.OK);
 
-    }
-
-    @GetMapping("/api/post/qnas")
-    public ResponseEntity<ApiResponse<List<PostResponseDto>>> getAllQna() {
-
-        List<Post> qnas = postService.getAllPost(Category.QNA);
-
-        List<PostResponseDto> responseDtos = qnas.stream()
-                                            .map(PostResponseDto::new)
-                                            .collect(Collectors.toList());
-
-        return new ResponseEntity (ApiResponse.response(
-                HttpStatusCode.GET_SUCCESS,
-                HttpResponseMsg.GET_SUCCESS,
-                responseDtos), HttpStatus.OK);
     }
 
     @GetMapping("/api/post/qnasPage")
