@@ -3,33 +3,43 @@ import CustomAppBar from '../../component/appbar/CustomAppBar';
 import { useLocation } from 'react-router';
 import { Box ,Typography ,Button } from '@mui/material';
 import QnAItem from '../../component/questions/QnAItem';
-import { useNavigate } from 'react-router';
+import api from '../../api/api';
+import { useNavigate ,useParams } from 'react-router';
 
-export default function Search(){
+export default function Search( props ){
     const navigate = useNavigate();
-    const { state } = useLocation();
+    const params = useParams();
+    // const state = useLocation();
     const [qnaList,setQnaList] = React.useState([]);
     const [blogList,setBlogList] = React.useState([]);
     
     // Post -> QNA,Blog로 구분
     React.useEffect(() => {
-        let s1 = [];
-        let s2 = [];
-        state.res.map( item => {
-            if ( item.category == "QNA" ) 
-                s1.push(item);
-            else
-                s2.push(item);
-        });
-        setQnaList(s1);
-        setBlogList(s2);
-    },[]);
+
+        api.getSearchedPost({sentence : params.sentence , page: 0 })
+            .then( res => {
+                let s1 = [];
+                let s2 = [];
+                res.map( item => {
+                    if ( item.category == "QNA" ) 
+                        s1.push(item);
+                    else
+                        s2.push(item);
+                });
+                setQnaList(s1);
+                setBlogList(s2); 
+            })
+            .catch( e => {
+            });
+
+        
+    },[ ]);
 
     return(
         <Box sx={{ flexGrow: 1 }}>
             <CustomAppBar />
             <Box sx={{ display: 'flex' ,flexDirection: 'row' }}>
-                        <Typography sx={{ fontSize: 24 ,flex: 1 ,m: 3 }}>"{state.sentence}" 검색 결과</Typography>
+                        <Typography sx={{ fontSize: 24 ,flex: 1 ,m: 3 }}>"{params.sentence}" 검색 결과</Typography>
                         <Button 
                             onClick={() => navigate('/qna/register')}
                             variant='contained' 

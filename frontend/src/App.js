@@ -94,7 +94,7 @@ function App() {
           <Route exact path="/qna/:id" element={<QnA />} />
           <Route exact path="/qna/register" element={<QnARegister />} />
           {/* search */}
-          <Route path="/search" element={<Search />} />
+          <Route path="/search/:sentence" element={<Search />} />
 
           <Route path="/minihome" element={<MiniHome />} />
           <Route path="/minihome/write" element={<WriteBlog />} />

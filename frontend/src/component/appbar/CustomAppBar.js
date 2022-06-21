@@ -21,7 +21,7 @@ export default function(){
     const [userEmail, setUserEmail] = React.useState(null);
     // 사용자 id
     const [userName,setUserName] = React.useState("anonymous");
-    
+
     // 검색어 추천 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [sentence,setSentence] = React.useState("");
@@ -39,13 +39,9 @@ export default function(){
     }
     // 검색 - "Enter" 눌렀을 때  
     const handleSubmit = (event) => {
+       
+        navigate(`/search/${sentence}`);
 
-        api.getSearchedPost({sentence : sentence, page: state.page })
-            .then( res => {
-                
-                navigate('/search',{ state: { res: res , sentence: sentence ,page: state.page } })
-            })
-        .catch()
     }
     
     // 햄버거 메뉴 활성화

@@ -33,10 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -52,7 +49,7 @@ public class PostController {
 
     @PostMapping("/api/post")
     @Transactional
-    public ResponseEntity<ApiResponse<PostResponseDto>> registerPost(@RequestHeader(value = "Auth") String jwtToken,
+    public ResponseEntity<ApiResponse<PostResponseDto>> registerPost(@RequestHeader(value = "Auth",required = false) String jwtToken,
                                                      @RequestParam(value = "content") String content,
                                                      @RequestParam(value = "category") Category category,
                                                      @RequestParam(value = "title") String title,
@@ -208,7 +205,7 @@ public class PostController {
     @GetMapping("/api/post")
     @Transactional
     //Post 하나를 표현할 때 사용.
-    public ResponseEntity<ApiResponse> getPost(@RequestHeader(value = "Auth") String jwtToken,
+    public ResponseEntity<ApiResponse> getPost(@RequestHeader (value = "Auth",required = false) String jwtToken,
                                                @RequestParam(name = "post_id") Long id) {
 
         User caller = userService.getUserByJwt(jwtToken);

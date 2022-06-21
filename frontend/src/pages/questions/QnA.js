@@ -58,7 +58,6 @@ export default function QnA( props ){
 
         api.getPost(state.id)
         .then( res => {
-            console.log(res)
             setPostComment(res.postCommentResponseDtos)
             setTargetUserEmail(res.userResponseDto.email);
             setUserProfileUrl(res.userResponseDto.profileUrl);
