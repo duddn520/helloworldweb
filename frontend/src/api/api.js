@@ -923,6 +923,6 @@ export default { registerUserWithKakao, getGuestBooks, registerUserWithNaver,
     getBlogPosts, registerQnA ,getSearchedPost ,updatePost, deletePost, getPost,
     getOtherUser,registerPostComment,getPostComment,registerPostSubComment,updateNickName 
     ,getUserQnas ,getUserComments, getGithubRepositories, registerUserWithGithub, connectUserToGithub , getNewToken
-    ,updatePostSubComment ,deletePostSubComment, registerBlog, getImgUrl, updateBlog, deleteImgUrl, selectPostComment, deleteGuestBook,updateProfileMusic, alarmTest
+    ,updatePostSubComment ,deletePostSubComment, registerBlog, getImgUrl, updateBlog, deleteImgUrl, selectPostComment, deleteGuestBook,updateProfileMusic
     ,getTopQuestions, updateFcm
 } ;

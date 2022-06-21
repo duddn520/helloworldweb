@@ -60,6 +60,8 @@ public class UserService {
     // JWT를 사용하여 User를 찾아주는 함수
     @Transactional
     public User getUserByJwt(String jwtToken) {
+        if( jwtToken == null )
+            return User.builder().role(Role.GUEST).build();
         String userEmail = jwtTokenProvider.getUserEmail(jwtToken);
         User findUser = getUserByEmail(userEmail);
 
