@@ -4,12 +4,13 @@ import { Box ,Typography ,Button ,ListItem ,Avatar } from '@mui/material';
 import styled from '@emotion/styled';
 export default function QnAItem({item}){
     const navigate = useNavigate();
+    console.log(item)
 
     return(
         <Box border={1} borderColor='rgb(240,240,240)' sx={styles.container}>
             <Box sx={styles.leftBox}>
                 <Typography sx={styles.subinfo}>{item.views} 조회수</Typography>
-                <Typography sx={{ ...styles.subinfo ,fontWeight: 'bold' }}>2 답변</Typography>
+                <Typography sx={{ ...styles.subinfo ,fontWeight: 'bold' }}>{item.numOfSubComments} 답변</Typography>
             </Box>
             <Box sx={styles.rightBox}>
                 <Button 

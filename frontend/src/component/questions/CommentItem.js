@@ -9,7 +9,6 @@ export default function CommentItem({item , reply}){
         <Box border={1} borderColor='rgb(240,240,240)' sx={styles.container}>
             <Box sx={styles.leftBox}>
                 <Typography sx={{ fontSize: 13 ,ml: 2 ,mb: 1  ,textAlign: 'start' ,justifyContent: 'start' }}>{item.views} 조회수</Typography>
-                <Typography sx={{ fontSize: 13 ,ml: 2 ,mb: 1 ,fontWeight: 'bold' }}>2 답변</Typography>
             </Box>
             <Box sx={styles.rightBox}>
                 {/* <Box> */}

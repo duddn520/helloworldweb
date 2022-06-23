@@ -25,29 +25,29 @@ request.interceptors.request.use(
     }
 );
 
-request.interceptors.response.use(
-    (response) => {
-        return response;
-    },
-    (error) => {
+// request.interceptors.response.use(
+//     (response) => {
+//         return response;
+//     },
+//     (error) => {
         
-        // 서버 에러가 난 경우
-        if( error?.response?.status === 500 && hasToken() ){
-            api.getNewToken( window.sessionStorage.getItem("Auth") , window.sessionStorage.getItem("Refresh") )
-            .then( res => {
-                if( res.auth )
-                    window.sessionStorage.setItem("Auth",res.auth);
-                window.location.reload();
-            })
-            .catch( e => {
-                // alert("다시 로그인 해주세요.")
-                // window.sessionStorage.clear();
-                // window.location.replace("/login");
-            })
-        }
-        return Promise.reject(error);
-    }
-);
+//         // 서버 에러가 난 경우
+//         if( error?.response?.status === 500 && hasToken() ){
+//             api.getNewToken( window.sessionStorage.getItem("Auth") , window.sessionStorage.getItem("Refresh") )
+//             .then( res => {
+//                 if( res.auth )
+//                     window.sessionStorage.setItem("Auth",res.auth);
+//                 window.location.reload();
+//             })
+//             .catch( e => {
+//                 // alert("다시 로그인 해주세요.")
+//                 // window.sessionStorage.clear();
+//                 // window.location.replace("/login");
+//             })
+//         }
+//         return Promise.reject(error);
+//     }
+// );
 
 const hasToken = () => {
     if( window.sessionStorage.getItem("Auth") && window.sessionStorage.getItem("Refresh") )

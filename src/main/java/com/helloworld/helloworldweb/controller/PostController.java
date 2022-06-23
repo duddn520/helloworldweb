@@ -137,18 +137,20 @@ public class PostController {
                 HttpStatusCode.GET_SUCCESS,
                 HttpResponseMsg.GET_SUCCESS,
                 postResponseDtoWithPageNum), HttpStatus.OK);
-
     }
 
+    @Transactional
     @GetMapping("/api/post/qnasPage")
     public ResponseEntity<ApiResponse<List<PostResponseDto>>> getPageQna(@PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable) {
 
         List<Post> qnas = postService.getPagePosts(Category.QNA, pageable);
         int pageNum = postService.getAllPostPageNum(Category.QNA);
 
-        List<PostResponseDtoWithUser> responseDtos = qnas.stream()
-                .map(PostResponseDtoWithUser::new)
-                .collect(Collectors.toList());
+        List<PostResponseDtoWithUser> responseDtos = new ArrayList<>();
+        for(Post p : qnas)
+        {
+            responseDtos.add(new PostResponseDtoWithUser(p,postService.getPostCommentNumberByPost(p)));
+        }
 
         PostResponseDtoWithPageNum postResponseDtoWithPageNum = new PostResponseDtoWithPageNum(responseDtos, pageNum);
 

@@ -310,4 +310,10 @@ public class PostService {
         LocalDateTime today = LocalDateTime.of(time.getYear(),time.getMonth(),time.getDayOfMonth(),0,0);
         return postRepository.findTop5ByCreatedTimeGreaterThanEqualAndCategoryOrderByViewsDesc(today, Category.QNA).orElseGet(ArrayList::new);
     }
+
+    @Transactional
+    public int getPostCommentNumberByPost(Post post)
+    {
+        return post.getPostComments().size();
+    }
 }

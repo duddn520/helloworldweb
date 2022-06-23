@@ -21,6 +21,7 @@ public class PostResponseDtoWithUser {
     private Long views;
     private LocalDateTime createdTime;
     private LocalDateTime modifiedTime;
+    private int numOfSubComments;
 
     public PostResponseDtoWithUser(Post post) {
         this.id = post.getId();
@@ -32,5 +33,18 @@ public class PostResponseDtoWithUser {
         this.views = post.getViews();
         this.createdTime = post.getCreatedTime();
         this.modifiedTime = post.getModifiedTime();
+    }
+
+    public PostResponseDtoWithUser (Post post, int numOfSubComments) {
+        this.id = post.getId();
+        this.userResponseDto = new UserResponseDto(post.getUser());
+        this.category = post.getCategory();
+        this.title = post.getTitle();
+        this.content = post.getContent();
+        this.tags = post.getTags();
+        this.views = post.getViews();
+        this.createdTime = post.getCreatedTime();
+        this.modifiedTime = post.getModifiedTime();
+        this.numOfSubComments = numOfSubComments;
     }
 }
