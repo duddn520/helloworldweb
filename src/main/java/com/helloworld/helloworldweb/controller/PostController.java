@@ -48,7 +48,6 @@ public class PostController {
     private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/api/post")
-    @Transactional
     public ResponseEntity<ApiResponse<PostResponseDto>> registerPost(@RequestHeader(value = "Auth",required = false) String jwtToken,
                                                      @RequestParam(value = "content") String content,
                                                      @RequestParam(value = "category") Category category,
@@ -56,7 +55,8 @@ public class PostController {
                                                      @RequestParam(value = "tags", required = false, defaultValue = "") String tags,
                                                      @RequestParam(value = "imageUrlArray", required = false) String urls) throws IOException {
 
-        User findUser = userService.getUserByJwt(jwtToken);
+        User authenticatedUser = userService.getUserByJwt(jwtToken);
+        User findUser = userService.getUserWithPostByEmail(authenticatedUser.getEmail());
         //post 객체 생성
         Post post = Post.builder()
                 .category(category)
@@ -237,7 +237,7 @@ public class PostController {
     }
 
     @PutMapping("/api/post")
-    @Transactional
+//    @Transactional
     public ResponseEntity<ApiResponse<PostResponseDto>> updatePost(@RequestParam(value = "post_id") Long postId,
                                                                    @RequestParam(value = "content") String content,
                                                                    @RequestParam(value = "title") String title,
