@@ -5,6 +5,7 @@ import com.helloworld.helloworldweb.domain.QPost;
 import com.helloworld.helloworldweb.domain.QUser;
 import com.helloworld.helloworldweb.domain.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -16,12 +17,13 @@ import static com.helloworld.helloworldweb.domain.QPost.post;
 import static com.helloworld.helloworldweb.domain.QUser.user;
 
 @Repository
-public class UserRepositoryCustomImpl implements UserRepositoryCustom {
+public class UserRepositoryCustomImpl extends QuerydslRepositorySupport implements UserRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
     private final EntityManager entityManager;
 
     public UserRepositoryCustomImpl(JPAQueryFactory jpaQueryFactory, EntityManager entityManager) {
+        super(User.class);
         this.jpaQueryFactory = jpaQueryFactory;
         this.entityManager = entityManager;
     }
