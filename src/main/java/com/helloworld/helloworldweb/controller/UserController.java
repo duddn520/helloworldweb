@@ -231,6 +231,7 @@ public class UserController extends HttpServlet {
     }
 
     // 특정 유저가 작성한 답변들만 조회
+    @Transactional
     @GetMapping("/api/user/comments")
     public ResponseEntity<ApiResponse<List<PostSubCommentResponseDto>>> getUserComments(@RequestParam(name= "id") Long id){
         List<Pair<Post, PostSubComment>> findAllUserComments = postSubCommentService.getAllUserComments(id);
