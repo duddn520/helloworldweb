@@ -55,6 +55,7 @@ export default function(){
             navigate('/');
         })
         .catch( e => {
+            console.log(e)
             alert("다시 시도해주세요.");
         })
     }

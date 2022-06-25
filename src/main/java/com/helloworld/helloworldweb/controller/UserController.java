@@ -53,6 +53,7 @@ public class UserController extends HttpServlet {
     public ResponseEntity<ApiResponse> registerUserWithKakao(HttpServletRequest request,HttpServletResponse response) throws ParseException {
 
         response.addHeader("Access-Control-Expose-Headers", "Auth");
+        response.addHeader("Access-Control-Expose-Headers", "Refresh");
 
         // 카카오로 부터 받아온 정보로 유저로 등록
         Map<String, Object> stringObjectMap = userService.addKakaoUser(request.getHeader("token"));
@@ -88,6 +89,8 @@ public class UserController extends HttpServlet {
         response.addHeader("Auth", jwt);
         response.addHeader("Refresh",refresh);
         response.addHeader("Access-Control-Expose-Headers", "Auth");
+        response.addHeader("Access-Control-Expose-Headers", "Refresh");
+
 
         return new ResponseEntity<>(ApiResponse.response(
                 HttpStatusCode.POST_SUCCESS,
@@ -99,6 +102,8 @@ public class UserController extends HttpServlet {
     public ResponseEntity<ApiResponse> registerUserWithGithub(@RequestParam(name = "code") String code,HttpServletResponse servletresponse) throws ParseException {
 
         servletresponse.addHeader("Access-Control-Expose-Headers", "Auth");
+        servletresponse.addHeader("Access-Control-Expose-Headers", "Refresh");
+
 
         String token = userService.getGithubAccessTokenByCode(code);
 
@@ -280,8 +285,8 @@ public class UserController extends HttpServlet {
             else{
                 //refreshToken도 만료 -> 다시 로그인
                 return new ResponseEntity (ApiResponse.response(
-                        HttpStatusCode.FORBIDDEN,
-                        HttpResponseMsg.FORBIDDEN), HttpStatus.FORBIDDEN);
+                        HttpStatusCode.NOT_ACCEPTABLE,
+                        HttpResponseMsg.NEED_JOIN), HttpStatus.NOT_ACCEPTABLE);
             }
         }
 
