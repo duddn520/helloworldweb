@@ -51,7 +51,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
-                .anyRequest().permitAll()
+                .antMatchers("/api/user/register/**").permitAll()
+                .antMatchers("/api/search").permitAll()
+                .antMatchers("/api/post/qnasPage").permitAll()
+                .antMatchers("/api/user/getnewtoken").permitAll()
+                .antMatchers("/api/post/top-questions").permitAll()
+                .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
     }
