@@ -46,7 +46,7 @@ public class PostService {
 
     //AWS S3에 파일을 업로드 하는 서비스
     //controller로 부터 Post 객체, User 객체, front에서 받은 file을 받음
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Post addPost(Post post, User user, String[] storedUrls) throws IOException {
 
         //Post와 User 연관관계 맺어줌
@@ -79,7 +79,7 @@ public class PostService {
     }
 
     //로컬에 저장할 때 사용한 함수 -> S3를 사용하는 현재 필요없음.
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void addPostWithImageForLocal(Post post, User user, List<MultipartFile> files) throws IOException {
 
         //Post와 User 연관관계 맺어줌
@@ -203,7 +203,7 @@ public class PostService {
         postRepository.save(post);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Post updatePost(Post post, String title, String content, String tags, String[] storedUrls) throws IOException {
 
         List<PostImage> postImages = post.getPostImages();
