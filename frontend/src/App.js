@@ -15,27 +15,27 @@ import Blog from './pages/Blog';
 import MakeUserName from './pages/MakeUserName';
 import React from 'react';
 import { firebaseApp, vapidKey } from './firebase';
-import { getMessaging, getToken, onMessage, isSupported} from 'firebase/messaging'
+// import { getMessaging, getToken, onMessage, isSu} from 'firebase/messaging'
 import {Button, Row, Col, Toast} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { onBackgroundMessage } from 'firebase/messaging/sw';
 import api from './api/api';
 import { MessageOutlined } from '@mui/icons-material';
 
-const firebaseMessaging = getMessaging(firebaseApp);
+// const firebaseMessaging = getMessaging(firebaseApp);
 
 function App() {
   
   const [show,setShow] = React.useState(false);
   const [notification,setNotification] = React.useState({title:"",body:""});
 
-  if(isSupported){
-  onMessage(firebaseMessaging,(payload)=>{
-    setShow(true);
-    setNotification({title : payload.notification.title, body : payload.notification.body})
-    console.log(payload)
-  });
-}
+  // if(isSupported){
+  // onMessage(firebaseMessaging,(payload)=>{
+  //   setShow(true);
+  //   setNotification({title : payload.notification.title, body : payload.notification.body})
+  //   console.log(payload)
+  // });
+// }
 
 
   // onBackgroundMessage(firebaseMessaging, (payload) => {
@@ -48,26 +48,26 @@ function App() {
   //   };
   // });
 
-  React.useEffect(()=>{
-    if(isSupported)
-    {
-    getToken(firebaseMessaging,{vapidKey:vapidKey})
-    .then((currentToken) => {
-      if(currentToken){
-        console.log(currentToken);
-        window.sessionStorage.setItem("fcm",currentToken);
-      }
-      else
-      {
-        console.log("fcm 획득 실패")
-      }
-    })
-    .catch(function (error) {
-      console.log("FCM Error : ", error);
-    });
-  }
+  // React.useEffect(()=>{
+  //   if(isSupported)
+  //   {
+  //   getToken(firebaseMessaging,{vapidKey:vapidKey})
+  //   .then((currentToken) => {
+  //     if(currentToken){
+  //       console.log(currentToken);
+  //       window.sessionStorage.setItem("fcm",currentToken);
+  //     }
+  //     else
+  //     {
+  //       console.log("fcm 획득 실패")
+  //     }
+  //   })
+  //   .catch(function (error) {
+  //     console.log("FCM Error : ", error);
+  //   });
+  // }
 
-  },[])
+  // },[])
 
   return (
       <BrowserRouter>
