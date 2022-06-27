@@ -15,7 +15,7 @@ import Blog from './pages/Blog';
 import MakeUserName from './pages/MakeUserName';
 import React from 'react';
 import { firebaseApp, vapidKey } from './firebase';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging'
+import { getMessaging, getToken, onMessage, isSupported} from 'firebase/messaging'
 import {Button, Row, Col, Toast} from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { onBackgroundMessage } from 'firebase/messaging/sw';
@@ -29,11 +29,13 @@ function App() {
   const [show,setShow] = React.useState(false);
   const [notification,setNotification] = React.useState({title:"",body:""});
 
+  if(isSupported){
   onMessage(firebaseMessaging,(payload)=>{
     setShow(true);
     setNotification({title : payload.notification.title, body : payload.notification.body})
     console.log(payload)
   });
+}
 
 
   // onBackgroundMessage(firebaseMessaging, (payload) => {
@@ -47,6 +49,8 @@ function App() {
   // });
 
   React.useEffect(()=>{
+    if(isSupported)
+    {
     getToken(firebaseMessaging,{vapidKey:vapidKey})
     .then((currentToken) => {
       if(currentToken){
@@ -61,6 +65,7 @@ function App() {
     .catch(function (error) {
       console.log("FCM Error : ", error);
     });
+  }
 
   },[])
 
