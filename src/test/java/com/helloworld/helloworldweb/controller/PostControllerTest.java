@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@Transactional //테스트 반복을 위해 한 트랜잭션 후에 롤백함.
+//@Transactional //테스트 반복을 위해 한 트랜잭션 후에 롤백함.
 @AutoConfigureMockMvc
 //Post Integration Test
 public class PostControllerTest {
@@ -280,7 +280,8 @@ public class PostControllerTest {
                 .build();
         String testUserJwt = getToken();
         User user = userService.getUserByJwt(testUserJwt);
-        Post savedpost = postService.addPost(newPost, user, null);
+        User findUser = userService.getUserWithPostByEmail(user.getEmail());
+        Post savedpost = postService.addPost(newPost, findUser, null);
 
         MultiValueMap<String, String> requestParam = new LinkedMultiValueMap<>();
         requestParam.set("post_id", savedpost.getId().toString());

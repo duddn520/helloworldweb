@@ -24,10 +24,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +52,11 @@ public class UserService {
     @Transactional
     public User getUserByEmail(String email){
         return userRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
+    }
+
+    @Transactional
+    public User getUserWithPostByEmail(String email){
+        return userRepository.findUserWithPostByEmail(email).orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
     }
 
     // JWT를 사용하여 User를 찾아주는 함수
