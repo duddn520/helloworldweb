@@ -40,7 +40,11 @@ out/
 /logs/local/*.log
 
 ### properties ###
-application.properties
-application-aws.yml
-application-credentials.yml
-helloworldweb-32e96-firebase-adminsdk-nx2kt-0738bbce8d.json
+/src/main/resources/*.properties
+/src/main/resources/*.yml
+/src/main/resources/*.json
+
+/src/test/resources/*.properties
+/src/test/resources/*.yml
+/src/test/resources/*.json
+
