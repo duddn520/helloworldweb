@@ -42,9 +42,17 @@ out/
 ### properties ###
 /src/main/resources/*.properties
 /src/main/resources/*.yml
-/src/main/resources/*.json
 
 /src/test/resources/*.properties
 /src/test/resources/*.yml
+
+### firebase ###
+/src/main/resources/*.json
 /src/test/resources/*.json
+/frontend/src/firebase.js
+
+### redirect urls ###
+/frontend/src/ApiKey.js
+/frontend/src/api/redirectUrl.js
+
 
