@@ -166,7 +166,7 @@ function WriteBlog(){
             if(item.getElementsByTagName('IMG').length !== 0){
                 let images = Array.from(item.getElementsByTagName('IMG'));
                 images.map((img)=>{
-                    imageArray.push(img.currentSrc);
+                    imageArray.push(img.src);
                 })
             }
         });
