@@ -130,11 +130,35 @@ function WriteBlog(){
             console.log(res.data.result)
             const recognizedResult = res.data.result;
             
-            for(let i = 0 ; i<recognizedResult.length ; i++)
-            {
-                let word = recognizedResult[i].recognition_words
-                total += word
-            }
+            let compareY = 0
+            let newline = []
+            let total = ""
+            recognizedResult.map((item, index)=>{
+                let boxes = item.boxes;
+                let word = item.recognition_words;
+                let avgY = (boxes[2][1] + boxes[3][1]) / 2
+                if(Math.abs(avgY - compareY) <= 15){
+                    newline.push({x: boxes[0][0], word: word})
+                    compareY = (avgY + compareY) / 2
+                }
+                else{
+                    newline.sort((a, b) => a.x - b.x);
+                    newline.map((wordItem) =>{
+                        total += wordItem.word;
+                    });
+                    total += "\n";
+                    newline = []
+                    newline.push({x: boxes[0][0], word: word});
+                    compareY = avgY
+                }
+                if(index == recognizedResult.length-1){
+                    newline.sort((a, b) => a.x - b.x);
+                    newline.map((wordItem) =>{
+                        total += wordItem.word
+                    });
+                    total += "\n";
+                }
+            })
             
             try { 
                 // // 정상적으로 업로드 됐다면 로딩 placeholder 삭제 
