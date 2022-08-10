@@ -193,10 +193,9 @@ public class PostController {
 
     //프론트에서 게시물 주인에게만 삭제버튼이 생기므로 호출유저 비교 필요 없음.
     @DeleteMapping("/api/post")
-    @Transactional
     public ResponseEntity<ApiResponse> deletePost(@RequestParam(value = "post_id") Long postId) {
 
-        Post findPost = postService.getPost(postId);
+        Post findPost = postService.getPostWithImages(postId);
         postService.deletePost(findPost);
 
         return new ResponseEntity<>(ApiResponse.response(

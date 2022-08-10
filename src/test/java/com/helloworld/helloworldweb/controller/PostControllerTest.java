@@ -119,11 +119,10 @@ public class PostControllerTest {
                 .category(Category.BLOG)
                 .title("BLOG")
                 .content("hello my name is Jihun")
-//                .postImages(new ArrayList<>())
                 .tags("TEST")
                 .build();
-        String testUserJwt = getToken();
-        User user = userService.getUserByJwt(testUserJwt);
+
+        User user = userService.getUserWithPostByEmail(testEmail);
 
         Post savedpost = postService.addPost(newPost, user, null);
 
@@ -134,11 +133,47 @@ public class PostControllerTest {
         mockMvc.perform(
                 delete("/api/post")
                         .params(requestParam)
+                        .header("Auth", getToken())
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8")
                 )
 
         //then
+                .andExpect(status().isOk());
+    }
+    @Test
+    void 게시물삭제_이미지포함() throws Exception {
+        //given
+        Post newPost = Post.builder()
+                .category(Category.BLOG)
+                .title("BLOG")
+                .content("hello my name is Jihun")
+                .postImages(new ArrayList<>())
+                .tags("TEST")
+                .build();
+
+        User user = userService.getUserWithPostByEmail(testEmail);
+        MockMultipartFile file = new MockMultipartFile("file",
+                "TestImage.png",
+                "image/png",
+                new FileInputStream("/Users/heojihun/Project/helloworldweb/src/test/java/com/helloworld/helloworldweb/controller/TestImage.png"));
+        String uploadImageUrl = fileProcessService.uploadImage(file);
+        String[] storedUrls = new String[]{uploadImageUrl};
+        Post savedpost = postService.addPost(newPost, user, storedUrls);
+
+        MultiValueMap<String, String> requestParam = new LinkedMultiValueMap<>();
+        requestParam.set("post_id", savedpost.getId().toString());
+
+        //when
+        mockMvc.perform(
+                        delete("/api/post")
+                                .params(requestParam)
+                                .header("Auth", getToken())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("UTF-8")
+                )
+
+                //then
                 .andExpect(status().isOk());
     }
 

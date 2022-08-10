@@ -247,6 +247,15 @@ public class PostService {
     }
 
     @Transactional
+    // Post 한 개 조회 + Post의 postImages 까지 한꺼번에 조회
+    // deletPost에서 사용
+    public Post getPostWithImages(Long postId) {
+
+        Post findPost = postRepository.findPostWithImagesById(postId).orElseThrow((()->new IllegalArgumentException("해당 게시물이 존재하지 않습니다.")));
+
+        return findPost;
+    }
+    @Transactional
     public void deletePost(Post post) {
 
         List<PostImage> postImages = post.getPostImages();
