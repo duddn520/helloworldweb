@@ -20,6 +20,7 @@ public class PostResponseDtoWithPageNum {
         this.pageNum = pageNum;
     }
 
+    //조회한 게시물들이 본인의 게시물인지 알 필요가 있을 때 사용 ex) blog
     public PostResponseDtoWithPageNum(List<PostResponseDtoWithUser> responseDtos, int pageNum, boolean IsOwner) {
         this.postResponseDtoWithUser = responseDtos;
         this.pageNum = pageNum;

@@ -139,8 +139,8 @@ public class PostController {
                 postResponseDtoWithPageNum), HttpStatus.OK);
     }
 
-    @Transactional
     @GetMapping("/api/post/qnasPage")
+    @Transactional
     public ResponseEntity<ApiResponse<List<PostResponseDto>>> getPageQna(@PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable) {
 
         List<Post> qnas = postService.getPagePosts(Category.QNA, pageable);
@@ -238,14 +238,13 @@ public class PostController {
     }
 
     @PutMapping("/api/post")
-//    @Transactional
     public ResponseEntity<ApiResponse<PostResponseDto>> updatePost(@RequestParam(value = "post_id") Long postId,
                                                                    @RequestParam(value = "content") String content,
                                                                    @RequestParam(value = "title") String title,
                                                                    @RequestParam(value = "tags", required = false, defaultValue = "") String tags,
                                                                    @RequestParam(value = "imageUrlArray", required = false) String urls) throws IOException {
 
-        Post targetPost = postService.getPost(postId);
+        Post targetPost = postService.getPostWithImages(postId);
 
         String[] storedUrls;
         if(urls != "" && urls != null) {
