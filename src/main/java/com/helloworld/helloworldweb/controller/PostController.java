@@ -212,7 +212,8 @@ public class PostController {
         User caller = userService.getUserByJwt(jwtToken);
         Post post = postService.getPost(id);
         postService.updatePostViews(post);
-        if(post.isSolved()) {
+
+        if(post.isSolved()) { // 채택된 게시글에서는 채택된 답변을 가장 위로 올려야 한다. 댓글의 순서 변경이 필요하다
             List<PostComment> postComments = postCommentService.getPostCommentsInOrder(post);
 
             PostResponseDtoWithPostComments responseDto = new PostResponseDtoWithPostComments(post, postComments, caller);

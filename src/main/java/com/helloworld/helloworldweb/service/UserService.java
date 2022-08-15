@@ -154,7 +154,6 @@ public class UserService {
         requestHeaders.put("Authorization", header);
         String responseBody = get(apiURL,requestHeaders);
 
-        System.out.println("responseBody = " + responseBody);
         return responseBody;
 
     }
@@ -214,10 +213,32 @@ public class UserService {
         HttpURLConnection con = connect(apiUrl);
         try {
             con.setRequestMethod("GET");
+            con.setConnectTimeout(2000);
+            con.setReadTimeout(2000);
+
             for(Map.Entry<String, String> header :requestHeaders.entrySet()) {
                 con.setRequestProperty(header.getKey(), header.getValue());
             }
 
+
+            int responseCode = con.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
+                return readBody(con.getInputStream());
+            } else { // 에러 발생
+                return readBody(con.getErrorStream());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("API 요청과 응답 실패", e);
+        } finally {
+            con.disconnect();
+        }
+    }
+    private static String get(String apiUrl){
+        HttpURLConnection con = connect(apiUrl);
+        try {
+            con.setRequestMethod("GET");
+            con.setConnectTimeout(2000);
+            con.setReadTimeout(2000);
 
             int responseCode = con.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
@@ -277,32 +298,15 @@ public class UserService {
         return (JSONObject) obj2;
     }
 
-    public String getAccessTokenFromNaver(String state, String code) {
+    public String getAccessTokenFromNaver(String state, String code) throws ParseException {
+        String response = get(" https://nid.naver.com/oauth2.0/token?client_id=3RFZ_7joHf_HlJXavuMB&client_secret=luFryHID4J&grant_type=authorization_code&state="+state+"&code="+code);
+        JSONParser parser = new JSONParser();
+        Object obj = parser.parse(response);
+        JSONObject responseJSON = (JSONObject) obj;
 
-        HttpURLConnection con = connect(" https://nid.naver.com/oauth2.0/token?client_id=3RFZ_7joHf_HlJXavuMB&client_secret=luFryHID4J&grant_type=authorization_code&state="+state+"&code="+code);
-        try {
-            con.setRequestMethod("GET");
-            int responseCode = con.getResponseCode();
+        String access_token = responseJSON.getAsString("access_token");
 
-            if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
-                String response = readBody(con.getInputStream());
-
-                JSONParser parser = new JSONParser();
-                Object obj = parser.parse(response);
-                JSONObject responseJSON = (JSONObject) obj;
-
-                String access_token = responseJSON.getAsString("access_token");
-
-                return access_token;
-
-            } else { // 에러 발생
-                throw new RuntimeException("API 엑세스 토큰 요청 실패");
-            }
-        } catch (IOException | ParseException e) {
-            throw new RuntimeException("API 요청과 응답 실패", e);
-        } finally {
-            con.disconnect();
-        }
+        return access_token;
     }
 
     public String getGithubAccessTokenByCode(String code)
