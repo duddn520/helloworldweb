@@ -1,5 +1,7 @@
 package com.helloworld.helloworldweb.service;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.helloworld.helloworldweb.domain.Role;
 import com.helloworld.helloworldweb.domain.User;
 import com.helloworld.helloworldweb.jwt.JwtTokenProvider;
@@ -18,7 +20,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import javax.swing.text.html.Option;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -76,11 +77,16 @@ public class UserService {
         String userInfoFromKakao = getUserInfoFromKakao(accessToken);
 
         //받은 String정보를 JSON 객체화
-        JSONObject userInfo = stringToJson(userInfoFromKakao, "kakao_account");
+        JsonObject total = stringToJson(userInfoFromKakao);
+        String accountInfoString = total.get("kakao_account").toString();
+        JsonObject userInfo = stringToJson(accountInfoString);
+        String profileString = userInfo.get("profile").toString();
+        JsonObject profileInfo = stringToJson(profileString);
+
 
         // 필요한 정보들
-        String email = userInfo.getAsString("email");
-        String profileUrl = ( (JSONObject)userInfo.get("profile") ).getAsString("profile_image_url");
+        String email = userInfo.get("email").getAsString();
+        String profileUrl = profileInfo.get("profile_image_url").getAsString();
 
 
         return addUser(email,profileUrl);
@@ -93,11 +99,14 @@ public class UserService {
         String userInfoRespnoseFromNaver = getUserInfoFromNaver(accessToken);
 
         //받은 String정보를 JSON 객체화
-        JSONObject userInfo = stringToJson(userInfoRespnoseFromNaver, "response");
+        JsonObject total = stringToJson(userInfoRespnoseFromNaver);
+        String accountInfoString = total.get("response").toString();
+        JsonObject userInfo = stringToJson(accountInfoString);
+
 
         // 필요한 정보들
-        String email = userInfo.getAsString("email") + "/";
-        String profileUrl = userInfo.getAsString("profile_image");
+        String email = userInfo.get("email").getAsString() + "/";
+        String profileUrl = userInfo.get("profile_image").getAsString();
 
         return addUser(email, profileUrl);
     }
@@ -289,22 +298,14 @@ public class UserService {
 
     }
 
-    private JSONObject stringToJson(String str, String key) throws ParseException {
-        JSONParser jsonParser = new JSONParser();
-        Object obj = jsonParser.parse(str);
-        JSONObject newJson = (JSONObject) obj;
-
-        Object obj2 = jsonParser.parse(newJson.getAsString(key));
-        return (JSONObject) obj2;
+    private JsonObject stringToJson(String str) {
+        JsonObject json = JsonParser.parseString(str).getAsJsonObject();
+        return json;
     }
 
     public String getAccessTokenFromNaver(String state, String code) throws ParseException {
         String response = get(" https://nid.naver.com/oauth2.0/token?client_id=3RFZ_7joHf_HlJXavuMB&client_secret=luFryHID4J&grant_type=authorization_code&state="+state+"&code="+code);
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(response);
-        JSONObject responseJSON = (JSONObject) obj;
-
-        String access_token = responseJSON.getAsString("access_token");
+        String access_token = stringToJson(response).get("access_token").getAsString();
 
         return access_token;
     }
