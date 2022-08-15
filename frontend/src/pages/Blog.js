@@ -83,6 +83,14 @@ function Blog(){
         })
     }
 
+    function timeToString(s){
+        let date = s.split("T")[0];
+        let time = s.split("T")[1];
+        let hm = time.split(":")[0] +":"+ time.split(":")[1];
+
+        return  date+ " "+hm;
+    }
+
     return(
         <div>
             {post === null ? 
@@ -98,7 +106,8 @@ function Blog(){
                         <SmallUserProfile userInfo={post.userResponseDto}/>
                         <Box sx={{justifyContent: 'space-between', display: 'flex', width: '100%', marginBottom: 1}}>
                             <Typography sx={{fontWeight :'bold', fontSize: 20, color: 'gray'}}>{'태그: '+post.tags}</Typography>
-                            <Typography sx={{fontWeight :'bold', fontSize: 15}}>{(post.modifiedTime === null || post.modifiedTime === post.createdTime) ? post.createdTime : post.modifiedTime+' (수정됨)'}</Typography>
+                            {/* <Typography sx={{fontWeight :'bold', fontSize: 15}}>{(post.modifiedTime === post.createdTime) ? timeToString(post.createdTime) : timeToString(post.modifiedTime)+' (수정됨)'}</Typography> */}
+                            <Typography sx={{fontWeight :'bold', fontSize: 15}}>{timeToString(post.createdTime)}</Typography>
                         </Box>
                     </TitleBox>
 

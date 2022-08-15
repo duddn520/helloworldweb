@@ -13,15 +13,8 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class PostResponseDtoWithPostComments {
-    private Long id;
+public class PostResponseDtoWithPostComments extends PostResponseDto {
     private UserResponseDto userResponseDto;
-    private Category category;
-    private String title;
-    private String content;
-    private String tags;
-    private String createdTime;
-    private String modifiedTime;
     private List<PostCommentResponseDto> postCommentResponseDtos = new ArrayList<>();
     private List<PostImageResponseDto> postImageResponseDtos = new ArrayList<>();
     private boolean IsOwner;
@@ -29,14 +22,8 @@ public class PostResponseDtoWithPostComments {
 
     // 한 게시물 전체를 표현하기 위해 필요한 정보
     public PostResponseDtoWithPostComments(Post post, User caller) {
-        this.id = post.getId();
+        super(post);
         this.userResponseDto = new UserResponseDto(post.getUser(), caller);
-        this.category = post.getCategory();
-        this.title = post.getTitle();
-        this.content = post.getContent();
-        this.tags = post.getTags();
-        this.createdTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(post.getCreatedTime());
-        this.modifiedTime = post.getModifiedTime() != null ? DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(post.getModifiedTime()) : null;
         this.postCommentResponseDtos = postCommentsToResponseDtos(post.getPostComments(),caller);
         this.postImageResponseDtos = postImageResponseDtos(post.getPostImages());
         this.IsOwner = checkIsOwner(post.getUser(),caller);
@@ -44,14 +31,8 @@ public class PostResponseDtoWithPostComments {
     }
     //공급받은 PostComment List로 ResponseDto 제작하는 생성자.
     public PostResponseDtoWithPostComments(Post post,List<PostComment> postComments, User caller) {
-        this.id = post.getId();
+        super(post);
         this.userResponseDto = new UserResponseDto(post.getUser(), caller);
-        this.category = post.getCategory();
-        this.title = post.getTitle();
-        this.content = post.getContent();
-        this.tags = post.getTags();
-        this.createdTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(post.getCreatedTime());
-        this.modifiedTime = post.getModifiedTime() != null ? DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(post.getModifiedTime()) : null;
         this.postCommentResponseDtos = postCommentsToResponseDtos(postComments,caller);
         this.postImageResponseDtos = postImageResponseDtos(post.getPostImages());
         this.IsOwner = checkIsOwner(post.getUser(),caller);
