@@ -72,7 +72,7 @@ const BlogComment = ({postComment, MyInfo, afterSaveSubComment}) => {
                                     {subComment.isOwner && <Typography sx={{fontSize: 13, color: 'gray'}} onClick={()=>{openCommentModifyEditor(index)}}>수정</Typography>}
                                 </Box>
                                 <Typography>{subComment.content}</Typography>
-                                <Typography sx={{fontSize: 14, color: 'lightgray'}}>{(subComment.modifiedTime === null || subComment.modifiedTime === subComment.createdTime) ? subComment.createdTime : subComment.modifiedTime}</Typography>
+                                <Typography sx={{fontSize: 14, color: 'lightgray'}}>{(subComment.modifiedTime === subComment.createdTime) ? subComment.createdTime : subComment.modifiedTime}</Typography>
                                 <SubCommentBtn onClick={()=>{openCommentEditer()}}>
                                     <Typography sx={{fontSize: 12, fontWeight: 'bold'}}>답글</Typography>
                                 </SubCommentBtn>
@@ -94,7 +94,7 @@ const BlogComment = ({postComment, MyInfo, afterSaveSubComment}) => {
                                         {subComment.isOwner && <Typography sx={{fontSize: 13, color: 'gray'}} onClick={()=>{openCommentModifyEditor(index)}}>수정</Typography>}
                                     </Box>
                                     <Typography>{subComment.content}</Typography>
-                                    <Typography sx={{fontSize: 14, color: 'lightgray'}}>{(subComment.modifiedTime === null || subComment.modifiedTime === subComment.createdTime) ? subComment.createdTime : subComment.modifiedTime}</Typography>
+                                    <Typography sx={{fontSize: 14, color: 'lightgray'}}>{(subComment.modifiedTime === subComment.createdTime) ? subComment.createdTime : subComment.modifiedTime}</Typography>
                                 </Box>
                             </SubCommentBundle>
                             {index === modifyTargetIndex && <CommentEditor myInfo={myInfo} isOpenCommentEditer={true} openCommentEditer={()=>{}} commentType={"SUBCOMMENT"} afterSaveComment={()=>{afterSaveSubComment(); setIsOpenSubCommentEditor(false);}} postCommentId={postComment.id} modify={true}/>}

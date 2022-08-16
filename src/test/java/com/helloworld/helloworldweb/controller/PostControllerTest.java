@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-//@Transactional //테스트 반복을 위해 한 트랜잭션 후에 롤백함.
+@Transactional //테스트 반복을 위해 한 트랜잭션 후에 롤백함.
 @AutoConfigureMockMvc
 //Post Integration Test
 public class PostControllerTest {
@@ -119,11 +119,10 @@ public class PostControllerTest {
                 .category(Category.BLOG)
                 .title("BLOG")
                 .content("hello my name is Jihun")
-//                .postImages(new ArrayList<>())
                 .tags("TEST")
                 .build();
-        String testUserJwt = getToken();
-        User user = userService.getUserByJwt(testUserJwt);
+
+        User user = userService.getUserWithPostByEmail(testEmail);
 
         Post savedpost = postService.addPost(newPost, user, null);
 
@@ -134,6 +133,7 @@ public class PostControllerTest {
         mockMvc.perform(
                 delete("/api/post")
                         .params(requestParam)
+                        .header("Auth", getToken())
                         .contentType(MediaType.APPLICATION_JSON)
                         .characterEncoding("UTF-8")
                 )
@@ -141,90 +141,44 @@ public class PostControllerTest {
         //then
                 .andExpect(status().isOk());
     }
-
     @Test
-    void QNA전체조회() throws Exception  {
+    void 게시물삭제_이미지포함() throws Exception {
         //given
-        String testUserJwt = getToken();
-        User user = userService.getUserByJwt(testUserJwt);
-
-        Post newQna = Post.builder()
-                .category(Category.QNA)
-                .title("QNA")
-                .content("I have a question")
-//                .postImages(new ArrayList<>())
-                .tags("TEST")
-                .build();
-        Post savedQna = postService.addPost(newQna, user, null);
-
-        Post newBlog = Post.builder()
+        Post newPost = Post.builder()
                 .category(Category.BLOG)
                 .title("BLOG")
                 .content("hello my name is Jihun")
-//                .postImages(new ArrayList<>())
+                .postImages(new ArrayList<>())
                 .tags("TEST")
                 .build();
-        Post savedBlog = postService.addPost(newBlog, user, null);
 
-        //when
-        mockMvc.perform(
-                get("/api/post/qnas")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding("UTF-8")
-        )
+        User user = userService.getUserWithPostByEmail(testEmail);
 
-        //then
-                .andExpect(status().isOk());
-        List<Post> qnas = postRepository.findByCategory(Category.QNA).get();
-        //이미 저장된 블로그까지 불러오므로 local DB 에서 create 했을때만 사용
-//        assertThat(qnas.toArray().length).isEqualTo(1);
-        assertThat(savedQna).isEqualTo(qnas.get(qnas.toArray().length - 1 ));
-    }
+        MockMultipartFile file = new MockMultipartFile("file",
+                "TestImage.png",
+                "image/png",
+                new FileInputStream("/Users/heojihun/Project/helloworldweb/src/test/java/com/helloworld/helloworldweb/controller/TestImage.png"));
 
-    @Test
-    void 사용자의블로그조회() throws Exception {
-        //given
-        String testUserJwt = getToken();
-        User user = userService.getUserByJwt(testUserJwt);
-
-        Post newQna = Post.builder()
-                .category(Category.QNA)
-                .title("QNA")
-                .content("I have a question")
-//                .postImages(new ArrayList<>())
-                .tags("TEST")
-                .build();
-        Post savedQna = postService.addPost(newQna, user, null);
-
-        Post newBlog = Post.builder()
-                .category(Category.BLOG)
-                .title("BLOG")
-                .content("hello my name is Jihun")
-//                .postImages(new ArrayList<>())
-                .tags("TEST")
-                .build();
-        Post savedBlog = postService.addPost(newBlog, user, null);
+        String uploadImageUrl = fileProcessService.uploadImage(file);
+        String[] storedUrls = new String[]{uploadImageUrl};
+        Post savedpost = postService.addPost(newPost, user, storedUrls);
 
         MultiValueMap<String, String> requestParam = new LinkedMultiValueMap<>();
-        requestParam.set("email", testEmail);
+        requestParam.set("post_id", savedpost.getId().toString());
 
         //when
         mockMvc.perform(
-                get("/api/post/blogs")
-                        .params(requestParam)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .characterEncoding("UTF-8")
-                        .header("Auth",testUserJwt)
-        )
+                        delete("/api/post")
+                                .params(requestParam)
+                                .header("Auth", getToken())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .characterEncoding("UTF-8")
+                )
 
-        //then
+                //then
                 .andExpect(status().isOk());
-
-        List<Post> blogs = postRepository.findByUserIdAndCategory(user.getId(), Category.BLOG).get();
-        //이미 저장된 블로그까지 불러오므로 local DB 에서 create 했을때만 사용
-//        assertThat(blogs.toArray().length).isEqualTo(1);
-        assertThat(savedBlog).isEqualTo(blogs.get(blogs.toArray().length - 1));
     }
+
 
     @Test
     void 게시물_하나_조회() throws Exception {
@@ -233,12 +187,11 @@ public class PostControllerTest {
                 .category(Category.BLOG)
                 .title("BLOG")
                 .content("hello my name is Jihun")
-//                .postImages(new ArrayList<>())
                 .postComments(new ArrayList<>())
                 .tags("TEST")
                 .build();
-        String testUserJwt = getToken();
-        User user = userService.getUserByJwt(testUserJwt);
+
+        User user = userService.getUserWithPostByEmail(testEmail);
 
         Post savedpost = postService.addPost(newPost, user, null);
 
@@ -275,12 +228,10 @@ public class PostControllerTest {
                 .category(Category.BLOG)
                 .title("BLOG")
                 .content("hello my name is Jihun")
-//                .postImages(new ArrayList<>())
                 .tags("TEST")
                 .build();
-        String testUserJwt = getToken();
-        User user = userService.getUserByJwt(testUserJwt);
-        User findUser = userService.getUserWithPostByEmail(user.getEmail());
+
+        User findUser = userService.getUserWithPostByEmail(testEmail);
         Post savedpost = postService.addPost(newPost, findUser, null);
 
         MultiValueMap<String, String> requestParam = new LinkedMultiValueMap<>();
@@ -380,8 +331,8 @@ public class PostControllerTest {
                     .postComments(new ArrayList<>())
                     .tags("TEST")
                     .build();
-            String testUserJwt = getToken();
-            User user = userService.getUserByJwt(testUserJwt);
+
+            User user = userService.getUserWithPostByEmail(testEmail);
             postService.addPost(newPost, user, null);
         }
         for(int i =0 ; i< 30; i++){
@@ -392,8 +343,8 @@ public class PostControllerTest {
                     .postComments(new ArrayList<>())
                     .tags("TEST")
                     .build();
-            String testUserJwt = getToken();
-            User user = userService.getUserByJwt(testUserJwt);
+
+            User user = userService.getUserWithPostByEmail(testEmail);
             postService.addPost(newPost, user, null);
         }
 
@@ -428,8 +379,8 @@ public class PostControllerTest {
                     .postComments(new ArrayList<>())
                     .tags("TEST")
                     .build();
-            String testUserJwt = getToken();
-            User user = userService.getUserByJwt(testUserJwt);
+
+            User user = userService.getUserWithPostByEmail(testEmail);
             postService.addPost(newPost, user, null);
         }
         for(int i =0 ; i< 30; i++){
@@ -440,8 +391,8 @@ public class PostControllerTest {
                     .postComments(new ArrayList<>())
                     .tags("TEST")
                     .build();
-            String testUserJwt = getToken();
-            User user = userService.getUserByJwt(testUserJwt);
+
+            User user = userService.getUserWithPostByEmail(testEmail);
             postService.addPost(newPost, user, null);
         }
 

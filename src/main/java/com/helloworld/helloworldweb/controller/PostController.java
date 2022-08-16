@@ -139,8 +139,8 @@ public class PostController {
                 postResponseDtoWithPageNum), HttpStatus.OK);
     }
 
-    @Transactional
     @GetMapping("/api/post/qnasPage")
+    @Transactional
     public ResponseEntity<ApiResponse<List<PostResponseDto>>> getPageQna(@PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable) {
 
         List<Post> qnas = postService.getPagePosts(Category.QNA, pageable);
@@ -193,10 +193,9 @@ public class PostController {
 
     //프론트에서 게시물 주인에게만 삭제버튼이 생기므로 호출유저 비교 필요 없음.
     @DeleteMapping("/api/post")
-    @Transactional
     public ResponseEntity<ApiResponse> deletePost(@RequestParam(value = "post_id") Long postId) {
 
-        Post findPost = postService.getPost(postId);
+        Post findPost = postService.getPostWithImages(postId);
         postService.deletePost(findPost);
 
         return new ResponseEntity<>(ApiResponse.response(
@@ -213,7 +212,8 @@ public class PostController {
         User caller = userService.getUserByJwt(jwtToken);
         Post post = postService.getPost(id);
         postService.updatePostViews(post);
-        if(post.isSolved()) {
+
+        if(post.isSolved()) { // 채택된 게시글에서는 채택된 답변을 가장 위로 올려야 한다. 댓글의 순서 변경이 필요하다
             List<PostComment> postComments = postCommentService.getPostCommentsInOrder(post);
 
             PostResponseDtoWithPostComments responseDto = new PostResponseDtoWithPostComments(post, postComments, caller);
@@ -239,14 +239,13 @@ public class PostController {
     }
 
     @PutMapping("/api/post")
-//    @Transactional
     public ResponseEntity<ApiResponse<PostResponseDto>> updatePost(@RequestParam(value = "post_id") Long postId,
                                                                    @RequestParam(value = "content") String content,
                                                                    @RequestParam(value = "title") String title,
                                                                    @RequestParam(value = "tags", required = false, defaultValue = "") String tags,
                                                                    @RequestParam(value = "imageUrlArray", required = false) String urls) throws IOException {
 
-        Post targetPost = postService.getPost(postId);
+        Post targetPost = postService.getPostWithImages(postId);
 
         String[] storedUrls;
         if(urls != "" && urls != null) {
